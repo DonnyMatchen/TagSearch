@@ -1,7 +1,7 @@
-import express, { Express, Request, Response, Router } from "express";
-import { body, validationResult, query } from 'express-validator';
+import express, { Router } from "express";
+import { body, validationResult } from 'express-validator';
 
-import { DataHandler, Item, ItemType, Role, SearchResults, Tag, TagType, User, roleToString } from '@rt/data';
+import { DataHandler, Item, ItemType, Role, Tag, TagType, User, roleToString } from '@rt/data';
 import getArguments from "@utl/getArguments";
 
 export default function post(dataHandler: DataHandler): Router {
@@ -75,7 +75,7 @@ export default function post(dataHandler: DataHandler): Router {
                                 dataHandler, req.session.user, req.query, req.body, 'item', false, false,
                                 [], ['Item created successfully.']
                             ).then(args => res.render("create-edit", args));
-                        }, error => {
+                        }, (error:Error) => {
                             errors.push(error.message);
                         });
                     })
@@ -95,7 +95,7 @@ export default function post(dataHandler: DataHandler): Router {
                             dataHandler, req.session.user, req.query, req.body, 'item', false, false,
                             [], ['Item updated successfully.']
                         ).then(args => res.render("create-edit", args));
-                    }, error => {
+                    }, (error:Error) => {
                         errors.push(error.message);
                     });
                 }
@@ -178,7 +178,7 @@ export default function post(dataHandler: DataHandler): Router {
                         await dataHandler.getTag(req.body.prnt)
                         .then(found => {
                             parent = found;
-                        }, error => {
+                        }, (error:Error) => {
                             errors.push('Parent is an invalid tag.');
                         });
                     }
@@ -193,7 +193,7 @@ export default function post(dataHandler: DataHandler): Router {
                                     dataHandler, req.session.user, req.query, req.body, 'tag', false, false,
                                     [], ['Tag created successfully.']
                                 ).then(args => res.render("create-edit", args));
-                            }, error => {
+                            }, (error:Error) => {
                                 errors.push(error.message);
                             });
                         } else {
@@ -206,13 +206,13 @@ export default function post(dataHandler: DataHandler): Router {
                                     dataHandler, req.session.user, req.query, req.body, 'tag', false, false,
                                     [], ['Tag updated successfully.']
                                 ).then(args => res.render("create-edit", args));
-                            }, error => {
+                            }, (error:Error) => {
                                 errors.push(error.message);
                             });
                         }
                     }
                 }
-            }, error => {
+            }, (error:Error) => {
                 errors.push('Parent is an invalid tag.');
             }).finally(() => {
                 if(!errorList.isEmpty() || errors.length > 0) {
@@ -284,7 +284,7 @@ export default function post(dataHandler: DataHandler): Router {
                             dataHandler, req.session.user, req.query, req.body, 'tagType', false, false,
                             [], ['Tag Type created successfully.']
                         ).then(args => res.render('create-edit', args));
-                    }, error => {
+                    }, (error:Error) => {
                         errors.push(error.message);
                     });
                 } else {
@@ -295,7 +295,7 @@ export default function post(dataHandler: DataHandler): Router {
                             dataHandler, req.session.user, req.query, req.body, 'tagType', false, false,
                             [], ['Tag Type updated successfully.']
                         ).then(args => res.render('create-edit', args));
-                    }, error => {
+                    }, (error:Error) => {
                         errors.push(error.message);
                     });
                 }
@@ -384,7 +384,7 @@ export default function post(dataHandler: DataHandler): Router {
                                 dataHandler, req.session.user, req.query, req.body, 'user', false, false,
                                 [], ['User created successfully.']
                             ).then(args => res.render('create-edit', args));
-                        }, error => {
+                        }, (error:Error) => {
                             errors.push(error.message);
                         });
                     } else {
@@ -393,12 +393,12 @@ export default function post(dataHandler: DataHandler): Router {
                                 dataHandler, req.session.user, req.query, req.body, 'user', false, false,
                                 [], ['User updated successfully.']
                             ).then(args => res.render('create-edit', args));
-                        }, error => {
+                        }, (error:Error) => {
                             errors.push(error.message);
                         });
                     }
                 }
-            }, error => {
+            }, (error:Error) => {
                 errors.push('There was an error setting the password.');
             }).finally(() => {
                 if(!errorList.isEmpty || errors.length > 0) {
@@ -476,7 +476,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getItem(+query.edit).then(item => {
                     vals = new RetItemHolder(`${item.id}`, item.source, `${item.date}`, item.tags.join(' '), item.desc);
-                }, error => {
+                }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
                     }
@@ -500,7 +500,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getTag(query.edit).then(tag => {
                     vals = new TagHolder(tag.name, tag.type, tag.parent == null ? '' : tag.parent);
-                }, error => {
+                }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
                     }
@@ -521,7 +521,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getTagType(query.edit).then(type => {
                     vals = new TagTypeHolder(type.name, type.color, `${type.order}`);
-                }, error => {
+                }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
                     }
@@ -543,7 +543,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getUser(query.edit).then(user => {
                     vals = new UserHolder(user.username, '', roleToString(user.role));
-                }, error => {
+                }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
                     }

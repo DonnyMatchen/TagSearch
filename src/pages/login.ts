@@ -1,5 +1,5 @@
-import express, { Express, Request, Response, Router } from "express";
-import { body, validationResult, query } from 'express-validator';
+import express, { Router } from "express";
+import { body, validationResult } from 'express-validator';
 
 import { DataHandler, User, UserState } from "@rt/data";
 import getArguments from "@utl/getArguments";
@@ -38,13 +38,13 @@ export default function login(dataHandler: DataHandler): Router {
                         } else {
                             failure = true;
                         }
-                    }, error => {
+                    }, (error:Error) => {
                         failure = true;
                     });
                 } else {
                     res.redirect(`/login/set?username=${user.username}`);
                 }
-            }, error => {
+            }, (error:Error) => {
                 failure = true;
             });
         } else {
@@ -114,14 +114,14 @@ export default function login(dataHandler: DataHandler): Router {
                             },
                             [], ['Password chagned successfully!']
                         ));
-                    }, error => {
+                    }, (error:Error) => {
                         errors.push(error.message);
                     });
-                }, error => {
+                }, (error:Error) => {
                     errors.push(error.message);
                 });
             }
-        }, error => {
+        }, (error:Error) => {
             errors.push(error.message);
         }).finally(() => {
             if(!errorList.isEmpty() || errors.length > 0) {
@@ -210,14 +210,14 @@ export default function login(dataHandler: DataHandler): Router {
                             },
                             [], ['Password chagned successfully!']
                         ));
-                    }, error => {
+                    }, (error:Error) => {
                         errors.push(error.message);
                     });
-                }, error => {
+                }, (error:Error) => {
                     errors.push(error.message);
                 });
             }
-        }, error => {
+        }, (error:Error) => {
             errors.push(error.message);
         }).finally(() => {
             if(!errorList.isEmpty() || errors.length > 0) {

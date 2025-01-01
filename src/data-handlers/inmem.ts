@@ -1,4 +1,4 @@
-import { TagType, Tag, Item, DataHandler, SearchOptions, SearchResults, User, getRandomString, Role, UserError, TagError, TagTypeError, ItemError } from "@rt/data";
+import { TagType, Tag, Item, DataHandler, SearchOptions, SearchResults, User, getRandomString, Role } from "@rt/data";
 
 export default class InMem extends DataHandler {
     //InMem data-stores
@@ -163,11 +163,11 @@ export default class InMem extends DataHandler {
                         out.push(item);
                     }
                 });
-            }, (error:TagError) => {
+            }, (error:Error) => {
                 errorString = error.message;
             });
             if(errorString != '') {
-                throw new TagError(errorString);
+                throw new Error(errorString);
             }
             if(pageSize <= 0) {
                 return new SearchResults(out, out.length, 1);
@@ -185,7 +185,7 @@ export default class InMem extends DataHandler {
     async getUser(userName: string): Promise<User> {
         let user: User = this.users.get(userName);;
         if(user == undefined) {
-            throw new UserError(`${userName} not found.`);
+            throw new Error(`${userName} not found.`);
         } else {
             return user;
         }
@@ -193,7 +193,7 @@ export default class InMem extends DataHandler {
     async getTag(name: string): Promise<Tag> {
         let tag: Tag = this.tags.get(name);;
         if(tag == undefined) {
-            throw new TagError(`${name} not found.`);
+            throw new Error(`${name} not found.`);
         } else {
             return tag;
         }
@@ -201,7 +201,7 @@ export default class InMem extends DataHandler {
     async getTagType(name: string): Promise<TagType> {
         let type: TagType = this.tagTypes.get(name);;
         if(type == undefined) {
-            throw new TagTypeError(`${name} not found.`);
+            throw new Error(`${name} not found.`);
         } else {
             return type;
         }
@@ -209,7 +209,7 @@ export default class InMem extends DataHandler {
     async getItem(id: number): Promise<Item> {
         let item: Item = this.items.get(id);;
         if(item == undefined) {
-            throw new ItemError(`${id} not found.`);
+            throw new Error(`${id} not found.`);
         } else {
             return item;
         }
@@ -237,7 +237,7 @@ export default class InMem extends DataHandler {
         if(error != '') {
             return out;
         } else {
-            throw new TagError(error);
+            throw new Error(error);
         }
     }
     getTagTypes(names: string[]): TagType[] {
@@ -254,7 +254,7 @@ export default class InMem extends DataHandler {
         if(error != '') {
             return out;
         } else {
-            throw new TagTypeError(error);
+            throw new Error(error);
         }
     }
     getItems(ids: number[]): Item[] {
@@ -271,35 +271,35 @@ export default class InMem extends DataHandler {
         if(error != '') {
             return out;
         } else {
-            throw new ItemError(error);
+            throw new Error(error);
         }
     }
 
     //Adders
     async addUser(user: User) {
         if(this.users.has(user.username)) {
-            throw new UserError('User already exists.');
+            throw new Error('User already exists.');
         } else {
             this.users.set(user.username, user);
         }
     }
     async addTag(tag: Tag) {
         if(this.tags.has(tag.name)) {
-            throw new TagError('Tag already exists');
+            throw new Error('Tag already exists');
         } else {
             this.tags.set(tag.name, tag);
         }
     }
     async addTagType(type: TagType) {
         if(this.tagTypes.has(type.name)) {
-            throw new TagTypeError('Tag Type already exists.');
+            throw new Error('Tag Type already exists.');
         } else {
             this.tagTypes.set(type.name, type);
         }
     }
     async addItem(item: Item) {
         if(this.items.has(item.id)) {
-            throw new ItemError('Item already exists');
+            throw new Error('Item already exists');
         } else {
             this.items.set(item.id, item);
         }
@@ -313,11 +313,11 @@ export default class InMem extends DataHandler {
             old.hash = user.hash;
             old.salt = user.salt;
             old.state = user.state;
-        }, async (error:UserError) => {
-            await this.addUser(user).then(() => {}, (error:UserError) => {errorString = error.message;});
+        }, async (error:Error) => {
+            await this.addUser(user).then(() => {}, (error:Error) => {errorString = error.message;});
         });
         if (errorString != '') {
-            throw new UserError(`Unable to update user "${user.username}".\nThis was caused by: ${errorString}`);
+            throw new Error(`Unable to update user "${user.username}".\nThis was caused by: ${errorString}`);
         }
     }
     async updateTag(tag: Tag) {
@@ -325,11 +325,11 @@ export default class InMem extends DataHandler {
         await this.getTag(tag.name).then(old => {
             old.type = tag.type;
             old.parent = tag.parent;
-        }, async (error:TagError) => {
-            await this.addTag(tag).then(() => {}, (error:TagError) => {errorString = error.message;});
+        }, async (error:Error) => {
+            await this.addTag(tag).then(() => {}, (error:Error) => {errorString = error.message;});
         });
         if (errorString != '') {
-            throw new TagError(`Unable to update tag "${tag.name}".\nThis was caused by: ${errorString}`);
+            throw new Error(`Unable to update tag "${tag.name}".\nThis was caused by: ${errorString}`);
         }
     }
     async updateTagType(type: TagType) {
@@ -337,11 +337,11 @@ export default class InMem extends DataHandler {
         await this.getTagType(type.name).then(old => {
             old.color = type.color;
             old.order = type.order;
-        }, async (error:TagTypeError) => {
-            await this.addTagType(type).then(() => {}, (error:TagTypeError) => {errorString = error.message;});
+        }, async (error:Error) => {
+            await this.addTagType(type).then(() => {}, (error:Error) => {errorString = error.message;});
         });
         if (errorString != '') {
-            throw new TagTypeError(`Unable to update tag type "${type.name}".\nThis was caused by: ${errorString}`);
+            throw new Error(`Unable to update tag type "${type.name}".\nThis was caused by: ${errorString}`);
         }
     }
     async updateItem(item: Item, tags: string[]) {
@@ -351,11 +351,11 @@ export default class InMem extends DataHandler {
             old.desc = item.desc;
             old.pub = item.pub;
             old.tagsChanged(this, tags);
-        }, async (error:ItemError) => {
-            await this.addItem(item).then(() => {}, (error:ItemError) => {errorString = error.message});
+        }, async (error:Error) => {
+            await this.addItem(item).then(() => {}, (error:Error) => {errorString = error.message});
         });
         if (errorString != '') {
-            throw new ItemError(`Unable to update item "${item.id}".\nThis was caused by: ${errorString}`);
+            throw new Error(`Unable to update item "${item.id}".\nThis was caused by: ${errorString}`);
         }
     }
 
@@ -369,7 +369,7 @@ export default class InMem extends DataHandler {
                 }
             });
             if(admins < 2) {
-                throw new UserError('There must be at least one admin account.')
+                throw new Error('There must be at least one admin account.')
             }
         }
         this.users.delete(user.username);

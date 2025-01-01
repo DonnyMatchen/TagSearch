@@ -1,5 +1,5 @@
-import express, { Express, Request, Response, Router } from "express";
-import Data, { DataHandler, Item, Tag, TagError, TagType } from '@rt/data';
+import express, { Router } from "express";
+import Data, { DataHandler, Tag, TagType } from '@rt/data';
 import getArguments from "@utl/getArguments";
 
 export default function item(dataHandler: DataHandler): Router {
@@ -50,7 +50,7 @@ export default function item(dataHandler: DataHandler): Router {
                     ['You do not have access to this item.']
                 ));
             }
-        }, error => {
+        }, (error:Error) => {
             res.render('item', getArguments(
                 req.session.user,
                 'Item',

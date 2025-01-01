@@ -1,5 +1,5 @@
-import express, { Express, Request, Response, Router } from "express";
-import { DataHandler, Item, ItemError, SearchResults, Tag, TagError, TagType, TagTypeError, UserError } from '@rt/data';
+import express, { Router } from "express";
+import { DataHandler, TagType } from '@rt/data';
 import partition from "@utl/partition";
 import getArguments from "@utl/getArguments";
 
@@ -30,7 +30,7 @@ export default function search(dataHandler: DataHandler): Router {
                     page: +page
                 }
             ));
-        }, (error:TagError) => {
+        }, (error:Error) => {
             res.render('search', getArguments(
                 req.session.user,
                 'Search',
@@ -153,7 +153,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         },
                                         [], ['Item deleted successfuly.']
                                     ));
-                                }, (error:TagError) => {
+                                }, (error:Error) => {
                                     res.render('search', getArguments(
                                         req.session.user,
                                         'Search',
@@ -169,10 +169,10 @@ export default function search(dataHandler: DataHandler): Router {
                                         [error.message]
                                     ));
                                 });
-                            }, (error:ItemError) => {
+                            }, (error:Error) => {
                                 skip = true;
                             });
-                        }, (error:ItemError) => {
+                        }, (error:Error) => {
                             skip = true;
                         });
                     }
@@ -199,7 +199,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         },
                                         [], ['Tag deleted successfuly.']
                                     ));
-                                }, (error:TagError) => {
+                                }, (error:Error) => {
                                     res.render('search', getArguments(
                                         req.session.user,
                                         'Search',
@@ -215,10 +215,10 @@ export default function search(dataHandler: DataHandler): Router {
                                         [error.message]
                                     ));
                                 });
-                            }, (error:TagError) => {
+                            }, (error:Error) => {
                                 skip = true;
                             });
-                        }, (error:TagError) => {
+                        }, (error:Error) => {
                             skip = true;
                         });
                     }
@@ -245,7 +245,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         },
                                         [], ['Tag Type deleted successfuly.']
                                     ));
-                                }, (error:TagError) => {
+                                }, (error:Error) => {
                                     res.render('search', getArguments(
                                         req.session.user,
                                         'Search',
@@ -261,10 +261,10 @@ export default function search(dataHandler: DataHandler): Router {
                                         [error.message]
                                     ));
                                 });
-                            }, (error:TagTypeError) => {
+                            }, (error:Error) => {
                                 skip = true;
                             });
-                        }, (error:TagTypeError) => {
+                        }, (error:Error) => {
                             skip = true;
                         });
                     }
@@ -291,7 +291,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         },
                                         [], ['User deleted successfuly.']
                                     ));
-                                }, (error:TagError) => {
+                                }, (error:Error) => {
                                     res.render('search', getArguments(
                                         req.session.user,
                                         'Search',
@@ -307,10 +307,10 @@ export default function search(dataHandler: DataHandler): Router {
                                         [error.message]
                                     ));
                                 });
-                            }, (error:UserError) => {
+                            }, (error:Error) => {
                                 skip = true;
                             });
-                        }, (error:UserError) => {
+                        }, (error:Error) => {
                             skip = true;
                         });
                     }

@@ -1,5 +1,5 @@
-import express, { Express, Request, Response, Router } from "express";
-import Data, { DataHandler, Item, Tag, TagError, TagType } from '@rt/data';
+import express, { Router } from "express";
+import Data, { DataHandler, Tag, TagType } from '@rt/data';
 import getArguments from "@utl/getArguments";
 
 export default function tag(dataHandler: DataHandler): Router {
@@ -30,7 +30,7 @@ export default function tag(dataHandler: DataHandler): Router {
                     codex: codex
                 }
             ));
-        }, error => {
+        }, (error:Error) => {
             res.render('tag', getArguments(
                 req.session.user,
                 'Tag',

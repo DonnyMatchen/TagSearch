@@ -129,7 +129,7 @@ export class Item {
                     let foundTag: Tag;
                     dataHandler.getTag(tag).then(found => {
                         foundTag = found;
-                    }, error => {
+                    }, (error:Error) => {
                         dataHandler.getTagType('default').then(type => {
                             foundTag = new Tag(tag, type);
                             dataHandler.addTag(foundTag);
@@ -154,7 +154,7 @@ export class Item {
                                 cand.addRef(this.id);
                                 dataHandler.updateTag(parent);
                             }
-                        }, error => {
+                        }, (error:Error) => {
                             parent = null;
                         });
                         tag = parent;
@@ -184,7 +184,7 @@ export class Item {
             let foundTag: Tag;
             await dataHandler.getTag(tag).then(found => {
                 foundTag = found;
-            }, error => {
+            }, (error:Error) => {
                 dataHandler.getTagType('default').then(type => {
                     foundTag = new Tag(tag, type);
                     dataHandler.addTag(foundTag);
@@ -294,16 +294,20 @@ export class User {
         }
         if(change) {
             let newSalt: string = getRandomString(15);
+            let err:Error = null;
             await argon2.hash(newPassword + newSalt).then(hash => {
                 this.hash = hash;
                 this.state = UserState.Set;
                 this.salt = newSalt;
-            }, error => {
+            }, (error:Error) => {
                 this.state = UserState.Error;
-                throw new PasswordError(error);
+                err = error;
             });
+            if(err != null) {
+                throw err;
+            }
         } else {
-            throw new PasswordError('Verification failed');
+            throw new Error('Verification failed');
         }
     }
 
@@ -555,14 +559,14 @@ export abstract class DataHandler {
         let tags: string[] = this.tagsFromString(input);
         if(tags.length < 2) {
             if(tags.length == 1) {
-                let error: string = '';
+                let error: Error = null;
                 await this.getTag(tags[0]).then(found => {
                     reduced = found.refs;
-                }, error => {
-                    error = `Tag "${tags[0]}" not found.`;
+                }, (error:Error) => {
+                    error = new Error(`Tag "${tags[0]}" not found.`);
                 });
-                if(error != '') {
-                    throw new TagError(error);
+                if(error != null) {
+                    throw error;
                 }
             }
         } else {
@@ -609,12 +613,6 @@ export abstract class DataHandler {
         }
     }
 }
-
-export class TagError extends Error {}
-export class TagTypeError extends Error {}
-export class ItemError extends Error {}
-export class UserError extends Error {}
-export class PasswordError extends Error {}
 
 export default class Data {
     static async init(handler: DataHandler) {
