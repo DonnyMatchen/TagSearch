@@ -555,11 +555,15 @@ export abstract class DataHandler {
         let tags: string[] = this.tagsFromString(input);
         if(tags.length < 2) {
             if(tags.length == 1) {
+                let error: string = '';
                 await this.getTag(tags[0]).then(found => {
                     reduced = found.refs;
                 }, error => {
-                    throw error;
+                    error = `Tag "${tags[0]}" not found.`;
                 });
+                if(error != '') {
+                    throw new TagError(error);
+                }
             }
         } else {
             this.getTags(tags).forEach(found => {

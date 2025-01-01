@@ -149,6 +149,7 @@ export default class InMem extends DataHandler {
                 );
             }
         } else {
+            let errorString: string = '';
             await this.reduce(search).then(reduced => {
                 this.getItems(reduced).forEach(item => {
                     let add: boolean = item.pub || user != undefined && user.role >= 1;
@@ -162,7 +163,12 @@ export default class InMem extends DataHandler {
                         out.push(item);
                     }
                 });
+            }, (error:TagError) => {
+                errorString = error.message;
             });
+            if(errorString != '') {
+                throw new TagError(errorString);
+            }
             if(pageSize <= 0) {
                 return new SearchResults(out, out.length, 1);
             } else {
@@ -219,24 +225,54 @@ export default class InMem extends DataHandler {
     }
     getTags(names: string[]): Tag[] {
         let out: Tag[] = [];
+        let error: string = '';
         names.forEach(name => {
-            out.push(this.tags.get(name));
+            if(this.tags.has(name)) {
+                out.push(this.tags.get(name));
+            } else {
+                error = `Tag "${name}" not found.`;
+                return;
+            }
         });
-        return out;
+        if(error != '') {
+            return out;
+        } else {
+            throw new TagError(error);
+        }
     }
     getTagTypes(names: string[]): TagType[] {
         let out: TagType[] = [];
+        let error: string = '';
         names.forEach(name => {
-            out.push(this.tagTypes.get(name));
+            if(this.tagTypes.has(name)) {
+                out.push(this.tagTypes.get(name));
+            } else {
+                error = `Tag Type "${name}" not found.`;
+                return;
+            }
         });
-        return out;
+        if(error != '') {
+            return out;
+        } else {
+            throw new TagTypeError(error);
+        }
     }
     getItems(ids: number[]): Item[] {
         let out: Item[] = [];
+        let error: string = '';
         ids.forEach(id => {
-            out.push(this.items.get(id));
+            if(this.items.has(id)) {
+                out.push(this.items.get(id));
+            } else {
+                error = `Item "${id}" not found.`;
+                return;
+            }
         });
-        return out;
+        if(error != '') {
+            return out;
+        } else {
+            throw new ItemError(error);
+        }
     }
 
     //Adders
@@ -271,59 +307,55 @@ export default class InMem extends DataHandler {
 
     //Updaters
     async updateUser(user: User) {
-        let success: boolean = false;
+        let errorString: string = '';
         await this.getUser(user.username).then(old => {
             old.role = user.role;
             old.hash = user.hash;
             old.salt = user.salt;
             old.state = user.state;
-            success = true;
-        }, error => {
-            this.addUser(user).then(() => {success = true;}, error => {success = false;});
+        }, async (error:UserError) => {
+            await this.addUser(user).then(() => {}, (error:UserError) => {errorString = error.message;});
         });
-        if (!success) {
-            throw new UserError('Unable to update user.');
+        if (errorString != '') {
+            throw new UserError(`Unable to update user "${user.username}".\nThis was caused by: ${errorString}`);
         }
     }
     async updateTag(tag: Tag) {
-        let success: boolean = false;
+        let errorString: string = '';
         await this.getTag(tag.name).then(old => {
             old.type = tag.type;
             old.parent = tag.parent;
-            success = true;
-        }, error => {
-            this.addTag(tag).then(() => {success = true;}, error => {success = false;});
+        }, async (error:TagError) => {
+            await this.addTag(tag).then(() => {}, (error:TagError) => {errorString = error.message;});
         });
-        if (!success) {
-            throw new TagError('Unable to update tag.');
+        if (errorString != '') {
+            throw new TagError(`Unable to update tag "${tag.name}".\nThis was caused by: ${errorString}`);
         }
     }
     async updateTagType(type: TagType) {
-        let success: boolean = false;
+        let errorString: string = '';
         await this.getTagType(type.name).then(old => {
             old.color = type.color;
             old.order = type.order;
-            success = true;
-        }, error => {
-            this.addTagType(type).then(() => {success = true;}, error => {success = false;});
+        }, async (error:TagTypeError) => {
+            await this.addTagType(type).then(() => {}, (error:TagTypeError) => {errorString = error.message;});
         });
-        if (!success) {
-            throw new TagTypeError('Unable to update tag type.');
+        if (errorString != '') {
+            throw new TagTypeError(`Unable to update tag type "${type.name}".\nThis was caused by: ${errorString}`);
         }
     }
     async updateItem(item: Item, tags: string[]) {
-        let success: boolean = false;
+        let errorString: string = '';
         await this.getItem(item.id).then(async old => {
             old.date = item.date;
             old.desc = item.desc;
             old.pub = item.pub;
             old.tagsChanged(this, tags);
-            success = true;
-        }, error => {
-            this.addItem(item).then(() => {success = true;}, error => {success = false;});
+        }, async (error:ItemError) => {
+            await this.addItem(item).then(() => {}, (error:ItemError) => {errorString = error.message});
         });
-        if (!success) {
-            throw new ItemError('Unable to update item.');
+        if (errorString != '') {
+            throw new ItemError(`Unable to update item "${item.id}".\nThis was caused by: ${errorString}`);
         }
     }
 
