@@ -31,9 +31,13 @@ export default function login(dataHandler: DataHandler): Router {
         if(errorList.isEmpty()) {
             await dataHandler.getUser(req.body.uname).then(async user => {
                 if(user.state == UserState.Set) {
-                    await user.check(req.body.pass).then(() => {
-                        req.session.user = user;
-                        res.redirect('/search');
+                    await user.check(req.body.pass).then(check => {
+                        if(check) {
+                            req.session.user = user;
+                            res.redirect('/search');
+                        } else {
+                            failure = true;
+                        }
                     }, error => {
                         failure = true;
                     });

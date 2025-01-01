@@ -415,83 +415,100 @@ export abstract class DataHandler {
      */
     abstract getItem(id: number): Promise<Item>;
 
+    /**
+     * This does not garentee that contents will be in the same order.
+     * Where it isn't feasible to gather all entities in one async opperation,
+     * use `Promise.all()`.
+     * @param usernames an array of usernames
+     * @returns an array of users
+     */
     abstract getUsers(usernames: string[]): User[];
+    /**
+     * This does not garentee that contents will be in the same order.
+     * Where it isn't feasible to gather all entities in one async opperation,
+     * use `Promise.all()`.
+     * @param names an array of tag names
+     * @returns an array of tags
+     */
     abstract getTags(names: string[]): Tag[];
+    /**
+     * This does not garentee that contents will be in the same order.
+     * Where it isn't feasible to gather all entities in one async opperation,
+     * use `Promise.all()`.
+     * @param names an array of tag type names
+     * @returns an array of tag types
+     */
     abstract getTagTypes(names: string[]): TagType[];
+    /**
+     * This does not garentee that contents will be in the same order.
+     * Where it isn't feasible to gather all entities in one async opperation,
+     * use `Promise.all()`.
+     * @param names an array of item ids
+     * @returns an array of items
+     */
     abstract getItems(ids: number[]): Item[];
 
     /**
-     * Adds the user to the database.  If the user exists, it updates them instead of adding a duplicate.
+     * If the user's username is already present, the promise is rejected.
      * @param user the user to add to the database
-     * @returns true if the user was added successfully, false otherwise
      */
     abstract addUser(user: User): Promise<void>;
     /**
-     * Adds the tag to the database.  If the tag exists, it updates it instead of adding a duplicate.
+     * If the tag's name is already present, the promise is rejected.
      * @param tag the tag to add to the database
-     * @returns true if the tag was added successfully, false otherwise
      */
     abstract addTag(tag: Tag): Promise<void>;
     /**
-     * Adds the tag type to the database.  If the tag type exists, it updates it instead of adding a duplicate.
+     * If the tag type's name is already present, the promise is rejected.
      * @param type the tag type to add to the database
-     * @returns true if the tag type was added successfully, false otherwise
      */
     abstract addTagType(type: TagType): Promise<void>;
     /**
-     * Adds the item to the database.  If the item exists, it updates it instead of adding a duplicate.
+     * If the item's id is already present, the promise is rejected.
      * @param item the item to add to the database
-     * @returns true if the item was added successfully, false otherwise
      */
     abstract addItem(item: Item): Promise<void>;
 
     /**
-     * 
+     * If the user doesn't exist, it is added instead.
      * @param user the new user to replace the old
-     * @returns true if the user was updated, false if the user does not exist or was not updated
      */
     abstract updateUser(user: User): Promise<void>;
     /**
-     * 
+     * If the tag doesn't exist, it is added instead.
      * @param tag the new tag to replace the old
-     * @returns true if the tag was updated, false if the tag does not exist or was not updated
      */
     abstract updateTag(tag: Tag): Promise<void>;
     /**
-     * 
+     * If the tag type doesn't exist, it is added instead.
      * @param type the new tag type to replace the old
-     * @returns true if the tag type was updated, false if the tag type does not exist or was not updated
      */
     abstract updateTagType(type: TagType): Promise<void>;
     /**
-     * 
+     * If the item doesn't exist, it is added instead.
      * @param item the new item to replace the old
-     * @returns true if the item was updated, false if the item does not exist or was not updated
+     * @param tags the new tags to be added to the item
      */
     abstract updateItem(item: Item, tags: string[]): Promise<void>;
 
     /**
      * 
      * @param user the user to be deleted
-     * @returns true if the user was deleted, false otherwise
      */
     abstract deleteUser(user: User): Promise<void>;
     /**
      * 
      * @param tag the tag to be deleted
-     * @returns true if the tag was deleted, false otherwise
      */
     abstract deleteTag(tag: Tag): Promise<void>;
     /**
      * 
      * @param type the tag type to be deleted
-     * @returns true if the tag type was deleted, false otherwise
      */
     abstract deleteTagType(type: TagType): Promise<void>;
     /**
      * 
      * @param item the item to be deleted
-     * @returns true if the item was deleted, false otherwise
      */
     abstract deleteItem(item: Item): Promise<void>;
 
