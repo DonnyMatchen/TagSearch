@@ -1,6 +1,5 @@
 import express, { Router } from "express";
 
-import { DataHandler, Item, Tag, TagType } from "@rt/data";
 import getArguments from "@utl/getArguments";
 
 export default function deleter(): Router {

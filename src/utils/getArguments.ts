@@ -1,5 +1,4 @@
 import { User } from "@rt/data";
-import { Session } from "express-session";
 
 export default function getArguments(
     user: User,

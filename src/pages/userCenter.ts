@@ -1,6 +1,6 @@
-import express, { Express, Request, Response, Router } from "express";
+import express, { Router } from "express";
 
-import { DataHandler, SearchResults, User } from "@rt/data";
+import { DataHandler } from "@rt/data";
 import getArguments from "@utl/getArguments";
 
 export default function userCenter(dataHandler: DataHandler): Router {
