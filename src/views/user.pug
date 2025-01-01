@@ -1,0 +1,55 @@
+extends layout
+
+block layout-content
+    div#userSearch
+        label#userSearchLabel.tagSearchElement(for="userSearch") Search Users
+        input#userSearchBar.tagSearchElement(type="text" name="userSearch", value=args.userSearch)
+        button#userSearchButton.tagSearchElement(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('userSearchBar').value;`) Go
+    table#tagTable
+        tr#tagSearchHeader
+            th Username
+            th Role
+            th State
+            th Options
+        each user in args.results
+            tr.tagSearchRow
+                td.tagTypeCell= user.username
+                td.tagTypeCell= user.roleToString()
+                td.tagTypeCell= user.stateToString()
+                td
+                    a.button.tableButton.editButton(href=`${baseURL}/post/user?edit=${user.username}`) E
+                    a.button.tableButton.deleteButton(href=`${baseURL}/delete/user?username=${user.username}`) X
+    -if(args.page == null || args.page <= 0)
+        -args.page = 1
+    -if(args.pages == null || args.pages <= 0)
+        -args.pages = 1
+    div#pageNumbers
+        -if(args.page != 1)
+            a.button(href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tagSearch}&tags=${search}&page=${1}`)= '<<'
+            a.button(href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tagSearch}&tags=${search}&page=${args.page - 1}`)= '<'
+        -if(args.pages <= 10)
+            -i = 1;
+            while i <= args.pages
+                -if(i == args.page)
+                    span= i++
+                -else
+                    -n = i++;
+                    a.button(href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tagSearch}&tags=${search}&page=${n}`)= n
+        -else
+            -if(args.page <= 5)
+                -i = 1;
+            -else
+                -i = args.page - 5
+            -if(args.page >= args.pages - 5)
+                -t = args.pages
+            -else
+                -t = args.page + 5
+            while i <= t
+                -if(i == args.page)
+                    span= i++
+                -else
+                    -n = i++;
+                    a.button(href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tagSearch}&tags=${search}&page=${n}`)= n
+        -if(args.page != args.pages)
+            a.button(href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tagSearch}&tags=${search}&page=${args.page + 1}`)= '>'
+            a.button(href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tagSearch}&tags=${search}&page=${args.pages}`)= '>>'

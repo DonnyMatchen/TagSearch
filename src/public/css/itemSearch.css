@@ -1,0 +1,33 @@
+table#searchTable {
+    margin-left: auto;
+    margin-right: auto;
+}
+tr.searchRow {
+    padding-bottom: 1em;
+}
+td.searchItem {
+    text-align: center;
+    padding-right: 1em;
+    padding-top: 1em;
+    width: 12vw;
+}
+td.searchDesc {
+    vertical-align: top;
+}
+td.searchImage {
+    padding: 0%;
+    vertical-align: bottom;
+}
+img.thumb {
+    width: 12vw;
+    vertical-align: bottom;
+}
+
+div#pageNumbers {
+    margin-top: 2em;
+    text-align: center;
+}
+div#pageNumbers a, div#pageNumbers span {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}

@@ -1,0 +1,28 @@
+table#formTable {
+    margin-left: auto;
+    margin-right: auto;
+}
+td.formLabel, td.blank {
+    padding-right: 1em;
+}
+td.formField, td.formSubmit {
+    width: 15vw;
+}
+
+td.formField input, td.formField select, td.formField textarea, td.formSubmit input {
+    background-color: var(--content);
+    color: var(--foreground);
+    border: var(--border);
+    width: 100%;
+}
+td.formLabel {
+    text-align: right;
+    vertical-align: top;
+}
+
+td.formSubmit {
+    text-align: center;
+}
+td.formSubmit input {
+    padding: 0.5em;
+}

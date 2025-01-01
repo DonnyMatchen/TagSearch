@@ -1,0 +1,41 @@
+extends layout
+
+block layout-content
+    - if(args.tag != null)
+        table.displayTable
+            tr 
+                td.display.displayRelatives
+                    h2 Parent
+                    -if(args.tag.parent == null)
+                        div (None)
+                    - else
+                        div
+                            a(href=`${baseURL}/tag?name=${args.tag.parent}`)= args.tag.parent
+                    h2 Children
+                    -if(args.tag.children.length == 0)
+                        div (None)
+                    -else
+                        each child in args.tag.children
+                            div
+                                a(href=`${baseURL}/tag?name=${child}`)= child
+                    h2 Siblings
+                    -if(args.codex.siblings.length == 0)
+                        div (None)
+                    -else
+                        each sibling in args.codex.siblings
+                            div
+                                a(href=`${baseURL}/tag?name=${sibling}`)= sibling
+                td.display.displayInfo
+                    -if(user != undefined && user.role >= 2)
+                        h2 Options
+                        div#options
+                            a.button.editButton(href=`${baseURL}/post/tag?edit=${args.tag.name}`) Edit
+                            a.button.deleteButton(href=`${baseURL}/delete/tag?name=${args.tag.name}`) Delete
+                    h2 Type
+                    a(style=`color: ${args.codex.type.color}`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tag.type}`)= args.tag.type
+                    h2 Item Count
+                    a(href=`${baseURL}/search?tags=${args.tag.name}`)= args.tag.refs.length
+                    h2 Link
+                    a(href=`${baseURL}/tag?name=${args.tag.name}`)= `${baseURL}/tag?name=${args.tag.name}`
+    - else
+        h2 The specified tag could not be loaded or does not exist

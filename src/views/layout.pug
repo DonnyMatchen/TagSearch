@@ -1,0 +1,72 @@
+block variables
+doctype html
+html
+    -
+        var navItems = [
+            {
+                0: ['Home', ''],
+                1: ['Search', '/search'],
+                2: ['Tags', '/search/tags'],
+                3: ['Tag Types', '/search/tagTypes']
+            },
+            {
+                4: ['New Item', '/post/item'],
+                5: ['New Tag', '/post/tag']
+            },
+            {
+                6: ['New TagType', '/post/tagType'],
+                7: ['Manage Users', '/userCenter'],
+                8: ['New User', '/post/user']
+            }
+        ]
+    -level = user != undefined ? user.role : '0';
+    head
+        meta(charset='utf-8')
+        link(rel='shortcut icon', href='/favicon.ico')
+        link(rel='stylesheet', type='text/css', href='/css/main.css')
+        - if(styles.length > 0)
+            each style in styles
+                link(rel='stylesheet', type='text/css', href=`/css/${style}.css`)
+        meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+        meta(name='theme-color', content='#000000')
+        title #{title} | TagSearch
+    body
+        div#root
+            header 
+                h1#title= title
+                div#searchSection
+                    label#searchLabel.searchElement(for='search') Search
+                    input#searchBar.searchElement(type='text' name='search', value=search)
+                    button#searchButton.searchElement(onclick=`window.location.href='${baseURL}/search?tags='+document.getElementById('searchBar').value.replace(' ', '+');`) Go
+                nav
+                    div#navPages
+                        each group, security in navItems
+                            div.navGroup
+                                each pair, index in group
+                                    -if(index != page)
+                                        -if(security <= +level)
+                                            a.navItem.button(href=`${baseURL}${pair[1]}`)= pair[0]
+                                    -else
+                                        span.navItem= pair[0]
+                    div#userSection
+                        -if(user == undefined)
+                            -if(page == 101)
+                                span.navItem Login
+                            -else
+                                a.button.navItem(href=`${baseURL}/login`) Log In
+                        -else
+                            span= user.username
+                            -if(page == 102)
+                                span.navItem Change Password
+                            -else
+                                a.button.navItem(href=`${baseURL}/login/change`) Change Password
+                            a.button.navItem(href=`${baseURL}/logout`) Log Out
+            div#banners
+                each error in errors
+                    div.error= error
+                each success in successes
+                    div.success= success
+                each message in messages
+                    div.message= message
+            h3#legend= legend
+            block layout-content

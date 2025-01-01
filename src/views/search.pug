@@ -1,0 +1,52 @@
+extends layout
+
+block layout-content
+    table#searchTable
+        each rw in args.results
+            tr.searchRow
+                each item in rw
+                    - if(item != undefined)
+                        td.searchItem.searchImage
+                            a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
+                                -if(item.type == 0)
+                                    img.thumb(alt=item.tags.join(" "), src=item.source)
+                                -else
+                                    img.thumb(alt=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
+            tr.searchRow
+                each item in rw
+                    - if(item != undefined)
+                        td.searchItem.searchDesc= item.desc
+    -if(args.page == null || args.page <= 0)
+        -args.page = 1
+    -if(args.pages == null || args.pages <= 0)
+        -args.pages = 1
+    div#pageNumbers
+        -if(args.page != 1)
+            a.button(href=`${baseURL}/search?tags=${search}&page=${1}`)= '<<'
+            a.button(href=`${baseURL}/search?tags=${search}&page=${args.page - 1}`)= '<'
+        -if(args.pages <= 10)
+            -i = 1;
+            while i <= args.pages
+                -if(i == args.page)
+                    span= i++
+                -else
+                    -n = i++;
+                    a.button(href=`${baseURL}/search?tags=${search}&page=${n}`)= n
+        -else
+            -if(args.page <= 5)
+                -i = 1;
+            -else
+                -i = args.page - 5
+            -if(args.page >= args.pages - 5)
+                -t = args.pages
+            -else
+                -t = args.page + 5
+            while i <= t
+                -if(i == args.page)
+                    span= i++
+                -else
+                    -n = i++;
+                    a.button(href=`${baseURL}/search?tags=${search}&page=${n}`)= n
+        -if(args.page != args.pages)
+            a.button(href=`${baseURL}/search?tags=${search}&page=${args.page + 1}`)= '>'
+            a.button(href=`${baseURL}/search?tags=${search}&page=${args.pages}`)= '>>'

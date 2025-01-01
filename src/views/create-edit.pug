@@ -1,0 +1,73 @@
+extends layout
+
+block layout-content
+    -if(args.target != undefined)
+        form(action=args.target, method='post')
+            table#formTable
+                - if(args.vals == undefined)
+                    input(type='hidden', name='state', value='new')
+                    each type, name in args.form
+                        tr.formRow 
+                            td.formLabel= args.labels[name]
+                            td.formField
+                                -if(type.includes('/dis'))
+                                    - type = type.replace('/dis', '')
+                                    -if(type == 'text-area')
+                                        textArea(name=name, rows=5, readonly)
+                                    -else if(type == 'select')
+                                        select(name=name readonly)
+                                            each str in args.arrs[name]
+                                                option(value=str)= str
+                                    -else
+                                        input(type=type, name=name, readonly)
+                                -else
+                                    -if(type == 'text-area')
+                                        textArea(name=name, rows=5)
+                                    -else if(type == 'select')
+                                        select(name=name)
+                                            each str in args.arrs[name]
+                                                option(value=str)= str
+                                    -else
+                                        input(type=type, name=name)
+                    tr.submitRow
+                        td.blank
+                        td.formSubmit
+                            -if(args.update)
+                                input(type='submit', value='Update')
+                            -else
+                                input(type='submit', value='Add')
+                - else
+                    input(type='hidden', name='state', value='update')
+                    each type, name in args.form
+                        tr.formRow 
+                            td.formLabel= args.labels[name]
+                            td.formField
+                                -if(type.includes('/dis'))
+                                    - type = type.replace('/dis', '')
+                                    -if(type == 'text-area')
+                                        textArea(name=name, rows=5, readonly)= value=args.vals[name]
+                                    -else if(type == 'select')
+                                        select(name=name readonly value=args.vals[name])
+                                            each str in args.arrs[name]
+                                                option(value=str)= str
+                                    -else
+                                        input(type=type, name=name, readonly, value=args.vals[name])
+                                -else
+                                    -if(type == 'text-area')
+                                        textArea(name=name, rows=5)= args.vals[name]
+                                    -else if(type == 'select')
+                                        select(name=name)
+                                            each str in args.arrs[name]
+                                                -if(str == args.vals[name])
+                                                    option(value=str, selected='selected')= str
+                                                -else
+                                                    option(value=str)= str
+                                    -else
+                                        input(type=type, name=name, value=args.vals[name])
+                    tr.submitRow
+                        td.blank
+                        td.formSubmit
+                            -if(args.update)
+                                input(type='submit', value='Update')
+                            -else
+                                input(type='submit', value='Add')

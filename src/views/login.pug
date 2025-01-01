@@ -1,0 +1,20 @@
+extends layout
+
+block layout-content
+    -if(user == undefined)
+        div#loginBox
+            form(action='/login', method='post')
+                h1 Log In
+                table
+                    tr
+                        td.formLabel Username
+                        td.formField
+                            input(type="text" name="uname" required)
+                    tr
+                        td.formLabel Password
+                        td.formField
+                            input(type="password" name="pass" required)
+                    tr
+                        td.blank
+                        td.formSubmit
+                            input(type="submit" value="Login")

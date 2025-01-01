@@ -1,0 +1,40 @@
+extends layout
+
+block layout-content
+    div#loginBox
+        form(action=`/login/${args.set ? 'set' : 'change'}`, method='post')
+            table
+                -if(args.set)
+                    tr
+                        td.formLabel Username
+                        td.formField
+                            input(type="text" name="uname")
+                    tr
+                        td.formLabel Password
+                        td.formField
+                            input(type="password" name="pass1")
+                    tr
+                        td.formLabel Re-Enter Password
+                        td.formField
+                            input(type="password" name="pass2")
+                    tr
+                        td.blank
+                        td.formSubmit
+                            input(type="submit" value="Set")
+                -else
+                    tr
+                        td.formLabel Current Password
+                        td.formField
+                            input(type="password" name="oPass")
+                    tr
+                        td.formLabel New Password
+                        td.formField
+                            input(type="password" name="nPass1")
+                    tr
+                        td.formLabel Re-Enter Password
+                        td.formField
+                            input(type="password" name="nPass2")
+                    tr
+                        td.blank
+                        td.formSubmit
+                            input(type="submit" value="Update")
