@@ -61,16 +61,19 @@ export default function post(dataHandler: DataHandler): Router {
             if(errorList.isEmpty()) {
                 if(req.body.state == 'new') {
                     await dataHandler.nextItemID().then(async id => {
-                        await dataHandler.addItem(new Item(dataHandler,
+                        let item = new Item(dataHandler,
                             id,
                             req.body.source,
                             new Date(req.body.date).valueOf(),
                             ItemType.Image,
                             {
-                                tags: req.body.tags,
                                 desc: req.body.desc
                             }
-                        )).then(() => {
+                        );
+                        Promise.all([
+                            item.tagsChanged(dataHandler, dataHandler.tagsFromString(req.body.tags)),
+                            dataHandler.addItem(item)
+                        ]).then(() => {
                             getArgumentsSimply(
                                 dataHandler, req.session.user, req.query, req.body, 'item', false, false,
                                 [], ['Item created successfully.']

@@ -90,7 +90,6 @@ export class Tag {
 }
 
 class ItemOptions {
-    tags?: string[] | string;
     desc?: string;
     pub?: boolean;
 }
@@ -120,47 +119,6 @@ export class Item {
             if(options.pub != undefined) {
                 this.pub = options.pub;
             }
-            let tags = options.tags;
-            if(tags != undefined && dataHandler != undefined) {
-                if(typeof tags == 'string') {
-                    tags = dataHandler.tagsFromString(tags);
-                }
-                tags.forEach(tag => {
-                    let foundTag: Tag;
-                    dataHandler.getTag(tag).then(found => {
-                        foundTag = found;
-                    }, (error:Error) => {
-                        dataHandler.getTagType('default').then(type => {
-                            foundTag = new Tag(tag, type);
-                            dataHandler.addTag(foundTag);
-                        })
-                    }).finally(() => {
-                        foundTag.addRef(this.id);
-                        this.tags.push(foundTag.name);
-                        dataHandler.updateTag(foundTag);
-                    });
-                });
-                let tag: Tag = null;
-                dataHandler.getTags(this.tags).forEach(async found => {
-                    if(tag == null) {
-                        tag = found;
-                    }
-                    while(tag != null) {
-                        let parent: Tag;
-                        await tag.getParent(dataHandler).then(cand => {
-                            parent = cand;
-                            if(!this.tags.includes(cand.name)) {
-                                this.tags.push(tag.parent);
-                                cand.addRef(this.id);
-                                dataHandler.updateTag(parent);
-                            }
-                        }, (error:Error) => {
-                            parent = null;
-                        });
-                        tag = parent;
-                    }
-                });
-            }
             if (options.desc == undefined || options.desc == null) {
                 options.desc = '';
             }
@@ -174,28 +132,70 @@ export class Item {
      * ONLY USE THIS FUNCTION TO ALTER THE TAGS LIST!
      * @param newList the new list of tags
      */
-    tagsChanged(dataHandler: DataHandler, newList: string[]) {
-        let changes: Diff = this.diffTags(this.tags, newList);
-        dataHandler.getTags(changes.removed).forEach(tag => {
-            tag.removeRef(this.id);
-            dataHandler.updateTag(tag);
-        });
-        changes.added.forEach(async tag => {
-            let foundTag: Tag;
-            await dataHandler.getTag(tag).then(found => {
-                foundTag = found;
-            }, (error:Error) => {
-                dataHandler.getTagType('default').then(type => {
-                    foundTag = new Tag(tag, type);
-                    dataHandler.addTag(foundTag);
+    async tagsChanged(dataHandler: DataHandler, newList: string[]) {
+        let error: Error = null;
+        await this.expandTags(dataHandler, newList).then(expanded => {
+            let changes: Diff = this.diffTags(this.tags, expanded);
+            changes.removed.forEach(async tagName => {
+                await dataHandler.getTag(tagName).then(tag => {
+                    tag.removeRef(this.id);
+                    dataHandler.updateTag(tag);
+                }, err => {
+                    error = err;
                 });
-            }).finally(() => {
-                foundTag.addRef(this.id);
-                dataHandler.updateTag(foundTag);
             });
+            if(error == null) {
+                changes.added.forEach(async tag => {
+                    let foundTag: Tag;
+                    await dataHandler.getTag(tag).then(found => {
+                        foundTag = found;
+                    }, async (error:Error) => {
+                        await dataHandler.getTagType('default').then(async type => {
+                            foundTag = new Tag(tag, type);
+                            await dataHandler.addTag(foundTag);
+                        });
+                    }).finally(() => {
+                        foundTag.addRef(this.id);
+                        dataHandler.updateTag(foundTag);
+                    });
+                });
+                this.tags.splice(0, this.tags.length);
+                expanded.forEach(tag => this.tags.push(tag));
+            }
+        }, err => {
+            error = err;
         });
-        this.tags.splice(0, this.tags.length);
-        newList.forEach(tag => this.tags.push(tag));
+        if(error != null) {
+            throw error;
+        }
+    }
+
+    private async expandTags(dataHandler: DataHandler, list: string[]) {
+        let out: string[] = [];
+        for(let i = 0; i < list.length; i++) {
+            let tagName = list[i];
+            let wrong: boolean = false;
+            await dataHandler.getTag(tagName).then(async tag => {
+                if(!out.includes(tag.name)) {
+                    out.push(tag.name);
+                }
+                let parent = tag.parent;
+                while(parent != null) {
+                    await dataHandler.getTag(parent).then(tag => {
+                        if(!out.includes(tag.name)) {
+                            out.push(tag.name);
+                        }
+                        parent = tag.parent;
+                    });
+                }
+            }, error => {
+                wrong = true;
+            });
+            if(wrong) {
+                throw new Error(tagName);
+            }
+        }
+        return out;
     }
 
     /**
@@ -637,116 +637,134 @@ export default class Data {
         handler.addTag(zz);
         handler.addTag(new Tag('zzz', null, zz));
         
-        await handler.nextItemID().then(id => 
-            handler.addItem(new Item(
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/a6/78/__scp_foundation_drawn_by_langbazi__sample-a6788af625a75e6a01cf24170853c751.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['xx'],
                     desc: 'A corner of a room',
                     pub: true
                 }
-            ))
-        );
-        await handler.nextItemID().then(id => 
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['xx']);
+            });
+        });
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/e1/6d/__ashen_one_dark_souls_and_1_more_drawn_by_conor_burke__sample-e16dd89ec5c0e2210dae609a58be8c04.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['yy'],
                     desc: 'A brave but foolish knight, fallen to flame and blood',
                     pub: true
                 }
-            ))
-        );
-        await handler.nextItemID().then(id =>
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['yy']);
+            });
+        });
+        
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/88/17/__slave_knight_gael_dark_souls_and_1_more_drawn_by_junjiuk__sample-88172e085d8be0193ee3ced013b26ed1.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['zzz'],
                     desc: 'He is forgotten',
                     pub: true
                 }
-            ))
-        );
-        await handler.nextItemID().then(id =>
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['zzz']);
+            });
+        });
+        
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/c9/5f/__hunter_and_micolash_host_of_the_nightmare_bloodborne_drawn_by_rashuu__sample-c95fbd43765275557e0a57e852cea958.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['x', 'yy'],
                     desc: 'climb the stairs, you\'ve coem this far'
                 }
-            ))
-        );
-        await handler.nextItemID().then(id =>
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['x', 'yy']);
+            });
+        });
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/d8/67/__original_drawn_by_wayukako__sample-d8671b5e581753bf8dde6b7ed762afb4.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['xx', 'z'],
                     desc: 'Ever upward'
                 }
-            ))
-        );
-        await handler.nextItemID().then(id =>
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['xx', 'z']);
+            });
+        });
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/d7/e8/__original_drawn_by_ashsadila__sample-d7e8c53ac85d834a342c7b752242f258.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['y', 'zz'],
                     desc: 'No more fighting... please...',
                     pub: true
                 }
-            ))
-        );
-        await handler.nextItemID().then(id =>
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['y', 'zz']);
+            });
+        });
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://cdn.donmai.us/sample/d7/e1/__girls_frontline__sample-d7e1d1b35bd30d7794469680cc72e45c.jpg',
                 1733066171000,
                 ItemType.Image,
                 {
-                    tags: ['xx', 'yy', 'zzz'],
                     desc: 'Infinity awaits',
                     pub: true
                 }
-            ))
-        );
-        await handler.nextItemID().then(id =>
-            handler.addItem(new Item(
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['xx', 'yy', 'zzz']);
+            });
+        });
+        await handler.nextItemID().then(async id => {
+            let item = new Item(
                 handler,
                 id,
                 'https://www.bankersonline.com/sites/default/files/tools/99INVPOL.pdf',
                 1733066171000,
                 ItemType.Document,
                 {
-                    tags: ['xx', 'yy', 'zzz'],
                     desc: 'A document!  A document!',
                     pub: true
                 }
-            ))
-        );
+            );
+            await handler.addItem(item).then(async () => {
+                await item.tagsChanged(handler, ['xx', 'yy', 'zzz']);
+            });
+        });
     }
 }
 
