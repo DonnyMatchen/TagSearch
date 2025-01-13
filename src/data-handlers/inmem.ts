@@ -216,12 +216,22 @@ export default class InMem extends DataHandler {
     }
 
     //Multi-Getters
-    getUsers(userNames: string[]): User[] {
+    getUsers(usernames: string[]): User[] {
         let out: User[] = [];
-        userNames.forEach(username => {
-            out.push(this.users.get(username));
+        let error: string = '';
+        usernames.forEach(username => {
+            if(this.users.has(username)) {
+                out.push(this.users.get(username));
+            } else {
+                error = `User "${username}" not found.`;
+                return;
+            }
         });
-        return out;
+        if(error == '') {
+            return out;
+        } else {
+            throw new Error(error);
+        }
     }
     getTags(names: string[]): Tag[] {
         let out: Tag[] = [];
@@ -234,7 +244,7 @@ export default class InMem extends DataHandler {
                 return;
             }
         });
-        if(error != '') {
+        if(error == '') {
             return out;
         } else {
             throw new Error(error);
@@ -251,7 +261,7 @@ export default class InMem extends DataHandler {
                 return;
             }
         });
-        if(error != '') {
+        if(error == '') {
             return out;
         } else {
             throw new Error(error);
@@ -268,7 +278,7 @@ export default class InMem extends DataHandler {
                 return;
             }
         });
-        if(error != '') {
+        if(error == '') {
             return out;
         } else {
             throw new Error(error);

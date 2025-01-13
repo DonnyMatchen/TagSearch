@@ -15,3 +15,77 @@ body {
 a {
     color: var(--foreground);
 }
+
+.right {
+    text-align: right;
+}
+
+.button {
+    text-decoration: none;
+    border: var(--border);
+    padding: 0.5em;
+    background-color: var(--content);
+    color: var(--foreground);
+}
+.field {
+    background-color: var(--content);
+    color: var(--foreground);
+}
+.edit {
+    background-color: var(--success);
+}
+.delete, .error {
+    background-color: var(--error);
+}
+.message {
+    background-color: var(--message);
+}
+
+header {
+    background-color: var(--header);
+    margin-bottom: 2em;
+}
+
+
+div#searchSection {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+span#searchLabel, input#searchBar, button#searchButton {
+    font-size: 1.5em;
+}
+span#searchLabel {
+    margin-left: auto;
+    text-align: right;
+}
+input#searchBar {
+    width: 100%;
+}
+button#searchButton {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+nav {
+    padding-bottom: 2em;
+}
+.navGroup {
+    display: inline;
+    margin-right: 0.5em;
+    margin-left: 0.5em;
+}
+.navItem {
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+}
+.navSelected {
+    background-color: var(--header);
+    border: none;
+}
+div#loginSection {
+    text-align: right;
+}
+
+h1#title, h3#legend {
+    text-align: center;
+}
