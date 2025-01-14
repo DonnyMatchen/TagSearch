@@ -48,24 +48,24 @@ html
                             button#searchButton.button(onclick=`window.location.href='${baseURL}/search?tags='+document.getElementById('searchBar').value.replace(' ', '+');`) Go
                     div.col-sm-5
                 nav.row
-                    div#navSection.col-sm-10
+                    div#navSection.col-sm-9
                         each group, security in navItems
                             div.navGroup
                                 each pair, index in group
-                                    -if(index != page)
+                                    -if(index != webPage)
                                         -if(security <= +level)
                                             a.button.navItem(href=`${baseURL}${pair[1]}`)= pair[0]
                                     -else
                                         span.button.navItem.navSelected= pair[0]
-                    div#loginSection.col-sm-2
+                    div#loginSection.col-sm-3
                         -if(user == undefined)
-                            -if(page == 101)
+                            -if(webPage == 101)
                                 span.navItem.navSelected Login
                             -else
                                 a.button.navItem(href=`${baseURL}/login`) Log In
                         -else
                             span= user.username
-                            -if(page == 102)
+                            -if(webPage == 102)
                                 span.button.navItem.navSelected Change Password
                             -else
                                 a.button.navItem(href=`${baseURL}/login/change`) Change Password

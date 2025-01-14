@@ -40,6 +40,14 @@ a {
 .message {
     background-color: var(--message);
 }
+.tableButton {
+    padding: 0;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    border: none;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
 
 header {
     background-color: var(--header);

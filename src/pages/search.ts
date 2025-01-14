@@ -87,7 +87,7 @@ export default function search(dataHandler: DataHandler): Router {
                 2,
                 `${results.total} result(s) matching "${tagSearch}"`,
                 search,
-                ['tagSearch'],
+                ['smallSearch'],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
@@ -125,7 +125,7 @@ export default function search(dataHandler: DataHandler): Router {
                 3,
                 `${results.total} result(s) matching "${tagSearch}"`,
                 search,
-                ['tagSearch'],
+                ['smallSearch'],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/search/tagTypes?tagTypeMatch=${tagSearch}&tags=${search}&page=`,

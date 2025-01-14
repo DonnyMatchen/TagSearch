@@ -1,0 +1,18 @@
+span#smallSearchLabel {
+    margin-left: auto;
+    text-align: right;
+}
+input#smallSearchBar {
+    width: 100%;
+}
+button#smallSearchButton {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+div#smallSearchResults {
+    margin-top: 2em;
+}
+div.smallSearchRow div, div.smallSearchHeader div {
+    text-align: center;
+}

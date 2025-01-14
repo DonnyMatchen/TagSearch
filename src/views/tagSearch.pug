@@ -1,19 +1,35 @@
 extends layout
 
 block layout-content
-    div#tagSearch
-        label#tagSearchLabel.tagSearchElement(for="tagSearch") Search Tags
-        input#tagSearchBar.tagSearchElement(type="text" name="tagSearch", value=args.tagSearch)
-        button#tagSearchButton.tagSearchElement(onclick=`window.location.href='${baseURL}/search/tags?tagMatch='+document.getElementById('tagSearchBar').value;`) Go
-    table#tagTable
-        tr#tagSearchHeader
-            th Name
-            th Type
-            th Count
-        each tag in args.results
-            tr.tagSearchRow
-                td
-                    a(href=`${baseURL}/tag?name=${tag.name}`)= tag.name
-                td
-                    a(style=`color: ${args.types.get(tag.type).color};`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
-                td= tag.refs.length
+    div#tagSearch.row
+        div.col-sm-3
+        div.col-sm-6.row.align-items-center
+            div.right.col-sm-3
+                span#smallSearchLabel Search Tags
+            div.col-sm-6
+                input#smallSearchBar.field(type='text' name="tagSearch", value=args.tagSearch)
+            div.col-sm-3
+                button#smallSearchButton.button(onclick=`window.location.href='${baseURL}/search/tags?tagMatch='+document.getElementById('smallSearchBar').value;`) Go
+        div.col-sm-3
+    div#smallSearchResults.row
+        div.col-sm-1
+        div.col-sm-10
+            div.row.smallSearchHeader
+                div.col-sm-3
+                div.col-sm-2
+                    b Name
+                div.col-sm-2
+                    b Type
+                div.col-sm-2
+                    b Count
+                div.col-sm-3
+            each tag in args.results
+                div.row.smallSearchRow
+                    div.col-sm-3
+                    div.col-sm-2
+                        a(href=`${baseURL}/tag?name=${tag.name}`)= tag.name
+                    div.col-sm-2
+                        a(style=`color: ${args.types.get(tag.type).color};`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
+                    div.col-sm-2= tag.refs.length
+                    div.col-sm-3
+        div.col-sm-1

@@ -1,26 +1,43 @@
 extends layout
 
 block layout-content
-    div#tagSearch
-        label#tagSearchLabel.tagSearchElement(for="tagSearch") Search Tag Types
-        input#tagSearchBar.tagSearchElement(type="text" name="tagSearch", value=args.tagSearch)
-        button#tagSearchButton.tagSearchElement(onclick=`window.location.href='${baseURL}/search/tags?tagMatch='+document.getElementById('tagSearchBar').value;`) Go
-    table#tagTable
-        tr#tagSearchHeader
-            th Name
-            th Color
-            th Precedence
-            -if(user != undefined && user.role >= 2)
-                th Options
-        each type in args.results
-            tr.tagSearchRow
-                td.tagTypeCell= type.name
-                td.tagTypeCell
-                    span= type.color.toString()
-                    span(style=`color:${type.color};`)  ■
-                td.tagTypeCell= type.order
-                -if(user != undefined && user.role >= 2)
-                    td
-                        a.button.tableButton.editButton(href=`${baseURL}/post/tagType?edit=${type.name}`) E
-                        -if(type.name != 'default')
-                            a.button.tableButton.deleteButton(href=`${baseURL}/delete/tagType?name=${type.name}`) X
+    div#tagSearch.row
+        div.col-sm-3
+        div.col-sm-6.row.align-items-center
+            div.right.col-sm-3
+                span#smallSearchLabel Search Tag Types
+            div.col-sm-6
+                input#smallSearchBar.field(type='text' name="tagSearch", value=args.tagSearch)
+            div.col-sm-3
+                button#smallSearchButton.button(onclick=`window.location.href='${baseURL}/search/tagTypes?tagMatch='+document.getElementById('smallSearchBar').value;`) Go
+        div.col-sm-3
+    div#smallSearchResults.row
+        div.col-sm-1
+        div.col-sm-10
+            div.row.smallSearchHeader
+                div.col-sm-2
+                div.col-sm-2
+                    b Name
+                div.col-sm-2
+                    b Color
+                div.col-sm-2
+                    b Precedence
+                div.col-sm-2
+                    -if(user != undefined && user.role >= 2)
+                        b Options
+                div.col-sm-2
+            each type in args.results
+                div.row.smallSearchRow
+                    div.col-sm-2
+                    div.col-sm-2= type.name
+                    div.col-sm-2
+                        span= type.color
+                        span(style=`color:${type.color};`)  ■
+                    div.col-sm-2= type.order
+                    div.col-sm-2
+                        -if(user != undefined && user.role >= 2)
+                            a.button.tableButton.edit(title='Edit' href=`${baseURL}/post/tagType?edit=${type.name}`) E
+                            -if(type.name != 'default')
+                                a.button.tableButton.delete(title='Delete' href=`${baseURL}/delete/tagType?name=${type.name}`) X
+                    div.col-sm-2
+        div.col-sm-1
