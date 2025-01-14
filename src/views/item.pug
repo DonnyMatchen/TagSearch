@@ -4,32 +4,33 @@ block layout-content
     - url = args.item.source
     - itm = args.item
     - if(args.item != null)
-        table.displayTable
-            tr 
-                td.displayImg
+        div.row
+            div.col-sm-1
+            div.col-sm-6.displayImg
+                -if(itm.type == 0)
                     a(href=url)
-                        -if(itm.type == 0)
-                            img.displayImage(alt=itm.tags.join(" "), src=url)
-                        -else
-                            embed.displayWindow(src=url)
-                td.displayTags
-                    -if(user != undefined && user.role >= 2)
-                        h2 Options
-                        div#options
-                            a.button.editButton(href=`${baseURL}/post/item?edit=${itm.id}`) Edit
-                            a.button.deleteButton(href=`${baseURL}/delete/item?id=${itm.id}`) Delete
-                    h2 Tags
-                    each type in args.types
-                        b= type.name
-                        ul
-                            each tag in args.tags.get(type.name)
-                                li(style=`padding-left: ${args.indents.get(tag.name) * 20}px;color:${type.color}`)
-                                    a(style=`color:${type.color}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
-                    h2 Timestamp
-                    div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
-                    h2 Description
-                    p= itm.desc
-                    h2 Link
-                    a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
+                        img.displayImage(title=itm.tags.join(" "), src=url)
+                -else
+                    embed.displayWindow(src=url)
+            div.col-sm-4.displayTags
+                -if(user != undefined && user.role >= 2)
+                    h2.infoHeading Options
+                    div#options
+                        a.button.edit(href=`${baseURL}/post/item?edit=${itm.id}`) Edit
+                        a.button.delete(href=`${baseURL}/delete/item?id=${itm.id}`) Delete
+                h2.infoHeading Tags
+                each type in args.types
+                    b= type.name
+                    ul
+                        each tag in args.tags.get(type.name)
+                            li(style=`padding-left: ${args.indents.get(tag.name) * 20}px;color:${type.color}`)
+                                a(style=`color:${type.color}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
+                h2.infoHeading Timestamp
+                div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
+                h2.infoHeading Description
+                p= itm.desc
+                h2.infoHeading Link
+                a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
+            div.col-sm-1
     - if(args.item == null)
         h2 The specified item could not be loaded or does not exist

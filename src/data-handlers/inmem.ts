@@ -30,7 +30,7 @@ export default class InMem extends DataHandler {
     }
 
     getPageLimit(): number {
-        return 30
+        return 28
     }
 
     //listers
@@ -150,18 +150,20 @@ export default class InMem extends DataHandler {
             }
         } else {
             let errorString: string = '';
-            await this.reduce(search).then(reduced => {
-                this.getItems(reduced).forEach(item => {
-                    let add: boolean = item.pub || user != undefined && user.role >= 1;
-                    if(add && options != undefined && options.before != undefined) {
-                        add = item.date <= options.before;
-                    }
-                    if(add && options != undefined && options.after != undefined) {
-                        add = item.date >= options.after
-                    }
-                    if(add) {
-                        out.push(item);
-                    }
+            await this.reduce(search).then(async reduced => {
+                await this.getItems(reduced).then(items => {
+                    items.forEach(item => {
+                        let add: boolean = item.pub || user != undefined && user.role >= 1;
+                        if(add && options != undefined && options.before != undefined) {
+                            add = item.date <= options.before;
+                        }
+                        if(add && options != undefined && options.after != undefined) {
+                            add = item.date >= options.after
+                        }
+                        if(add) {
+                            out.push(item);
+                        }
+                    });
                 });
             }, (error:Error) => {
                 errorString = error.message;
@@ -216,7 +218,7 @@ export default class InMem extends DataHandler {
     }
 
     //Multi-Getters
-    getUsers(usernames: string[]): User[] {
+    async getUsers(usernames: string[]): Promise<User[]> {
         let out: User[] = [];
         let error: string = '';
         usernames.forEach(username => {
@@ -233,7 +235,7 @@ export default class InMem extends DataHandler {
             throw new Error(error);
         }
     }
-    getTags(names: string[]): Tag[] {
+    async getTags(names: string[]): Promise<Tag[]> {
         let out: Tag[] = [];
         let error: string = '';
         names.forEach(name => {
@@ -250,7 +252,7 @@ export default class InMem extends DataHandler {
             throw new Error(error);
         }
     }
-    getTagTypes(names: string[]): TagType[] {
+    async getTagTypes(names: string[]): Promise<TagType[]> {
         let out: TagType[] = [];
         let error: string = '';
         names.forEach(name => {
@@ -267,7 +269,7 @@ export default class InMem extends DataHandler {
             throw new Error(error);
         }
     }
-    getItems(ids: number[]): Item[] {
+    async getItems(ids: number[]): Promise<Item[]> {
         let out: Item[] = [];
         let error: string = '';
         ids.forEach(id => {
@@ -386,16 +388,16 @@ export default class InMem extends DataHandler {
     }
     async deleteTag(tag: Tag) {
         if(tag.children.length > 0) {
-            this.getTags(tag.children).forEach(async childTag => {
+            await this.getTags(tag.children).then(tags => tags.forEach(async childTag => {
                 childTag.parent = null;
                 await this.updateTag(childTag);
-            });
+            }));
         }
-        this.getItems(tag.refs).forEach(async item => {
+        await this.getItems(tag.refs).then(items => items.forEach(async item => {
             let temp: string[] = item.tags.concat([]);
             temp.splice(temp.indexOf(tag.name), 1);
             await this.updateItem(item, temp);
-        });
+        }));
         if(tag.parent != null) {
             await tag.getParent(this).then(parent => {
                 parent.removeChild(tag.name);
@@ -412,9 +414,9 @@ export default class InMem extends DataHandler {
         this.tagTypes.delete(type.name);
     }
     async deleteItem(item: Item) {
-        this.getTags(item.tags).forEach(tag => {
+        await this.getTags(item.tags).then(tags => tags.forEach(tag => {
             tag.removeRef(item.id);
-        });
+        }));
         this.items.delete(item.id);
     }
 }

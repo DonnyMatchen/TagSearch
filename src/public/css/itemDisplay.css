@@ -1,0 +1,19 @@
+div.displayImg {
+    text-align: center;
+}
+div.displayTags {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 1em;
+    border: var(--border);
+}
+div#options a.button {
+    margin-right: 1em;
+}
+embed.displayWindow {
+    width: 90%;
+    height: 70vh;
+}
+h2.infoHeading {
+    margin-top: 0.5em;
+}

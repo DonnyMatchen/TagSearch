@@ -78,9 +78,9 @@ export default function search(dataHandler: DataHandler): Router {
                 }
             });
             let map: Map<string, TagType> = new Map();
-            dataHandler.getTagTypes(list).forEach(type => {
+            dataHandler.getTagTypes(list).then(types => types.forEach(type => {
                 map.set(type.name, type);
-            });
+            }));
             res.render('tagSearch', getArguments(
                 req.session.user,
                 'Search Results',

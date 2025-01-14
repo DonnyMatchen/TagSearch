@@ -17,11 +17,13 @@ export default function item(dataHandler: DataHandler): Router {
         }
         dataHandler.getItem(+id).then(async item => {
             if(item.pub || req.session.user.role >= 1) {
-                let tagCodex: TagsCodex = getTagObject(dataHandler, item.tags);
-                let types: TagType[] = tagCodex.getTagTypes();
+                let tagCodex: TagsCodex;
+                await getTagObject(dataHandler, item.tags).then(codex => tagCodex = codex);
+                let types: TagType[] = [];
+                await tagCodex.getTagTypes().then(foundTypes => foundTypes.forEach(type => types.push(type)));
                 types.sort((a: TagType, b: TagType) => {
                     return a.order - b.order;
-                })
+                });
                 res.render('item', getArguments(
                     req.session.user,
                     'Item',
@@ -83,28 +85,39 @@ export default function item(dataHandler: DataHandler): Router {
     return router;
 }
 
-function getTagObject(dataHandler: DataHandler, tags: string[]): TagsCodex {
+async function getTagObject(dataHandler: DataHandler, tags: string[]): Promise<TagsCodex> {
     let parents: Tag[] = [];
     let codex: TagsCodex = new TagsCodex(dataHandler);
-    dataHandler.getTags(tags).forEach(async tag => {
-        if (tag.parent != null) {
-            await getParents(dataHandler, tag).then(pList => {
-                parents = parents.concat(pList);
-            });
-        }
-    });
-    parents.forEach(parent => {
-        if(tags.includes(parent.name)) {
-            tags.splice(tags.indexOf(parent.name), 1);
+    let out: Tag[] = [];
+    await dataHandler.getTags(tags).then(async tags => {
+        for(let i = 0; i < tags.length; i++) {
+            let tag = tags[i];
+            if (tag.parent != null) {
+                await getParents(dataHandler, tag).then(pList => {
+                    pList.forEach(parent => {
+                        if(!parents.includes(parent)) {
+                            parents.push(parent);
+                        }
+                    });
+                });
+            }
+            out.push(tag);
         }
     });
 
-    tags.sort((a, b) => {
-        return a.localeCompare(b);
+    parents.forEach(parent => {
+        if(out.includes(parent)) {
+            out.splice(out.indexOf(parent), 1);
+        }
     });
-    dataHandler.getTags(tags).forEach(tag => {
-        codex.add(tag.type, tag);
+
+    out.sort((a, b) => {
+        return a.name.localeCompare(b.name);
     });
+    for(let i = 0; i < out.length; i++) {
+        let tag = out[i];
+        await codex.add(tag.type, tag);
+    }
     return codex;
 }
 
@@ -122,9 +135,7 @@ class TagsCodex {
             this.codex.set(key, []);
         }
         if(tag.parent != null) {
-            await tag.getParent(this.dataHandler).then(parent => {
-                this.add(key, parent);
-            });
+            await tag.getParent(this.dataHandler).then(async parent => await this.add(key, parent));
         }
         this.codex.get(key).push(tag);
         await tag.getProximity(this.dataHandler).then(prox => {
@@ -132,7 +143,7 @@ class TagsCodex {
         });
     }
 
-    getTagTypes(): TagType[] {
+    async getTagTypes(): Promise<TagType[]> {
         return this.dataHandler.getTagTypes([...this.codex.keys()]);
     }
 }

@@ -78,12 +78,11 @@ export class Tag {
         if(this.parent == null) {
             return out;
         } else {
-            let out: number = 0;
-            this.getParent(dataHandler).then(parent => {
-                parent.getProximity(dataHandler).then(prox => {
+            await this.getParent(dataHandler).then(async parent => {
+                await parent.getProximity(dataHandler).then(prox => {
                     out = prox + 1;
                 });
-            })
+            });
             return out;
         }
     }
@@ -421,36 +420,32 @@ export abstract class DataHandler {
 
     /**
      * This does not garentee that contents will be in the same order.
-     * Where it isn't feasible to gather all entities in one async opperation,
-     * use `Promise.all()`.
+     * 
      * @param usernames an array of usernames
      * @returns an array of users
      */
-    abstract getUsers(usernames: string[]): User[];
+    abstract getUsers(usernames: string[]): Promise<User[]>;
     /**
      * This does not garentee that contents will be in the same order.
-     * Where it isn't feasible to gather all entities in one async opperation,
-     * use `Promise.all()`.
+     * 
      * @param names an array of tag names
      * @returns an array of tags
      */
-    abstract getTags(names: string[]): Tag[];
+    abstract getTags(names: string[]): Promise<Tag[]>;
     /**
      * This does not garentee that contents will be in the same order.
-     * Where it isn't feasible to gather all entities in one async opperation,
-     * use `Promise.all()`.
+     * 
      * @param names an array of tag type names
      * @returns an array of tag types
      */
-    abstract getTagTypes(names: string[]): TagType[];
+    abstract getTagTypes(names: string[]): Promise<TagType[]>;
     /**
      * This does not garentee that contents will be in the same order.
-     * Where it isn't feasible to gather all entities in one async opperation,
-     * use `Promise.all()`.
+     * 
      * @param names an array of item ids
      * @returns an array of items
      */
-    abstract getItems(ids: number[]): Item[];
+    abstract getItems(ids: number[]): Promise<Item[]>;
 
     /**
      * If the user's username is already present, the promise is rejected.
@@ -570,7 +565,7 @@ export abstract class DataHandler {
                 }
             }
         } else {
-            this.getTags(tags).forEach(found => {
+            await this.getTags(tags).then(tags => tags.forEach(found => {
                 let refList: number[] = found.refs;
                 container.push(refList);
                 refList.forEach(ref => {
@@ -578,7 +573,7 @@ export abstract class DataHandler {
                         allRefs.push(ref);
                     }
                 });
-            })
+            }));
             allRefs.forEach(ref => {
                 let include = true;
                 for(let i = 0; i < container.length; i++) {
