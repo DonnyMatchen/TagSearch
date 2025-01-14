@@ -57,6 +57,12 @@ app.get('/', (req, res) => {
         'Yes, the site is working.',
         '',
         [],
+        {
+            active: false,
+            pageURL: '',
+            pageCount: 0,
+            pageNumber: 0
+        },
         {}
     ))
 });

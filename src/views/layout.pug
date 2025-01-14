@@ -79,3 +79,38 @@ html
                     div.message= message
             h3#legend= legend
             block layout-content
+            -if(pages.active)
+                -if(pages.pageNumber <= 0)
+                    -pages.pageNumber = 1
+                -if(pages.pageCount <= 0)
+                    -pages.pageCount = 1
+                div#pageNumbers
+                    -if(pages.pageNumber != 1)
+                        a.button(href=`${pages.pageURL}${1}`)= '<<'
+                        a.button(href=`${pages.pageURL}${pages.pageNumber - 1}`)= '<'
+                    -if(pages.pageCount <= 10)
+                        -i = 1;
+                        while i <= pages.pageCount
+                            -if(i == pages.pageNumber)
+                                span= i++
+                            -else
+                                -n = i++;
+                                a.button(href=`${pages.pageURL}${n}`)= n
+                    -else
+                        -if(pages.pageNumber <= 5)
+                            -i = 1;
+                        -else
+                            -i = pages.pageNumber - 5
+                        -if(pages.pageNumber >= pages.pageCount - 5)
+                            -t = pages.pageCount
+                        -else
+                            -t = pages.pageNumber + 5
+                        while i <= t
+                            -if(i == pages.pageNumber)
+                                span= i++
+                            -else
+                                -n = i++;
+                                a.button(href=`${pages.pageURL}${n}`)= n
+                    -if(pages.pageNumber != pages.pageCount)
+                        a.button(href=`${pages.pageURL}${pages.pageNumber + 1}`)= '>'
+                        a.button(href=`${pages.pageURL}${pages.pageCount}`)= '>>'

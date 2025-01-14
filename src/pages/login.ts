@@ -16,6 +16,12 @@ export default function login(dataHandler: DataHandler): Router {
             req.session.user == undefined ? '': 'You are already logged in',
             '',
             ['form', 'login'],
+            {
+                active: false,
+                pageURL: '',
+                pageCount: 0,
+                pageNumber: 0
+            },
             {}
         ));
     });
@@ -59,6 +65,12 @@ export default function login(dataHandler: DataHandler): Router {
                 req.session.user == undefined ? '': 'You are already logged in',
                 '',
                 ['form', 'login'],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['Incorrect username or password.']
             ));
@@ -74,6 +86,12 @@ export default function login(dataHandler: DataHandler): Router {
             '',
             '',
             ['form', 'login'],
+            {
+                active: false,
+                pageURL: '',
+                pageCount: 0,
+                pageNumber: 0
+            },
             {
                 set: false
             },
@@ -109,6 +127,12 @@ export default function login(dataHandler: DataHandler): Router {
                             '',
                             '',
                             ['form', 'login'],
+                            {
+                                active: false,
+                                pageURL: '',
+                                pageCount: 0,
+                                pageNumber: 0
+                            },
                             {
                                 set: false
                             },
@@ -152,6 +176,12 @@ export default function login(dataHandler: DataHandler): Router {
                     '',
                     ['form', 'login'],
                     {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
+                    {
                         set: false
                     },
                     errors
@@ -169,6 +199,12 @@ export default function login(dataHandler: DataHandler): Router {
             '',
             '',
             ['form', 'login'],
+            {
+                active: false,
+                pageURL: '',
+                pageCount: 0,
+                pageNumber: 0
+            },
             {
                 set: true,
                 user: req.query.username
@@ -205,6 +241,12 @@ export default function login(dataHandler: DataHandler): Router {
                             '',
                             '',
                             ['form', 'login'],
+                            {
+                                active: false,
+                                pageURL: '',
+                                pageCount: 0,
+                                pageNumber: 0
+                            },
                             {
                                 set: true
                             },
@@ -247,6 +289,12 @@ export default function login(dataHandler: DataHandler): Router {
                     '',
                     '',
                     ['form', 'login'],
+                    {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
                     {
                         set: true
                     },

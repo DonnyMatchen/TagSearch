@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { DataHandler, TagType } from '@rt/data';
 import partition from "@utl/partition";
-import getArguments from "@utl/getArguments";
+import getArguments, { Arguments } from "@utl/getArguments";
 
 export default function search(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -25,9 +25,13 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 ['itemSearch'],
                 {
-                    results: partition(results.results, 6),
-                    pages: results.pageCount,
-                    page: +page
+                    active: true,
+                    pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                    pageCount: results.pageCount,
+                    pageNumber: +page
+                },
+                {
+                    results: partition(results.results, 6)
                 }
             ));
         }, (error:Error) => {
@@ -39,9 +43,13 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 ['itemSearch'],
                 {
-                    results: [],
-                    pages: 1,
-                    page: 1
+                    active: true,
+                    pageURL: `${Arguments.url}/search?tags=${search}&`,
+                    pageCount: 1,
+                    pageNumber: 1
+                },
+                {
+                    results: []
                 },
                 [error.message]
             ));
@@ -81,11 +89,15 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 ['tagSearch'],
                 {
+                    active: true,
+                    pageURL: `${Arguments.url}/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
+                    pageCount: results.pageCount,
+                    pageNumber: +page
+                },
+                {
                     results: results.results,
                     types: map,
-                    tagSearch: tagSearch,
-                    pages: results.pageCount,
-                    page: +page
+                    tagSearch: tagSearch
                 }
             ));
         });
@@ -115,10 +127,14 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 ['tagSearch'],
                 {
+                    active: true,
+                    pageURL: `${Arguments.url}/search/tagTypes?tagTypeMatch=${tagSearch}&tags=${search}&page=`,
+                    pageCount: results.pageCount,
+                    pageNumber: +page
+                },
+                {
                     results: results.results,
-                    tagSearch: tagSearch,
-                    pages: results.pageCount,
-                    page: +page
+                    tagSearch: tagSearch
                 }
             ));
         });
@@ -147,9 +163,13 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 6),
-                                            pages: results.pageCount,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: results.pageCount,
+                                            pageNumber: 1
+                                        },
+                                        {
+                                            results: partition(results.results, 6)
                                         },
                                         [], ['Item deleted successfuly.']
                                     ));
@@ -162,11 +182,15 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: [],
-                                            pages: 1,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: 1,
+                                            pageNumber: 1
                                         },
-                                        [error.message]
+                                        {
+                                            results: []
+                                        },
+                                        [error.message], ['Item deleted successfuly.']
                                     ));
                                 });
                             }, (error:Error) => {
@@ -193,9 +217,13 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 6),
-                                            pages: results.pageCount,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: results.pageCount,
+                                            pageNumber: 1
+                                        },
+                                        {
+                                            results: partition(results.results, 6)
                                         },
                                         [], ['Tag deleted successfuly.']
                                     ));
@@ -208,11 +236,15 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: [],
-                                            pages: 1,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: 1,
+                                            pageNumber: 1
                                         },
-                                        [error.message]
+                                        {
+                                            results: []
+                                        },
+                                        [error.message], ['Tag deleted successfuly.']
                                     ));
                                 });
                             }, (error:Error) => {
@@ -239,9 +271,13 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 6),
-                                            pages: results.pageCount,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: results.pageCount,
+                                            pageNumber: 1
+                                        },
+                                        {
+                                            results: partition(results.results, 6)
                                         },
                                         [], ['Tag Type deleted successfuly.']
                                     ));
@@ -254,11 +290,15 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: [],
-                                            pages: 1,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: 1,
+                                            pageNumber: 1
                                         },
-                                        [error.message]
+                                        {
+                                            results: []
+                                        },
+                                        [error.message], ['Tag Type deleted successfuly.']
                                     ));
                                 });
                             }, (error:Error) => {
@@ -285,9 +325,13 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 6),
-                                            pages: results.pageCount,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: results.pageCount,
+                                            pageNumber: 1
+                                        },
+                                        {
+                                            results: partition(results.results, 6)
                                         },
                                         [], ['User deleted successfuly.']
                                     ));
@@ -300,11 +344,15 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: [],
-                                            pages: 1,
-                                            page: 1
+                                            active: true,
+                                            pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                                            pageCount: 1,
+                                            pageNumber: 1
                                         },
-                                        [error.message]
+                                        {
+                                            results: []
+                                        },
+                                        [error.message], ['User deleted successfuly.']
                                     ));
                                 });
                             }, (error:Error) => {

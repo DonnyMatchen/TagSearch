@@ -19,6 +19,12 @@ export default function deleter(): Router {
                 `Access denied`,
                 '',
                 ["delete"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to delete items.']
             ));
@@ -31,6 +37,12 @@ export default function deleter(): Router {
                 `Are you sure you want to delete item#${itemID}?`,
                 '',
                 ["delete"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {
                     cancel: `/item?id=${itemID}`,
                     delete: `Item ${itemID}`
@@ -49,6 +61,12 @@ export default function deleter(): Router {
                 `Access Denied`,
                 '',
                 ["delete"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to delete tags.']
             ));
@@ -61,6 +79,12 @@ export default function deleter(): Router {
                 `Are you sure you want to delete the tag "${name}"`,
                 '',
                 ["delete"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {
                     cancel: `/tag?name=${name}`,
                     delete: `Tag ${name}`
@@ -79,6 +103,12 @@ export default function deleter(): Router {
                 `Access Denied`,
                 '',
                 [],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to delete tag types.']
             ));
@@ -92,6 +122,12 @@ export default function deleter(): Router {
                     `You cannot delete the default tag type`,
                     '',
                     [],
+                    {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
                     {},
                     ['You cannot delete the default tag type']
                 ));
@@ -103,6 +139,12 @@ export default function deleter(): Router {
                     `Are you sure you want to delete the tag type '${name}'?`,
                     '',
                     ["delete"],
+                    {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
                     {
                         cancel: `/search/tagTypes?tagMatch=${name}`,
                         delete: `TagType ${name}`
@@ -122,6 +164,12 @@ export default function deleter(): Router {
                 `Access Denied`,
                 '',
                 [],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to delete users.']
             ));
@@ -134,6 +182,12 @@ export default function deleter(): Router {
                 `Are you sure you want to delete the user credentials for '${username}'?`,
                 '',
                 ["delete"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {
                     cancel: `/user?username=${username}`,
                     delete: `User ${username}`

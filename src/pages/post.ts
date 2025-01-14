@@ -21,6 +21,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ["form"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ["You are not permitted to create or edit items."]
             ));
@@ -52,6 +58,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ["form"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ["You are not permitted to create or edit items."]
             ));
@@ -140,6 +152,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ['form'],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to create or edit tags.']
             ));
@@ -168,6 +186,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ["form"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ["You are not permitted to create or edit tags."]
             ));
@@ -250,6 +274,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ['form'],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to create or edit tag types.']
             ));
@@ -340,6 +370,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ["form"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to create or edit users.']
             ));
@@ -372,6 +408,12 @@ export default function post(dataHandler: DataHandler): Router {
                 'Access Denied',
                 '',
                 ["form"],
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ["You are not permitted to create or edit users."]
             ));
@@ -562,6 +604,12 @@ async function getArgumentsSimply(
         'Required fields are marked by a *',
         '',
         ["form"],
+        {
+            active: false,
+            pageURL: '',
+            pageCount: 0,
+            pageNumber: 0
+        },
         edit && found || post ? {
             target: `/post/${dataType}`,
             form: form,

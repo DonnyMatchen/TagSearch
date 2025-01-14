@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 
 import { DataHandler } from "@rt/data";
-import getArguments from "@utl/getArguments";
+import getArguments, { Arguments } from "@utl/getArguments";
 
 export default function userCenter(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -16,6 +16,12 @@ export default function userCenter(dataHandler: DataHandler): Router {
                 `Access Denied`,
                 '',
                 ["delete"],
+                {
+                    active: true,
+                    pageURL: `${Arguments.url}/userCenter?username=&page=`,
+                    pageCount: 0,
+                    pageNumber: 0
+                },
                 {},
                 ['You are not permitted to access user information.']
             ));
@@ -34,13 +40,17 @@ export default function userCenter(dataHandler: DataHandler): Router {
                     'Manage Center',
                     7,
                     `${results.total} result(s) matching "${search}"`,
-                    search,
+                    '',
                     ['tagSearch'],
                     {
+                        active: true,
+                        pageURL: `${Arguments.url}/userCenter?username=${search}&page=`,
+                        pageCount: results.pageCount,
+                        pageNumber: +page
+                    },
+                    {
                         results: results.results,
-                        userSearch: search,
-                        pages: results.pageCount,
-                        page: +page
+                        userSearch: search
                     }
                 ));
             });

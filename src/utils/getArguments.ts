@@ -2,18 +2,18 @@ import { User } from "@rt/data";
 
 export default function getArguments(
     user: User,
-     title: string, page: number, legend: string,
-     search: string, styles: string[], args: object,
+     title: string, webPage: number, legend: string,
+     search: string, styles: string[], pages: Pages, args: object,
      errors?: string[], successes?: string[], messages?: string[]
 ): object {
-    return new Arguments(user, title, page, legend, search, styles, args, errors, successes, messages);
+    return new Arguments(user, title, webPage, legend, search, styles, pages, args, errors, successes, messages);
 }
 
 export class Arguments {
     static url: string;
     baseURL: string = Arguments.url;
     title: string;
-    page: number;
+    webPage: number;
     legend: string;
     search: string;
     styles: string[];
@@ -22,19 +22,21 @@ export class Arguments {
     messages: string[];
     args: object = {};
     user: User;
+    pages: Pages;
 
     constructor(
          user: User,
-         title: string, page: number, legend: string,
-         search: string, styles: string[], args: object,
+         title: string, webPage: number, legend: string,
+         search: string, styles: string[], pages: Pages, args: object,
          errors?: string[], successes?: string[], messages?: string[]
     ) {
         this.user = user;
         this.title = title;
-        this.page = page;
+        this.webPage = webPage;
         this.legend = legend;
         this.search = search;
         this.styles = styles;
+        this.pages = pages;
         this.args = args;
         if(errors == undefined) {
             errors = [];
@@ -49,4 +51,11 @@ export class Arguments {
         this.successes = successes;
         this.messages = messages;
     }
+}
+
+export class Pages {
+    active: boolean;
+    pageURL: string;
+    pageCount: number;
+    pageNumber: number;
 }

@@ -30,6 +30,12 @@ export default function item(dataHandler: DataHandler): Router {
                     search,
                     ['itemDisplay'],
                     {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
+                    {
                         item: item,
                         tags: tagCodex.codex,
                         indents: tagCodex.indents,
@@ -45,8 +51,12 @@ export default function item(dataHandler: DataHandler): Router {
                     search,
                     ['itemDisplay'],
                     {
-                        item: undefined
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
                     },
+                    {},
                     ['You do not have access to this item.']
                 ));
             }
@@ -59,8 +69,12 @@ export default function item(dataHandler: DataHandler): Router {
                 search,
                 ['itemDisplay'],
                 {
-                    item: item
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
                 },
+                {},
                 ['The item ID was invalid, the item does not exist, or none was provided.']
             ));
         });

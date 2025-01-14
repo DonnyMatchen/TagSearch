@@ -26,6 +26,12 @@ export default function tag(dataHandler: DataHandler): Router {
                 search,
                 ['tagDisplay'],
                 {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
+                {
                     tag: tag,
                     codex: codex
                 }
@@ -39,8 +45,12 @@ export default function tag(dataHandler: DataHandler): Router {
                 search,
                 ['tagDisplay'],
                 {
-                    tag: tag
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
                 },
+                {},
                 ['The tag name was invalid, or not provided']
             ));
         });
