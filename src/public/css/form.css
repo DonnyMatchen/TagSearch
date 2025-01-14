@@ -1,0 +1,9 @@
+div.labelCol {
+    text-align: right;
+}
+div.fieldCol input, div.fieldCol textarea, div.fieldCol select {
+    width: 100%;
+}
+div.submitCol, div.fieldCol, div.labelCol {
+    margin-top: 1em;
+}

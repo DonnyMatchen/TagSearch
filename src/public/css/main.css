@@ -31,7 +31,7 @@ a {
     background-color: var(--content);
     color: var(--foreground);
 }
-.edit {
+.edit, .create, .success {
     background-color: var(--success);
 }
 .delete, .error {
@@ -75,7 +75,7 @@ button#searchButton {
 }
 
 nav {
-    padding-bottom: 2em;
+    padding-bottom: 1em;
 }
 .navGroup {
     display: inline;
@@ -87,8 +87,9 @@ nav {
     margin-left: 0.25em;
 }
 .navSelected {
-    background-color: var(--header);
+    background-color: var(--bacground);
     border: none;
+    padding-bottom: 1.1em;
 }
 div#loginSection {
     text-align: right;

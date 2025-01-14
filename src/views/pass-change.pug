@@ -1,40 +1,58 @@
 extends layout
 
 block layout-content
-    div#loginBox
-        form(action=`/login/${args.set ? 'set' : 'change'}`, method='post')
-            table
+    div.row
+        div.col-sm-2
+        div#loginBox.col-sm-8
+            form(action=`/login/${args.set ? 'set' : 'change'}`, method='post')
                 -if(args.set)
-                    tr
-                        td.formLabel Username
-                        td.formField
-                            input(type="text" name="uname")
-                    tr
-                        td.formLabel Password
-                        td.formField
-                            input(type="password" name="pass1")
-                    tr
-                        td.formLabel Re-Enter Password
-                        td.formField
-                            input(type="password" name="pass2")
-                    tr
-                        td.blank
-                        td.formSubmit
-                            input(type="submit" value="Set")
+                    h1 Set Password
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-2.labelCol Username
+                        div.col-sm-3.fieldCol
+                            input.field(type="text" name="uname")
+                        div.col-sm-4
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-2.labelCol Password
+                        div.col-sm-3.fieldCol
+                            input.field(type="password" name="pass1")
+                        div.col-sm-4
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-2.labelCol Re-Enter Password
+                        div.col-sm-3.fieldCol
+                            input.field(type="password" name="pass2")
+                        div.col-sm-4
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-5.submitCol
+                            input.button.create(type="submit" value="Set")
+                        div.col-sm-4
                 -else
-                    tr
-                        td.formLabel Current Password
-                        td.formField
-                            input(type="password" name="oPass")
-                    tr
-                        td.formLabel New Password
-                        td.formField
-                            input(type="password" name="nPass1")
-                    tr
-                        td.formLabel Re-Enter Password
-                        td.formField
-                            input(type="password" name="nPass2")
-                    tr
-                        td.blank
-                        td.formSubmit
-                            input(type="submit" value="Update")
+                    h1 Change Password
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-2.labelCol Current Password
+                        div.col-sm-3.fieldCol
+                            input.field(type="password" name="oPass")
+                        div.col-sm-4
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-2.labelCol New Password
+                        div.col-sm-3.fieldCol
+                            input.field(type="password" name="nPass1")
+                        div.col-sm-4
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-2.labelCol Re-Enter Password
+                        div.col-sm-3.fieldCol
+                            input.field(type="password" name="nPass2")
+                        div.col-sm-4
+                    div.row
+                        div.col-sm-3
+                        div.col-sm-5.submitCol
+                            input.button.create(type="submit" value="Update")
+                        div.col-sm-4
+        div.col-sm-2
