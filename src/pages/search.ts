@@ -25,7 +25,7 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 ['itemSearch'],
                 {
-                    results: partition(results.results, 7),
+                    results: partition(results.results, 6),
                     pages: results.pageCount,
                     page: +page
                 }
@@ -147,7 +147,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 7),
+                                            results: partition(results.results, 6),
                                             pages: results.pageCount,
                                             page: 1
                                         },
@@ -193,7 +193,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 7),
+                                            results: partition(results.results, 6),
                                             pages: results.pageCount,
                                             page: 1
                                         },
@@ -239,7 +239,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 7),
+                                            results: partition(results.results, 6),
                                             pages: results.pageCount,
                                             page: 1
                                         },
@@ -285,7 +285,7 @@ export default function search(dataHandler: DataHandler): Router {
                                         '',
                                         ['itemSearch'],
                                         {
-                                            results: partition(results.results, 7),
+                                            results: partition(results.results, 6),
                                             pages: results.pageCount,
                                             page: 1
                                         },

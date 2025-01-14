@@ -30,7 +30,7 @@ export default class InMem extends DataHandler {
     }
 
     getPageLimit(): number {
-        return 28
+        return 30
     }
 
     //listers

@@ -70,7 +70,7 @@ export default function post(dataHandler: DataHandler): Router {
                                 desc: req.body.desc
                             }
                         );
-                        Promise.all([
+                        await Promise.all([
                             item.tagsChanged(dataHandler, dataHandler.tagsFromString(req.body.tags)),
                             dataHandler.addItem(item)
                         ]).then(() => {
@@ -81,7 +81,7 @@ export default function post(dataHandler: DataHandler): Router {
                         }, (error:Error) => {
                             errors.push(error.message);
                         });
-                    })
+                    });
                 } else {
                     await dataHandler.updateItem(new Item(
                         dataHandler,

@@ -1,21 +1,24 @@
 extends layout
 
 block layout-content
-    table#searchTable
-        each rw in args.results
-            tr.searchRow
-                each item in rw
-                    - if(item != undefined)
-                        td.searchItem.searchImage
-                            a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
-                                -if(item.type == 0)
-                                    img.thumb(alt=item.tags.join(" "), src=item.source)
-                                -else
-                                    img.thumb(alt=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
-            tr.searchRow
-                each item in rw
-                    - if(item != undefined)
-                        td.searchItem.searchDesc= item.desc
+    div.row
+        div.col-sm-1
+        div.col-sm-10
+            each rw in args.results
+                div.row.align-items-end
+                    each item in rw
+                        div.searchItem.searchImage.col-sm-2
+                            - if(item != undefined)
+                                a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
+                                    -if(item.type == 0)
+                                        img.thumb(alt=item.tags.join(" "), src=item.source)
+                                    -else
+                                        img.thumb(alt=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
+                div.descRow.row
+                    each item in rw
+                        div.searchItem.searchDesc.col-sm-2
+                            - if(item != undefined)
+                                span= item.desc
     -if(args.page == null || args.page <= 0)
         -args.page = 1
     -if(args.pages == null || args.pages <= 0)

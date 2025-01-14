@@ -89,3 +89,12 @@ div#loginSection {
 h1#title, h3#legend {
     text-align: center;
 }
+
+div#pageNumbers {
+    margin-top: 2em;
+    text-align: center;
+}
+div#pageNumbers a, div#pageNumbers span {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
