@@ -15,16 +15,17 @@ export default function tag(dataHandler: DataHandler): Router {
         if(search == undefined) {
             search = '';
         }
-        dataHandler.getTag(name).then(tag => {
+        dataHandler.getTag(name).then(async tag => {
             let codex: CodexSet = new CodexSet(dataHandler);
-            codex.setup(tag);
+            await codex.setup(tag);
+            console.log(`[server]: codex\n${JSON.stringify(codex)}`);
             res.render('tag', getArguments(
                 req.session.user,
                 'Tag',
                 -1,
                 `Tag Named "${name}"`,
                 search,
-                ['tagDisplay'],
+                ['display'],
                 {
                     active: false,
                     pageURL: '',
@@ -69,9 +70,8 @@ class CodexSet {
     }
 
     async setup(tag: Tag) {
-        let foundType: TagType;
         await this.dataHandler.getTagType(tag.type).then(type => {
-            foundType = type;
+            this.type = type;
         });
         if(tag.parent != null) {
             this.dataHandler.getTag(tag.parent).then(parent => {

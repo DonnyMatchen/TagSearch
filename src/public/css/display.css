@@ -1,7 +1,7 @@
 div.displayImg {
     text-align: center;
 }
-div.displayTags {
+div.displayBox {
     padding-left: 1em;
     padding-right: 1em;
     padding-bottom: 1em;
@@ -14,6 +14,6 @@ embed.displayWindow {
     width: 90%;
     height: 70vh;
 }
-h2.infoHeading {
-    margin-top: 0.5em;
+h3.infoHeading {
+    margin-top: 0.75em;
 }

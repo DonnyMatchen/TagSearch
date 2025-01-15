@@ -12,24 +12,24 @@ block layout-content
                         img.displayImage(title=itm.tags.join(" "), src=url)
                 -else
                     embed.displayWindow(src=url)
-            div.col-sm-4.displayTags
+            div.col-sm-4.displayBox
                 -if(user != undefined && user.role >= 2)
-                    h2.infoHeading Options
+                    h3.infoHeading Options
                     div#options
                         a.button.edit(href=`${baseURL}/post/item?edit=${itm.id}`) Edit
                         a.button.delete(href=`${baseURL}/delete/item?id=${itm.id}`) Delete
-                h2.infoHeading Tags
+                h3.infoHeading Tags
                 each type in args.types
                     b= type.name
                     ul
                         each tag in args.tags.get(type.name)
                             li(style=`padding-left: ${args.indents.get(tag.name) * 20}px;color:${type.color}`)
                                 a(style=`color:${type.color}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
-                h2.infoHeading Timestamp
+                h3.infoHeading Timestamp
                 div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
-                h2.infoHeading Description
+                h3.infoHeading Description
                 p= itm.desc
-                h2.infoHeading Link
+                h3.infoHeading Link
                 a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
             div.col-sm-1
     - if(args.item == null)

@@ -2,40 +2,41 @@ extends layout
 
 block layout-content
     - if(args.tag != null)
-        table.displayTable
-            tr 
-                td.display.displayRelatives
-                    h2 Parent
-                    -if(args.tag.parent == null)
-                        div (None)
-                    - else
+        div.row
+            div.col-sm-1
+            div.col-sm-5.displayBox
+                h3.infoHeading Parent
+                -if(args.tag.parent == null)
+                    div (None)
+                - else
+                    div
+                        a(href=`${baseURL}/tag?name=${args.tag.parent}`)= args.tag.parent
+                h3.infoHeading Children
+                -if(args.tag.children.length == 0)
+                    div (None)
+                -else
+                    each child in args.tag.children
                         div
-                            a(href=`${baseURL}/tag?name=${args.tag.parent}`)= args.tag.parent
-                    h2 Children
-                    -if(args.tag.children.length == 0)
-                        div (None)
-                    -else
-                        each child in args.tag.children
-                            div
-                                a(href=`${baseURL}/tag?name=${child}`)= child
-                    h2 Siblings
-                    -if(args.codex.siblings.length == 0)
-                        div (None)
-                    -else
-                        each sibling in args.codex.siblings
-                            div
-                                a(href=`${baseURL}/tag?name=${sibling}`)= sibling
-                td.display.displayInfo
-                    -if(user != undefined && user.role >= 2)
-                        h2 Options
-                        div#options
-                            a.button.editButton(href=`${baseURL}/post/tag?edit=${args.tag.name}`) Edit
-                            a.button.deleteButton(href=`${baseURL}/delete/tag?name=${args.tag.name}`) Delete
-                    h2 Type
-                    a(style=`color: ${args.codex.type.color}`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tag.type}`)= args.tag.type
-                    h2 Item Count
-                    a(href=`${baseURL}/search?tags=${args.tag.name}`)= args.tag.refs.length
-                    h2 Link
-                    a(href=`${baseURL}/tag?name=${args.tag.name}`)= `${baseURL}/tag?name=${args.tag.name}`
+                            a(href=`${baseURL}/tag?name=${child}`)= child
+                h3.infoHeading Siblings
+                -if(args.codex.siblings.length == 0)
+                    div (None)
+                -else
+                    each sibling in args.codex.siblings
+                        div
+                            a(href=`${baseURL}/tag?name=${sibling}`)= sibling
+            div.col-sm-5.displayBox
+                -if(user != undefined && user.role >= 2)
+                    h3.infoHeading Options
+                    div#options
+                        a.button.edit(href=`${baseURL}/post/tag?edit=${args.tag.name}`) Edit
+                        a.button.delete(href=`${baseURL}/delete/tag?name=${args.tag.name}`) Delete
+                h3.infoHeading Type
+                a(style=`color: ${args.codex.type.color}`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${args.tag.type}`)= args.tag.type
+                h3.infoHeading Item Count
+                a(href=`${baseURL}/search?tags=${args.tag.name}`)= args.tag.refs.length
+                h3.infoHeading Link
+                a(href=`${baseURL}/tag?name=${args.tag.name}`)= `${baseURL}/tag?name=${args.tag.name}`
+            div.col-sm-1    
     - else
         h2 The specified tag could not be loaded or does not exist
