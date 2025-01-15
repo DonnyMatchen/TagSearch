@@ -519,8 +519,10 @@ async function getArgumentsSimply(
             if(edit && post) {
                 found = true;
             } else if(edit) {
+                console.log(`[server]: A`);
                 await dataHandler.getItem(+query.edit).then(item => {
-                    vals = new RetItemHolder(`${item.id}`, item.source, `${item.date}`, item.tags.join(' '), item.desc);
+                    vals = new RetItemHolder(`${item.id}`, item.source, `${new Date(item.date).toISOString().slice(0, 19)}`, item.tags.join(' '), item.desc);
+                    found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
@@ -545,6 +547,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getTag(query.edit).then(tag => {
                     vals = new TagHolder(tag.name, tag.type, tag.parent == null ? '' : tag.parent);
+                    found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
@@ -566,6 +569,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getTagType(query.edit).then(type => {
                     vals = new TagTypeHolder(type.name, type.color, `${type.order}`);
+                    found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
@@ -588,6 +592,7 @@ async function getArgumentsSimply(
             } else if(edit) {
                 await dataHandler.getUser(query.edit).then(user => {
                     vals = new UserHolder(user.username, '', roleToString(user.role));
+                    found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {
                         errors = [];
