@@ -152,7 +152,8 @@ export default class InMem extends DataHandler {
             let errorString: string = '';
             await this.reduce(search).then(async reduced => {
                 await this.getItems(reduced).then(items => {
-                    items.forEach(item => {
+                    for(let i = 0; i < items.length; i++) {
+                        let item = items[i];
                         let add: boolean = item.pub || user != undefined && user.role >= 1;
                         if(add && options != undefined && options.before != undefined) {
                             add = item.date <= options.before;
@@ -163,7 +164,7 @@ export default class InMem extends DataHandler {
                         if(add) {
                             out.push(item);
                         }
-                    });
+                    }
                 });
             }, (error:Error) => {
                 errorString = error.message;
@@ -388,16 +389,22 @@ export default class InMem extends DataHandler {
     }
     async deleteTag(tag: Tag) {
         if(tag.children.length > 0) {
-            await this.getTags(tag.children).then(tags => tags.forEach(async childTag => {
-                childTag.parent = null;
-                await this.updateTag(childTag);
-            }));
+            await this.getTags(tag.children).then(async tags => {
+                for(let i = 0; i < tags.length; i++) {
+                    let childTag = tags[i];
+                    childTag.parent = null;
+                    await this.updateTag(childTag);
+                }
+            });
         }
-        await this.getItems(tag.refs).then(items => items.forEach(async item => {
-            let temp: string[] = item.tags.concat([]);
-            temp.splice(temp.indexOf(tag.name), 1);
-            await this.updateItem(item, temp);
-        }));
+        await this.getItems(tag.refs).then(async items => {
+            for(let i = 0; i < items.length; i++) {
+                let item = items[i];
+                let temp: string[] = item.tags.concat([]);
+                temp.splice(temp.indexOf(tag.name), 1);
+                await this.updateItem(item, temp);
+            }
+        });
         if(tag.parent != null) {
             await tag.getParent(this).then(parent => {
                 parent.removeChild(tag.name);
@@ -414,9 +421,11 @@ export default class InMem extends DataHandler {
         this.tagTypes.delete(type.name);
     }
     async deleteItem(item: Item) {
-        await this.getTags(item.tags).then(tags => tags.forEach(tag => {
-            tag.removeRef(item.id);
-        }));
+        await this.getTags(item.tags).then(tags => {
+            for(let i = 0; i < tags.length; i++) {
+                tags[i].removeRef(item.id);
+            }
+        });
         this.items.delete(item.id);
     }
 }

@@ -133,18 +133,20 @@ export class Item {
      */
     async tagsChanged(dataHandler: DataHandler, newList: string[]) {
         let error: Error = null;
-        await this.expandTags(dataHandler, newList).then(expanded => {
+        await this.expandTags(dataHandler, newList).then(async expanded => {
             let changes: Diff = this.diffTags(this.tags, expanded);
-            changes.removed.forEach(async tagName => {
+            for(let i = 0; i < changes.removed.length; i++) {
+                let tagName: string = changes.removed[i];
                 await dataHandler.getTag(tagName).then(tag => {
                     tag.removeRef(this.id);
                     dataHandler.updateTag(tag);
                 }, err => {
                     error = err;
                 });
-            });
+            }
             if(error == null) {
-                changes.added.forEach(async tag => {
+                for(let i = 0; i < changes.added.length; i++) {
+                    let tag = changes.added[i];
                     let foundTag: Tag;
                     await dataHandler.getTag(tag).then(found => {
                         foundTag = found;
@@ -157,7 +159,7 @@ export class Item {
                         foundTag.addRef(this.id);
                         dataHandler.updateTag(foundTag);
                     });
-                });
+                }
                 this.tags.splice(0, this.tags.length);
                 expanded.forEach(tag => this.tags.push(tag));
             }
@@ -565,15 +567,18 @@ export abstract class DataHandler {
                 }
             }
         } else {
-            await this.getTags(tags).then(tags => tags.forEach(found => {
-                let refList: number[] = found.refs;
-                container.push(refList);
-                refList.forEach(ref => {
-                    if(!allRefs.includes(ref)) {
-                        allRefs.push(ref);
-                    }
-                });
-            }));
+            await this.getTags(tags).then(tags => {
+                for(let i = 0; i < tags.length; i++) {
+                    let found = tags[i];
+                    let refList: number[] = found.refs;
+                    container.push(refList);
+                    refList.forEach(ref => {
+                        if(!allRefs.includes(ref)) {
+                            allRefs.push(ref);
+                        }
+                    });
+                }
+            });
             allRefs.forEach(ref => {
                 let include = true;
                 for(let i = 0; i < container.length; i++) {
@@ -592,13 +597,15 @@ export abstract class DataHandler {
 
     async ensureAdmin() {
         let foundAdmin: boolean = false;
-        this.searchUsers('', -1, 1).then(results => {
-            results.results.forEach(user => {
+        await this.searchUsers('', -1, 1).then(results => {
+            for(let i = 0; i < results.results.length; i++) {
+                let user = results.results[i];
                 if(user.role == Role.Admin) {
                     foundAdmin = true;
+                    break;
                 }
-            })
-        })
+            }
+        });
         if(!foundAdmin) {
             let admin: User = new User('admin', Role.Admin);
             admin.setPassword('', 'toor').then(() => {

@@ -20,7 +20,11 @@ export default function item(dataHandler: DataHandler): Router {
                 let tagCodex: TagsCodex;
                 await getTagObject(dataHandler, item.tags).then(codex => tagCodex = codex);
                 let types: TagType[] = [];
-                await tagCodex.getTagTypes().then(foundTypes => foundTypes.forEach(type => types.push(type)));
+                await tagCodex.getTagTypes().then(foundTypes => {
+                    for(let i = 0; i < foundTypes.length; i++) {
+                        types.push(foundTypes[i]);
+                    }
+                });
                 types.sort((a: TagType, b: TagType) => {
                     return a.order - b.order;
                 });
@@ -94,22 +98,24 @@ async function getTagObject(dataHandler: DataHandler, tags: string[]): Promise<T
             let tag = tags[i];
             if (tag.parent != null) {
                 await getParents(dataHandler, tag).then(pList => {
-                    pList.forEach(parent => {
+                    for(let i = 0; i < pList.length; i++) {
+                        let parent = pList[i];
                         if(!parents.includes(parent)) {
                             parents.push(parent);
                         }
-                    });
+                    }
                 });
             }
             out.push(tag);
         }
     });
 
-    parents.forEach(parent => {
+    for(let i = 0; i < parents.length; i++) {
+        let parent = parents[i];
         if(out.includes(parent)) {
             out.splice(out.indexOf(parent), 1);
         }
-    });
+    }
 
     out.sort((a, b) => {
         return a.name.localeCompare(b.name);

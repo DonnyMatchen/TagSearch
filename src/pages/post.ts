@@ -482,9 +482,9 @@ export default function post(dataHandler: DataHandler): Router {
 async function getTagTypes(dataHandler: DataHandler): Promise<string[]> {
     let out: string[] = [];
     await dataHandler.searchTagTypes('', -1, 1).then(results => {
-        results.results.forEach(type => {
-            out.push(type.name);
-        });
+        for(let i = 0; i < results.results.length; i++) {
+            out.push(results.results[i].name);
+        }
     });
     return out;
 }

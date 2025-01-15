@@ -70,17 +70,20 @@ export default function search(dataHandler: DataHandler): Router {
         if(req.query.tagMatch == null) {
             tagSearch = '';
         }
-        dataHandler.searchTags(tagSearch, dataHandler.getPageLimit(), +page).then(results => {
+        dataHandler.searchTags(tagSearch, dataHandler.getPageLimit(), +page).then(async results => {
             let list: string[] = [];
-            results.results.forEach(tag => {
+            for(let i = 0; i < results.results.length; i++) {
+                let tag = results.results[i];
                 if(!list.includes(tag.type)) {
                     list.push(tag.type);
                 }
-            });
+            }
             let map: Map<string, TagType> = new Map();
-            dataHandler.getTagTypes(list).then(types => types.forEach(type => {
-                map.set(type.name, type);
-            }));
+            await dataHandler.getTagTypes(list).then(types => {
+                for(let i = 0; i < types.length; i++) {
+                    map.set(types[i].name, types[i]);
+                }
+            });
             res.render('tagSearch', getArguments(
                 req.session.user,
                 'Search Results',

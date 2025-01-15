@@ -75,11 +75,12 @@ class CodexSet {
         });
         if(tag.parent != null) {
             this.dataHandler.getTag(tag.parent).then(parent => {
-                parent.children.forEach(tagName => {
+                for(let i = 0; i < parent.children.length; i++) {
+                    let tagName = parent.children[i];
                     if(tagName != tag.name) {
                         this.siblings.push(tagName);
                     }
-                });
+                }
             });
         }
     }
