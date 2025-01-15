@@ -15,6 +15,7 @@ import post from "@pg/post";
 import deleter from "@pg/delete";
 import userCenter from "@pg/userCenter";
 import login from "@pg/login";
+import api from "@pg/api";
 
 declare module "express-session" {
     interface SessionData {
@@ -81,6 +82,7 @@ app.use("/post", post(dataHandler));
 app.use("/delete", deleter());
 app.use('/userCenter', userCenter(dataHandler));
 app.use('/login', login(dataHandler));
+app.use('/api', api(dataHandler));
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

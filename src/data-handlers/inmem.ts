@@ -38,11 +38,12 @@ export default class InMem extends DataHandler {
         if(search == '') {
             let out = [...this.users.values()]
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -54,11 +55,12 @@ export default class InMem extends DataHandler {
                 }
             });
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -68,11 +70,12 @@ export default class InMem extends DataHandler {
         if(search == '') {
             let out = [...this.tags.values()]
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -84,11 +87,12 @@ export default class InMem extends DataHandler {
                 }
             });
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -98,11 +102,12 @@ export default class InMem extends DataHandler {
         if(search == '') {
             let out = [...this.tagTypes.values()];;
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -114,11 +119,12 @@ export default class InMem extends DataHandler {
                 }
             });
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -140,11 +146,12 @@ export default class InMem extends DataHandler {
                 }
             });
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
@@ -173,11 +180,12 @@ export default class InMem extends DataHandler {
                 throw new Error(errorString);
             }
             if(pageSize <= 0) {
-                return new SearchResults(out, out.length, 1);
+                return new SearchResults(out, out.length, 1, 1);
             } else {
                 return new SearchResults(
                     out.slice((pageNumber-1)*pageSize, (pageNumber-1)*pageSize + pageSize),
                     out.length,
+                    pageNumber,
                     (out.length - (out.length % pageSize)) / pageSize + (out.length % pageSize == 0 ? 0 : 1)
                 );
             }
