@@ -5,6 +5,6 @@ block layout-content
         form(action="../search", method='POST')
             input(type='hidden', name='del', value=args.delete)
             div.buttonRow
-                a#cancelButton.button(href=`${baseURL}${args.cancel}`) Cancel
-            div.buttonRow
-                input.deleteButton.button(type='submit', value='Delete')
+                a.button.message(href=`${baseURL}${args.cancel}`) Cancel
+                input.button.delete(type='submit', value='Delete')
+                

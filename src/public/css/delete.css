@@ -1,0 +1,7 @@
+div.buttonRow {
+    text-align: center;
+}
+div.buttonRow a, div.buttonRow input {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}

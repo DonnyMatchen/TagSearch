@@ -18,7 +18,6 @@ export default function tag(dataHandler: DataHandler): Router {
         dataHandler.getTag(name).then(async tag => {
             let codex: CodexSet = new CodexSet(dataHandler);
             await codex.setup(tag);
-            console.log(`[server]: codex\n${JSON.stringify(codex)}`);
             res.render('tag', getArguments(
                 req.session.user,
                 'Tag',

@@ -72,11 +72,11 @@ html
                             a.button.navItem(href=`${baseURL}/logout`) Log Out
             div#banners
                 each error in errors
-                    div.error= error
+                    div.error.banner= error
                 each success in successes
-                    div.success= success
+                    div.success.banner= success
                 each message in messages
-                    div.message= message
+                    div.message.banner= message
             h3#legend= legend
             block layout-content
             -if(pages.active)
