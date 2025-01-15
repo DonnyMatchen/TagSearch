@@ -506,8 +506,8 @@ async function getArgumentsSimply(
             typeName = 'Item';
             page = 4;
             form = edit ? 
-                new RetItemHolder('text/dis', 'text', 'datetime-local', 'text-area', 'text-area') :
-                new ItemHolder('text', 'datetime-local', 'text-area', 'text-area')
+                new RetItemHolder('text/dis', 'text', 'datetime', 'text-area', 'text-area') :
+                new ItemHolder('text', 'datetime', 'text-area', 'text-area')
             labels = edit ? 
             new RetItemHolder('Unique ID*', 'Source URL*', 'Date and Time*', 'Tags', 'Description') :
             new ItemHolder('Source URL*', 'Date and Time*', 'Tags', 'Description')
@@ -519,7 +519,6 @@ async function getArgumentsSimply(
             if(edit && post) {
                 found = true;
             } else if(edit) {
-                console.log(`[server]: A`);
                 await dataHandler.getItem(+query.edit).then(item => {
                     vals = new RetItemHolder(`${item.id}`, item.source, `${new Date(item.date).toISOString().slice(0, 19)}`, item.tags.join(' '), item.desc);
                     found = true;

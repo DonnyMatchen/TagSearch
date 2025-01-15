@@ -18,6 +18,8 @@ block layout-content
                                     select.field(name=name readonly)
                                         each str in args.arrs[name]
                                             option(value=str)= str
+                                -else if(type == 'datetime')
+                                    input.field(type='datetime-local', step=1, readonly)
                                 -else
                                     input.field(type=type, name=name, readonly)
                             -else
@@ -27,6 +29,8 @@ block layout-content
                                     select.field(name=name)
                                         each str in args.arrs[name]
                                             option(value=str)= str
+                                -else if(type == 'datetime')
+                                    input.field(type='datetime-local', step=1)
                                 -else
                                     input.field(type=type, name=name)
                         div.col-sm-4
@@ -53,6 +57,8 @@ block layout-content
                                     select.field(name=name readonly value=args.vals[name])
                                         each str in args.arrs[name]
                                             option(value=str)= str
+                                -else if(type == 'datetime')
+                                    input.field(type='datetime-local', step=1, readonly, value=args.vals[name])
                                 -else
                                     input.field(type=type, name=name, readonly, value=args.vals[name])
                             -else
@@ -65,6 +71,8 @@ block layout-content
                                                 option(value=str, selected='selected')= str
                                             -else
                                                 option(value=str)= str
+                                -else if(type == 'datetime')
+                                    input.field(type='datetime-local', step=1, value=args.vals[name])
                                 -else
                                     input.field(type=type, name=name, value=args.vals[name])
                         div.col-sm-4
