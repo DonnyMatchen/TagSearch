@@ -1,38 +1,39 @@
 extends layout
 
 block layout-content
-    div#tagSearch.row
-        div.col-sm-3
-        div.col-sm-6.row.align-items-center
-            div.right.col-sm-3
-                span#smallSearchLabel Search Users
-            div.col-sm-6
-                input#smallSearchBar.field(type='text' name="tagSearch", value=args.tagSearch)
+    div.container-fluid
+        div.row
             div.col-sm-3
-                button#smallSearchButton.button(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('smallSearchBar').value;`) Go
-        div.col-sm-3
-    div#smallSearchResults.row
-        div.col-sm-1
-        div.col-sm-10
-            div.row.smallSearchHeader
-                div.col-sm-2
-                div.col-sm-2
-                    b Username
-                div.col-sm-2
-                    b Role
-                div.col-sm-2
-                    b State
-                div.col-sm-2
-                    b Options
-                div.col-sm-2
-            each user in args.results
-                div.row.smallSearchRow
+            div.col-sm-6.row.align-items-center
+                div.col-sm-3.text-end
+                    span#smallSearchLabel Search Users
+                div.col-sm-6
+                    input#smallSearchBar.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
+                div.col-sm-3
+                    button#smallSearchButton.btn.ct-color(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('smallSearchBar').value;`) Go
+            div.col-sm-3
+        div.row.mt-3
+            div.col-sm-1
+            div.col-sm-10
+                div.row.mb-1.text-center
                     div.col-sm-2
-                    div.col-sm-2= user.username
-                    div.col-sm-2= user.roleToString()
-                    div.col-sm-2= user.stateToString()
                     div.col-sm-2
-                        a.button.tableButton.edit(title='Edit' href=`${baseURL}/post/user?edit=${user.username}`) E
-                        a.button.tableButton.delete(title='Delete' href=`${baseURL}/delete/user?username=${user.username}`) X
+                        b Username
                     div.col-sm-2
-        div.col-sm-1
+                        b Role
+                    div.col-sm-2
+                        b State
+                    div.col-sm-2
+                        b Options
+                    div.col-sm-2
+                each user in args.results
+                    div.row.mb-1.text-center.align-items-center
+                        div.col-sm-2
+                        div.col-sm-2= user.username
+                        div.col-sm-2= user.roleToString()
+                        div.col-sm-2= user.stateToString()
+                        div.col-sm-2
+                            a.btn.ms-2.me-2.gd-color(title='Edit' href=`${baseURL}/post/user?edit=${user.username}`) E
+                            a.btn.ms-2.me-2.er-color(title='Delete' href=`${baseURL}/delete/user?username=${user.username}`) X
+                        div.col-sm-2
+            div.col-sm-1

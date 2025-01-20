@@ -34,7 +34,6 @@ export default function item(dataHandler: DataHandler): Router {
                     -1,
                     `Item Number: ${id}`,
                     search,
-                    ['display'],
                     {
                         active: false,
                         pageURL: '',
@@ -55,7 +54,6 @@ export default function item(dataHandler: DataHandler): Router {
                     -1,
                     `Access Denied`,
                     search,
-                    ['display'],
                     {
                         active: false,
                         pageURL: '',
@@ -73,7 +71,6 @@ export default function item(dataHandler: DataHandler): Router {
                 -1,
                 `No item here`,
                 search,
-                ['display'],
                 {
                     active: false,
                     pageURL: '',

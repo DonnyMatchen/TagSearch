@@ -6,7 +6,7 @@ export default function api(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
     
     router.get('/', (req, res) => {
-        res.setHeader('Content-Type', 'text/json');
+        res.setHeader('Content-Type', 'application/json');
         res.send({
             'status': statuses.get(200),
             'messages': ['Server is up'],
@@ -16,7 +16,7 @@ export default function api(dataHandler: DataHandler): Router {
     });
 
     router.get('/tags', (req, res) => {
-        res.setHeader('Content-Type', 'text/json');
+        res.setHeader('Content-Type', 'application/json');
         let search: string = <string>req.query.match;
         let page: string = <string>req.query.page;
         if (search == undefined) {
@@ -50,7 +50,7 @@ export default function api(dataHandler: DataHandler): Router {
                 });
             });
         }
-    })
+    });
     return router;
 }
 

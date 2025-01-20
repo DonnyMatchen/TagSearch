@@ -1,43 +1,46 @@
 extends layout
 
 block layout-content
-    div#tagSearch.row
-        div.col-sm-3
-        div.col-sm-6.row.align-items-center
-            div.right.col-sm-3
-                span#smallSearchLabel Search Tag Types
-            div.col-sm-6
-                input#smallSearchBar.field(type='text' name="tagSearch", value=args.tagSearch)
+    div.container-fluid
+        div.row
             div.col-sm-3
-                button#smallSearchButton.button(onclick=`window.location.href='${baseURL}/search/tagTypes?tagMatch='+document.getElementById('smallSearchBar').value;`) Go
-        div.col-sm-3
-    div#smallSearchResults.row
-        div.col-sm-1
-        div.col-sm-10
-            div.row.smallSearchHeader
-                div.col-sm-2
-                div.col-sm-2
-                    b Name
-                div.col-sm-2
-                    b Color
-                div.col-sm-2
-                    b Precedence
-                div.col-sm-2
-                    -if(user != undefined && user.role >= 2)
-                        b Options
-                div.col-sm-2
-            each type in args.results
-                div.row.smallSearchRow
+            div.col-sm-6.row.align-items-center
+                div.col-sm-3.text-end
+                    span Search Tag Types
+                div.col-sm-6
+                    input.width-full.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
+                div.col-sm-3
+                    button#small-search-button.btn.gd-color(onclick=`window.location.href='${baseURL}/search/tagTypes?tagMatch='+document.getElementById('smallSearchBar').value;`) Go
+            div.col-sm-3
+        div.mt-3
+            div.col-sm-1
+            div.col-sm-10
+                div.row.mb-1.text-center
                     div.col-sm-2
-                    div.col-sm-2= type.name
                     div.col-sm-2
-                        span= type.color
-                        span(style=`color:${type.color};`)  ■
-                    div.col-sm-2= type.order
+                        b Name
+                    div.col-sm-2
+                        b Color
+                    div.col-sm-2
+                        b Precedence
                     div.col-sm-2
                         -if(user != undefined && user.role >= 2)
-                            a.button.tableButton.edit(title='Edit' href=`${baseURL}/post/tagType?edit=${type.name}`) E
-                            -if(type.name != 'default')
-                                a.button.tableButton.delete(title='Delete' href=`${baseURL}/delete/tagType?name=${type.name}`) X
+                            b Options
                     div.col-sm-2
-        div.col-sm-1
+                each type in args.results
+                    div.row.mb-1.text-center.align-items-center
+                        div.col-sm-2
+                        div.col-sm-2= type.name
+                        div.col-sm-2
+                            span= type.color
+                            span(style=`color:${type.color};`)  ■
+                        div.col-sm-2= type.order
+                        div.col-sm-2
+                            -if(user != undefined && user.role >= 2)
+                                a.btn.ms-2.me-2.gd-color(title='Edit' href=`${baseURL}/post/tagType?edit=${type.name}`) E
+                                -if(type.name != 'default')
+                                    a.btn.ms-2.me-2.er-color(title='Delete' href=`${baseURL}/delete/tagType?name=${type.name}`) X
+                                -else
+                                    span.btn.ms-2.me-2.btn-selected X
+                        div.col-sm-2
+            div.col-sm-1

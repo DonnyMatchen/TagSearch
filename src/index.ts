@@ -57,7 +57,6 @@ app.get('/', (req, res) => {
         0,
         'Yes, the site is working.',
         '',
-        [],
         {
             active: false,
             pageURL: '',
@@ -71,7 +70,12 @@ app.get('/', (req, res) => {
 app.get('/logout', (req, res) => {
     req.session.user = undefined;
     res.redirect('/search');
-})
+});
+
+app.get('/test', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.sendFile(path.join(__dirname, 'test.html'));
+});
 
 app.use(express.static(path.join(__dirname, "public")));
 

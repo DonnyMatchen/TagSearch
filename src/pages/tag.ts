@@ -24,7 +24,6 @@ export default function tag(dataHandler: DataHandler): Router {
                 -1,
                 `Tag Named "${name}"`,
                 search,
-                ['display'],
                 {
                     active: false,
                     pageURL: '',
@@ -43,7 +42,6 @@ export default function tag(dataHandler: DataHandler): Router {
                 -1,
                 `Tag Named "${name}"`,
                 search,
-                ['tagDisplay'],
                 {
                     active: false,
                     pageURL: '',

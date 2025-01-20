@@ -4,7 +4,7 @@ block layout-content
     -if(args.cancel != undefined)
         form(action="../search", method='POST')
             input(type='hidden', name='del', value=args.delete)
-            div.buttonRow
-                a.button.message(href=`${baseURL}${args.cancel}`) Cancel
-                input.button.delete(type='submit', value='Delete')
+            div.text-center
+                a.btn.ct-color.ms-2.me-2(href=`${baseURL}${args.cancel}`) Cancel
+                input.btn.er-color.ms-2.me-2(type='submit', value='Delete')
                 

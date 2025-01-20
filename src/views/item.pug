@@ -4,33 +4,34 @@ block layout-content
     - url = args.item.source
     - itm = args.item
     - if(args.item != null)
-        div.row
-            div.col-sm-1
-            div.col-sm-6.displayImg
-                -if(itm.type == 0)
-                    a(href=url)
-                        img.displayImage(title=itm.tags.join(" "), src=url)
-                -else
-                    embed.displayWindow(src=url)
-            div.col-sm-4.displayBox
-                -if(user != undefined && user.role >= 2)
-                    h3.infoHeading Options
-                    div#options
-                        a.button.edit(href=`${baseURL}/post/item?edit=${itm.id}`) Edit
-                        a.button.delete(href=`${baseURL}/delete/item?id=${itm.id}`) Delete
-                h3.infoHeading Tags
-                each type in args.types
-                    b= type.name
-                    ul
-                        each tag in args.tags.get(type.name)
-                            li(style=`padding-left: ${args.indents.get(tag.name) * 20}px;color:${type.color}`)
-                                a(style=`color:${type.color}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
-                h3.infoHeading Timestamp
-                div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
-                h3.infoHeading Description
-                p= itm.desc
-                h3.infoHeading Link
-                a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
-            div.col-sm-1
+        div.container-fluid
+            div.row
+                div.col-sm-1
+                div.col-sm-6.text-center
+                    -if(itm.type == 0)
+                        a(href=url)
+                            img.width-snug(title=itm.tags.join(" "), src=url)
+                    -else
+                        embed.width-snug.tall-embed(src=url)
+                div.col-sm-4.box.ps-3.pe-3.pb-3
+                    -if(user != undefined && user.role >= 2)
+                        h3.mt-3 Options
+                        div#options
+                            a.btn.gd-color.me-3(href=`${baseURL}/post/item?edit=${itm.id}`) Edit
+                            a.btn.er-color.me-3(href=`${baseURL}/delete/item?id=${itm.id}`) Delete
+                    h3.mt-3 Tags
+                    each type in args.types
+                        b= type.name
+                        ul
+                            each tag in args.tags.get(type.name)
+                                li(style=`padding-left: ${args.indents.get(tag.name) * 20}px;color:${type.color}`)
+                                    a(style=`color:${type.color}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
+                    h3.mt-3 Timestamp
+                    div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
+                    h3.mt-3 Description
+                    p= itm.desc
+                    h3.mt-3 Link
+                    a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
+                div.col-sm-1
     - if(args.item == null)
         h2 The specified item could not be loaded or does not exist

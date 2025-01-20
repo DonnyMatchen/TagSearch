@@ -20,7 +20,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ["form"],
                 {
                     active: false,
                     pageURL: '',
@@ -57,7 +56,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ["form"],
                 {
                     active: false,
                     pageURL: '',
@@ -151,7 +149,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ['form'],
                 {
                     active: false,
                     pageURL: '',
@@ -185,7 +182,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ["form"],
                 {
                     active: false,
                     pageURL: '',
@@ -273,7 +269,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ['form'],
                 {
                     active: false,
                     pageURL: '',
@@ -369,7 +364,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ["form"],
                 {
                     active: false,
                     pageURL: '',
@@ -407,7 +401,6 @@ export default function post(dataHandler: DataHandler): Router {
                 -1,
                 'Access Denied',
                 '',
-                ["form"],
                 {
                     active: false,
                     pageURL: '',
@@ -607,7 +600,6 @@ async function getArgumentsSimply(
         edit && found ? -1 : page,
         'Required fields are marked by a *',
         '',
-        ["form"],
         {
             active: false,
             pageURL: '',

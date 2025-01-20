@@ -3,10 +3,10 @@ import { User } from "@rt/data";
 export default function getArguments(
     user: User,
      title: string, webPage: number, legend: string,
-     search: string, styles: string[], pages: Pages, args: object,
+     search: string, pages: Pages, args: object,
      errors?: string[], successes?: string[], messages?: string[]
 ): object {
-    return new Arguments(user, title, webPage, legend, search, styles, pages, args, errors, successes, messages);
+    return new Arguments(user, title, webPage, legend, search, pages, args, errors, successes, messages);
 }
 
 export class Arguments {
@@ -16,7 +16,6 @@ export class Arguments {
     webPage: number;
     legend: string;
     search: string;
-    styles: string[];
     errors: string[];
     successes: string[];
     messages: string[];
@@ -27,7 +26,7 @@ export class Arguments {
     constructor(
          user: User,
          title: string, webPage: number, legend: string,
-         search: string, styles: string[], pages: Pages, args: object,
+         search: string, pages: Pages, args: object,
          errors?: string[], successes?: string[], messages?: string[]
     ) {
         this.user = user;
@@ -35,7 +34,6 @@ export class Arguments {
         this.webPage = webPage;
         this.legend = legend;
         this.search = search;
-        this.styles = styles;
         this.pages = pages;
         this.args = args;
         if(errors == undefined) {

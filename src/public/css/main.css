@@ -8,106 +8,57 @@
     --message: #505050;
     --border: var(--foreground), thin, solid;
 }
-body {
+
+.bg-color {
     background-color: var(--bacground);
     color: var(--foreground);
 }
+.hd-color {
+    background-color: var(--header);
+    color: var(--foreground);
+}
+.ct-color {
+    background-color: var(--content);
+    color: var(--foreground);
+}
+.gd-color {
+    background-color: var(--success);
+    color: var(--foreground);
+}
+.er-color {
+    background-color: var(--error);
+    color: var(--foreground);
+}
+.ms-color {
+    background-color: var(--message);
+    color: var(--foreground);
+}
+.field {
+    --bs-body-bg: var(--content);
+    --bs-body-color: var(--foreground);
+}
+
 a {
     color: var(--foreground);
 }
 
-.right {
-    text-align: right;
+.btn-selected {
+    cursor: default;
+    color: var(--foreground);
 }
 
-.button {
-    text-decoration: none;
+.box {
     border: var(--border);
-    padding: 0.5em;
-    background-color: var(--content);
-    color: var(--foreground);
-}
-.field {
-    background-color: var(--content);
-    color: var(--foreground);
-}
-.edit, .create, .success {
-    background-color: var(--success);
-}
-.delete, .error {
-    background-color: var(--error);
-}
-.message {
-    background-color: var(--message);
-}
-.banner {
-    text-align: center;
-    padding: 0.5em;
-}
-.tableButton {
-    padding: 0;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    border: none;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
 }
 
-header {
-    background-color: var(--header);
-    margin-bottom: 2em;
-}
-
-
-div#searchSection {
-    margin-top: 2em;
-    margin-bottom: 2em;
-}
-span#searchLabel, input#searchBar, button#searchButton {
-    font-size: 1.5em;
-}
-span#searchLabel {
-    margin-left: auto;
-    text-align: right;
-}
-input#searchBar {
+.width-full {
     width: 100%;
 }
-button#searchButton {
-    padding-top: 0;
-    padding-bottom: 0;
+
+.width-snug {
+    width: 90%;
 }
 
-nav {
-    padding-bottom: 1em;
-}
-.navGroup {
-    display: inline;
-    margin-right: 0.5em;
-    margin-left: 0.5em;
-}
-.navItem {
-    margin-right: 0.25em;
-    margin-left: 0.25em;
-}
-.navSelected {
-    background-color: var(--bacground);
-    border: none;
-    padding-bottom: 1.1em;
-}
-div#loginSection {
-    text-align: right;
-}
-
-h1#title, h3#legend {
-    text-align: center;
-}
-
-div#pageNumbers {
-    margin-top: 2em;
-    text-align: center;
-}
-div#pageNumbers a, div#pageNumbers span {
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+.tall-embed {
+    height: 75vh;
 }

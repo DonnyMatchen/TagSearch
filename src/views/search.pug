@@ -1,21 +1,22 @@
 extends layout
 
 block layout-content
-    div.row
-        div.col-sm-1
-        div.col-sm-10
-            each rw in args.results
-                div.row.align-items-end
-                    each item in rw
-                        div.searchItem.searchImage.col-sm-2
-                            - if(item != undefined)
-                                a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
-                                    -if(item.type == 0)
-                                        img.thumb(title=item.tags.join(" "), src=item.source)
-                                    -else
-                                        img.thumb(title=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
-                div.descRow.row
-                    each item in rw
-                        div.searchItem.searchDesc.col-sm-2
-                            - if(item != undefined)
-                                span= item.desc
+    div.container-fluid
+        div.row
+            div.col-sm-1
+            div.col-sm-10
+                each rw in args.results
+                    div.row.align-items-end
+                        each item in rw
+                            div.text-center.col-sm-2
+                                - if(item != undefined)
+                                    a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
+                                        -if(item.type == 0)
+                                            img.width-snug(title=item.tags.join(" "), src=item.source)
+                                        -else
+                                            img.width-snug(title=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
+                    div.row.mb-4
+                        each item in rw
+                            div.text-center.mt-2.col-sm-2
+                                - if(item != undefined)
+                                    span= item.desc

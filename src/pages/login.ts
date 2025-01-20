@@ -15,7 +15,6 @@ export default function login(dataHandler: DataHandler): Router {
             101,
             req.session.user == undefined ? '': 'You are already logged in',
             '',
-            ['form', 'login'],
             {
                 active: false,
                 pageURL: '',
@@ -64,7 +63,6 @@ export default function login(dataHandler: DataHandler): Router {
                 101,
                 req.session.user == undefined ? '': 'You are already logged in',
                 '',
-                ['form', 'login'],
                 {
                     active: false,
                     pageURL: '',
@@ -85,7 +83,6 @@ export default function login(dataHandler: DataHandler): Router {
             102,
             '',
             '',
-            ['form', 'login'],
             {
                 active: false,
                 pageURL: '',
@@ -126,7 +123,6 @@ export default function login(dataHandler: DataHandler): Router {
                             102,
                             '',
                             '',
-                            ['form', 'login'],
                             {
                                 active: false,
                                 pageURL: '',
@@ -174,7 +170,6 @@ export default function login(dataHandler: DataHandler): Router {
                     102,
                     '',
                     '',
-                    ['form', 'login'],
                     {
                         active: false,
                         pageURL: '',
@@ -198,7 +193,6 @@ export default function login(dataHandler: DataHandler): Router {
             102,
             '',
             '',
-            ['form', 'login'],
             {
                 active: false,
                 pageURL: '',
@@ -240,7 +234,6 @@ export default function login(dataHandler: DataHandler): Router {
                             102,
                             '',
                             '',
-                            ['form', 'login'],
                             {
                                 active: false,
                                 pageURL: '',
@@ -288,7 +281,6 @@ export default function login(dataHandler: DataHandler): Router {
                     102,
                     '',
                     '',
-                    ['form', 'login'],
                     {
                         active: false,
                         pageURL: '',

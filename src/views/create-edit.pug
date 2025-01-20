@@ -1,86 +1,87 @@
 extends layout
 
 block layout-content
-    -if(args.target != undefined)
-        form(action=args.target, method='post')
-            - if(args.vals == undefined)
-                input(type='hidden', name='state', value='new')
-                each type, name in args.form
-                    div.row
-                        div.col-sm-3
-                        div.col-sm-2.labelCol= args.labels[name]
-                        div.col-sm-3.fieldCol
-                            -if(type.includes('/dis'))
-                                - type = type.replace('/dis', '')
-                                -if(type == 'text-area')
-                                    textArea.field(name=name, rows=5, readonly)
-                                -else if(type == 'select')
-                                    select.field(name=name readonly)
-                                        each str in args.arrs[name]
-                                            option(value=str)= str
-                                -else if(type == 'datetime')
-                                    input.field(type='datetime-local', step=1, readonly)
-                                -else
-                                    input.field(type=type, name=name, readonly)
-                            -else
-                                -if(type == 'text-area')
-                                    textArea.field(name=name, rows=5)
-                                -else if(type == 'select')
-                                    select.field(name=name)
-                                        each str in args.arrs[name]
-                                            option(value=str)= str
-                                -else if(type == 'datetime')
-                                    input.field(type='datetime-local', step=1)
-                                -else
-                                    input.field(type=type, name=name)
-                        div.col-sm-4
-                div.row
-                    div.col-sm-5
-                    div.col-sm-3.submitCol
-                        -if(args.update)
-                            input.button.create(type='submit', value='Update')
-                        -else
-                            input.button.create(type='submit', value='Add')
-                    div.col-sm-4
-            - else
-                input(type='hidden', name='state', value='update')
-                each type, name in args.form
-                    div.row
-                        div.col-sm-3
-                        div.col-sm-2.labelCol= args.labels[name]
-                        div.col-sm-3.fieldCol
-                            -if(type.includes('/dis'))
-                                - type = type.replace('/dis', '')
-                                -if(type == 'text-area')
-                                    textArea.field(name=name, rows=5, readonly)= value=args.vals[name]
-                                -else if(type == 'select')
-                                    select.field(name=name readonly value=args.vals[name])
-                                        each str in args.arrs[name]
-                                            option(value=str)= str
-                                -else if(type == 'datetime')
-                                    input.field(type='datetime-local', step=1, readonly, value=args.vals[name])
-                                -else
-                                    input.field(type=type, name=name, readonly, value=args.vals[name])
-                            -else
-                                -if(type == 'text-area')
-                                    textArea.field(name=name, rows=5)= args.vals[name]
-                                -else if(type == 'select')
-                                    select.field(name=name)
-                                        each str in args.arrs[name]
-                                            -if(str == args.vals[name])
-                                                option(value=str, selected='selected')= str
-                                            -else
+    div.container-fluid
+        -if(args.target != undefined)
+            form(action=args.target, method='post')
+                - if(args.vals == undefined)
+                    input(type='hidden', name='state', value='new')
+                    each type, name in args.form
+                        div.row.mb-2
+                            div.col-sm-3
+                            div.col-sm-2.text-end= args.labels[name]
+                            div.col-sm-3
+                                -if(type.includes('/dis'))
+                                    - type = type.replace('/dis', '')
+                                    -if(type == 'text-area')
+                                        textArea.form-control.field(name=name, rows=5, readonly)
+                                    -else if(type == 'select')
+                                        select.form-control.field(name=name readonly)
+                                            each str in args.arrs[name]
                                                 option(value=str)= str
-                                -else if(type == 'datetime')
-                                    input.field(type='datetime-local', step=1, value=args.vals[name])
+                                    -else if(type == 'datetime')
+                                        input.form-control.field(type='datetime-local', step=1, readonly)
+                                    -else
+                                        input.form-control.field(type=type, name=name, readonly)
                                 -else
-                                    input.field(type=type, name=name, value=args.vals[name])
+                                    -if(type == 'text-area')
+                                        textArea.form-control.field(name=name, rows=5)
+                                    -else if(type == 'select')
+                                        select.form-control.field(name=name)
+                                            each str in args.arrs[name]
+                                                option(value=str)= str
+                                    -else if(type == 'datetime')
+                                        input.form-control.field(type='datetime-local', step=1)
+                                    -else
+                                        input.form-control.field(type=type, name=name)
+                            div.col-sm-4
+                    div.row.mb-2
+                        div.col-sm-5
+                        div.col-sm-3.submit-col
+                            -if(args.update)
+                                input.btn.gd-color(type='submit', value='Update')
+                            -else
+                                input.btn.gd-color(type='submit', value='Add')
                         div.col-sm-4
-                div.row
-                    div.col-sm-5
-                    div.col-sm-3.submitCol
-                        -if(args.update)
-                            input.button.create(type='submit', value='Update')
-                        -else
-                            input.button.create(type='submit', value='Add')
-                    div.col-sm-4
+                - else
+                    input(type='hidden', name='state', value='update')
+                    each type, name in args.form
+                        div.row.mb-2
+                            div.col-sm-3
+                            div.col-sm-2.text-right= args.labels[name]
+                            div.col-sm-3
+                                -if(type.includes('/dis'))
+                                    - type = type.replace('/dis', '')
+                                    -if(type == 'text-area')
+                                        textArea.form-control.field(name=name, rows=5, readonly)= value=args.vals[name]
+                                    -else if(type == 'select')
+                                        select.form-control.field(name=name readonly value=args.vals[name])
+                                            each str in args.arrs[name]
+                                                option(value=str)= str
+                                    -else if(type == 'datetime')
+                                        input.form-control.field(type='datetime-local', step=1, readonly, value=args.vals[name])
+                                    -else
+                                        input.form-control.field(type=type, name=name, readonly, value=args.vals[name])
+                                -else
+                                    -if(type == 'text-area')
+                                        textArea.form-control.field(name=name, rows=5)= args.vals[name]
+                                    -else if(type == 'select')
+                                        select.form-control.field(name=name)
+                                            each str in args.arrs[name]
+                                                -if(str == args.vals[name])
+                                                    option(value=str, selected='selected')= str
+                                                -else
+                                                    option(value=str)= str
+                                    -else if(type == 'datetime')
+                                        input.form-control.field(type='datetime-local', step=1, value=args.vals[name])
+                                    -else
+                                        input.form-control.field(type=type, name=name, value=args.vals[name])
+                            div.col-sm-4
+                    div.row.mb-2
+                        div.col-sm-5
+                        div.col-sm-3.submit-col
+                            -if(args.update)
+                                input.btn.gd-color(type='submit', value='Update')
+                            -else
+                                input.btn.gd-color(type='submit', value='Add')
+                        div.col-sm-4

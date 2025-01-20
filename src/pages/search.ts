@@ -23,7 +23,6 @@ export default function search(dataHandler: DataHandler): Router {
                 1,
                 `${results.total} result(s) from search "${search}"`,
                 search,
-                ['itemSearch'],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -41,7 +40,6 @@ export default function search(dataHandler: DataHandler): Router {
                 1,
                 ``,
                 search,
-                ['itemSearch'],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/search?tags=${search}&`,
@@ -90,7 +88,6 @@ export default function search(dataHandler: DataHandler): Router {
                 2,
                 `${results.total} result(s) matching "${tagSearch}"`,
                 search,
-                ['smallSearch'],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
@@ -128,7 +125,6 @@ export default function search(dataHandler: DataHandler): Router {
                 3,
                 `${results.total} result(s) matching "${tagSearch}"`,
                 search,
-                ['smallSearch'],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/search/tagTypes?tagTypeMatch=${tagSearch}&tags=${search}&page=`,
@@ -164,7 +160,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         `${results.total} result(s) from search ""`,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -183,7 +178,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         ``,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -218,7 +212,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         `${results.total} result(s) from search ""`,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -237,7 +230,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         ``,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -272,7 +264,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         `${results.total} result(s) from search ""`,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -291,7 +282,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         ``,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -326,7 +316,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         `${results.total} result(s) from search ""`,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,
@@ -345,7 +334,6 @@ export default function search(dataHandler: DataHandler): Router {
                                         1,
                                         ``,
                                         '',
-                                        ['itemSearch'],
                                         {
                                             active: true,
                                             pageURL: `${Arguments.url}/search?tags=${search}&page=`,

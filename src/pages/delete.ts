@@ -18,7 +18,6 @@ export default function deleter(): Router {
                 -1,
                 `Access denied`,
                 '',
-                ["delete"],
                 {
                     active: false,
                     pageURL: '',
@@ -36,7 +35,6 @@ export default function deleter(): Router {
                 -1,
                 `Are you sure you want to delete item#${itemID}?`,
                 '',
-                ["delete"],
                 {
                     active: false,
                     pageURL: '',
@@ -60,7 +58,6 @@ export default function deleter(): Router {
                 -1,
                 `Access Denied`,
                 '',
-                ["delete"],
                 {
                     active: false,
                     pageURL: '',
@@ -78,7 +75,6 @@ export default function deleter(): Router {
                 -1,
                 `Are you sure you want to delete the tag "${name}"`,
                 '',
-                ["delete"],
                 {
                     active: false,
                     pageURL: '',
@@ -102,7 +98,6 @@ export default function deleter(): Router {
                 -1,
                 `Access Denied`,
                 '',
-                [],
                 {
                     active: false,
                     pageURL: '',
@@ -121,7 +116,6 @@ export default function deleter(): Router {
                     -1,
                     `You cannot delete the default tag type`,
                     '',
-                    [],
                     {
                         active: false,
                         pageURL: '',
@@ -138,7 +132,6 @@ export default function deleter(): Router {
                     -1,
                     `Are you sure you want to delete the tag type '${name}'?`,
                     '',
-                    ["delete"],
                     {
                         active: false,
                         pageURL: '',
@@ -163,7 +156,6 @@ export default function deleter(): Router {
                 -1,
                 `Access Denied`,
                 '',
-                [],
                 {
                     active: false,
                     pageURL: '',
@@ -181,7 +173,6 @@ export default function deleter(): Router {
                 -1,
                 `Are you sure you want to delete the user credentials for '${username}'?`,
                 '',
-                ["delete"],
                 {
                     active: false,
                     pageURL: '',

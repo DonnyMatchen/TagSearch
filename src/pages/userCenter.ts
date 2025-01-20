@@ -15,7 +15,6 @@ export default function userCenter(dataHandler: DataHandler): Router {
                 -1,
                 `Access Denied`,
                 '',
-                ["smallSearch"],
                 {
                     active: true,
                     pageURL: `${Arguments.url}/userCenter?username=&page=`,
@@ -41,7 +40,6 @@ export default function userCenter(dataHandler: DataHandler): Router {
                     7,
                     `${results.total} result(s) matching "${search}"`,
                     '',
-                    ['smallSearch'],
                     {
                         active: true,
                         pageURL: `${Arguments.url}/userCenter?username=${search}&page=`,
