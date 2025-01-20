@@ -43,12 +43,15 @@ a {
 }
 
 .btn-selected {
-    cursor: default;
     color: var(--foreground);
 }
 
 .box {
     border: var(--border);
+}
+
+.bg-item {
+    cursor: default;
 }
 
 .width-full {

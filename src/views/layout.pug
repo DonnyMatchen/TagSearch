@@ -31,12 +31,12 @@ html
         title= `${title} | Tag Search`
     body.bg-color
         header.container-fluid.hd-color.pt-4.pb-3.mb-3
-            h1.pb-4.text-center Tag Search
+            h1.pb-4.text-center.bg-item Tag Search
             div.row.mt-3.mb-3
                 div.col-sm-2
                 div.col-sm-8.row.align-items-center
                     div.col-sm-3.text-end
-                        span Search
+                        span.bg-item Search
                     div.col-sm-6
                         input.width-full.field.form-control(type='text' name='search', value=search)
                     div.col-sm-3
@@ -52,21 +52,21 @@ html
                                         a.btn.m-1.ct-color(href=`${baseURL}${pair[1]}`)= pair[0]
                                 -else
                                     -if(security <= +level)
-                                        span.btn.m-1.btn-selected= pair[0]
+                                        span.btn.m-1.btn-selected.bg-item= pair[0]
                 div.col-sm-3.text-end
                     -if(user == undefined)
                         -if(webPage == 101)
-                            span.btn.m-1.btn-selected Login
+                            span.btn.m-1.btn-selected.bg-item Login
                         -else
                             a.btn.m-1.gd-color(href=`${baseURL}/login`) Log In
                     -else
-                        span.btn.m-1.btn-selected= user.username
+                        span.btn.m-1.btn-selected.bg-item= user.username
                         -if(webPage == 102)
-                            span.btn.m-1.btn-selected Change Password
+                            span.btn.m-1.btn-selected.bg-item Change Password
                         -else
                             a.btn.m-1.ct-color(href=`${baseURL}/login/change`) Change Password
                         a.btn.m-1.er-color(href=`${baseURL}/logout`) Log Out
-        div
+        div.bg-item
             each error in errors
                 div.er-color.p-3.mb-2.text-center= error
             each success in successes
@@ -88,7 +88,7 @@ html
                     -i = 1;
                     while i <= pages.pageCount
                         -if(i == pages.pageNumber)
-                            span.ml-2.mr-2.btn.btn-selected= i++
+                            span.ml-2.mr-2.btn.btn-selected.bg-item= i++
                         -else
                             -n = i++;
                             a.ml-2.mr-2.btn.ct-color(href=`${pages.pageURL}${n}`)= n
@@ -103,7 +103,7 @@ html
                         -t = pages.pageNumber + 5
                     while i <= t
                         -if(i == pages.pageNumber)
-                            span.ml-2.mr-2.btn.btn-selected= i++
+                            span.ml-2.mr-2.btn.btn-selected.bg-item= i++
                         -else
                             -n = i++;
                             a.ml-2.mr-2.btn.ct-color(href=`${pages.pageURL}${n}`)= n

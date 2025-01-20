@@ -6,11 +6,11 @@ block layout-content
             div.col-sm-3
             div.col-sm-6.row.align-items-center
                 div.col-sm-3.text-end
-                    span#smallSearchLabel Search Users
+                    span.bg-item Search Users
                 div.col-sm-6
-                    input#smallSearchBar.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
+                    input.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
                 div.col-sm-3
-                    button#smallSearchButton.btn.ct-color(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('smallSearchBar').value;`) Go
+                    button.btn.ct-color(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('smallSearchBar').value;`) Go
             div.col-sm-3
         div.row.mt-3
             div.col-sm-1

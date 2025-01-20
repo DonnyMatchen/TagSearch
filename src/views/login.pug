@@ -8,19 +8,19 @@ block layout-content
                 div.col-sm-8.box.p-4.text-center
                     form(action='/login', method='post')
                         h1 Log In
-                        div.row
+                        div.row.mb-2
                             div.col-sm-3
                             div.col-sm-2.labelCol Username
                             div.col-sm-3.fieldCol
-                                input.form-control(type="text" name="uname")
+                                input.field.form-control(type="text" name="uname")
                             div.col-sm-4
-                        div.row
+                        div.row.mb-2
                             div.col-sm-3
                             div.col-sm-2.labelCol Password
                             div.col-sm-3.fieldCol
-                                input.form-control(type="password" name="pass")
+                                input.field.form-control(type="password" name="pass")
                             div.col-sm-4
-                        div.row
+                        div.row.mb-2
                             div.col-sm-3
                             div.col-sm-5.submitCol
                                 input.btn.gd-color(type="submit" value="Login")
