@@ -1,12 +1,31 @@
 :root {
+    --color-red: #603030;
+    --color-red-h: #482424;
+    --color-orange: #604830;
+    --color-orange-h: #483624;
+    --color-yellow: #606030;
+    --color-yellow-h: #484824;
+    --color-green: #306030;
+    --color-green-h: #244824;
+    --color-cyan: #306060;
+    --color-cyan-h: #244848;
+    --color-blue: #303060;
+    --color-blue-h: #242448;
+    --color-purple: #483060;
+    --color-purple-h: #362448;
+    --color-magenta: #603060;
+    --color-magenta-h: #482448;
+    --color-pink: #603048;
+    --color-pink-h: #482436;
+
     --bacground: #202020;
-    --content: #303060;
-    --content-h: #242448;
     --foreground: #f0f0f0;
-    --error: #603030;
-    --error-h: #482424;
-    --success: #306030;
-    --success-h: #244824;
+    --content: var(--color-purple);
+    --content-h: var(--color-purple-h);
+    --error: var(--color-red);
+    --error-h: var(--color-red-h);
+    --success: var(--color-green);
+    --success-h: var(--color-green-h);
     --message: #505050;
     --message-h: #3c3c3c;
     --border: var(--foreground), thin, solid;
