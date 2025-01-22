@@ -453,7 +453,7 @@ export default class InMem extends DataHandler {
                         extension = 'svg';
                     }
                     let newPath = `${createHash('sha-256').update(data).digest('hex')}.${extension}`;
-                    fs.writeFile(path.join(__dirname, '..', 'public', 'assets', newPath), data, (err) => {
+                    fs.writeFile(path.join(__dirname, '..', 'public', 'img', newPath), data, (err) => {
                         if(err) {
                             reject(err);
                         } else {
