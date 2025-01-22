@@ -70,7 +70,33 @@ export default function post(dataHandler: DataHandler): Router {
             if(req.files == null && req.body.source == '') {
                 errors.push('You must either upload a file or provide a URL');
             }
-            if(errorList.isEmpty() && errors.length == 0) {
+            let abort = errors.length > 0;
+            if(!errorList.isEmpty() || errors.length > 0) {
+                errorList['errors'].forEach((error: any) => {
+                    if(error.path == 'src') {
+                        if(error.msg == 'not-url') {
+                            errors.push('Source URL is malformed');
+                        }
+                    } else if(error.path == 'date') {
+                        if(error.msg == 'empty') {
+                            errors.push('Date is blank');
+                            abort = true;
+                        }
+                    }
+                });
+                if(abort) {
+                    if(req.body.state == 'new') {
+                        getArgumentsSimply(
+                            dataHandler, req.session.user, req.query, req.body, 'item', false, true, errors
+                        ).then(args => res.render('create-edit', args));
+                    } else {
+                        getArgumentsSimply(
+                            dataHandler, req.session.user, req.query, req.body, 'item', true, true, errors
+                        ).then(args => res.render('create-edit', args));
+                    }
+                }
+            }
+            if(!abort) {
                 let newID: number;
                 let item: Item;
                 let word: string;
@@ -102,6 +128,9 @@ export default function post(dataHandler: DataHandler): Router {
                     if (req.body.state == 'new') {
                         return item.tagsChanged(dataHandler, dataHandler.tagsFromString(req.body.tags));
                     }
+                }, (error:Error) => {
+                    console.error(error.message);
+                    errors.push(error.message);
                 }).then(() => {
                     if (req.body.state == 'new') {
                         return dataHandler.addItem(item);
@@ -109,41 +138,21 @@ export default function post(dataHandler: DataHandler): Router {
                         return dataHandler.updateItem(item, dataHandler.tagsFromString(req.body.tags));
                     }
                 }, (error:Error) => {
+                    console.error(error.message);
                     errors.push(error.message);
                 }).then(() => {
                     return getArgumentsSimply(
-                        dataHandler, req.session.user, req.query, req.body, 'item', false, false,
+                        dataHandler, req.session.user, req.query, req.body, 'item', req.body.state != 'new', false,
                         [], [`Item ${word} successfully.`]
                     )
                 }, (error:Error) => {
+                    console.error(error.message);
                     errors.push(error.message);
                 }).then(args => {
                     if(args) {
                         res.render("create-edit", args);
                     }
                 });
-            }
-            if(!errorList.isEmpty() || errors.length > 0) {
-                errorList['errors'].forEach((error: any) => {
-                    if(error.path == 'src') {
-                        if(error.msg == 'not-url') {
-                            errors.push('Source URL is malformed');
-                        }
-                    } else if(error.path == 'date') {
-                        if(error.msg == 'empty') {
-                            errors.push('Date is blank');
-                        }
-                    }
-                });
-                if(req.body.state == 'new') {
-                    getArgumentsSimply(
-                        dataHandler, req.session.user, req.query, req.body, 'item', false, true, errors
-                    ).then(args => res.render('create-edit', args));
-                } else {
-                    getArgumentsSimply(
-                        dataHandler, req.session.user, req.query, req.body, 'item', true, true, errors
-                    ).then(args => res.render('create-edit', args));
-                }
             }
         }
     });

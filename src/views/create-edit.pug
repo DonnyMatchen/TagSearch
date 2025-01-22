@@ -26,7 +26,7 @@ block layout-content
                                     -else if(type == 'datetime')
                                         input.form-control.field(type='datetime-local' step=1 readonly)
                                     -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf" readonly)
+                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf" readonly)
                                     -else
                                         input.form-control.field(type=type, name=name, readonly)
                                 -else
@@ -43,7 +43,7 @@ block layout-content
                                     -else if(type == 'datetime')
                                         input.form-control.field(type='datetime-local', step=1, name=name)
                                     -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf")
+                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
                                     -else
                                         input.form-control.field(type=type, name=name)
                             div.col-sm-4.p-0
@@ -86,7 +86,7 @@ block layout-content
                                     -else if(type == 'datetime')
                                         input.form-control.field(type='datetime-local', step=1, readonly, value=args.vals[name])
                                     -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf" readonly)
+                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf" readonly)
                                     -else
                                         input.form-control.field(type=type, name=name, readonly, value=args.vals[name])
                                 -else
@@ -106,7 +106,7 @@ block layout-content
                                     -else if(type == 'datetime')
                                         input.form-control.field(type='datetime-local', step=1, value=args.vals[name])
                                     -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf")
+                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
                                     -else
                                         input.form-control.field(type=type, name=name, value=args.vals[name])
                             div.col-sm-4

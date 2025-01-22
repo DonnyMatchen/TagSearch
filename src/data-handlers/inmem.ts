@@ -3,6 +3,7 @@ import {createHash} from 'crypto';
 import path from "path";
 
 import { TagType, Tag, Item, DataHandler, SearchOptions, SearchResults, User, getRandomString, Role, ItemType } from "@rt/data";
+import { Arguments } from '@utl/getArguments';
 
 export default class InMem extends DataHandler {
     //InMem data-stores
@@ -442,14 +443,17 @@ export default class InMem extends DataHandler {
     }
 
     async reHost(tempFile: string, type: string): Promise<string> {
-        console.log(`[server]: Rehosting ${tempFile}`);
         return new Promise<string>((resolve, reject) => {
             fs.readFile(tempFile, (err, data) => {
                 if (err) {
                     reject(err);
                 } else {
-                    let newPath = `${createHash('sha-256').update(data).digest('hex')}.${type.split('/')[1]}`;
-                    fs.writeFile(`../public/assets/${newPath}`, data, (err) => {
+                    let extension = type.split('/')[1];
+                    if(extension == 'svg+xml') {
+                        extension = 'svg';
+                    }
+                    let newPath = `${createHash('sha-256').update(data).digest('hex')}.${extension}`;
+                    fs.writeFile(path.join(__dirname, '..', 'public', 'assets', newPath), data, (err) => {
                         if(err) {
                             reject(err);
                         } else {
@@ -458,7 +462,7 @@ export default class InMem extends DataHandler {
                                     console.log(`[server]: Cleanup required (${tempFile})`);
                                 }
                             });
-                            resolve(newPath);
+                            resolve(`${Arguments.url}/assets/${newPath}`);
                         }
                     });
                 }
