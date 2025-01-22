@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import bodyParser from "body-parser";
 import session from 'express-session';
+import fileUpload from 'express-fileupload';
 
 import Data, { DataHandler, User } from "@rt/data";
 import InMem from "@dh/inmem";
@@ -49,6 +50,15 @@ app.use(session({
     }
 }));
 
+app.use(fileUpload({
+    // Configure file uploads with maximum file size 10MB
+    limits: { fileSize: 20 * 1024 * 1024 },
+  
+    // Temporarily store uploaded files to disk, rather than buffering in memory
+    useTempFiles : true,
+    tempFileDir : '/tmp/tag-search/'
+}));
+
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.render('index', getArguments(
@@ -75,6 +85,14 @@ app.get('/logout', (req, res) => {
 app.get('/test', (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.sendFile(path.join(__dirname, 'test.html'));
+});
+app.post('/test', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send({
+        'body': req.body,
+        'filesType': req.files['jkl;'].constructor.name,
+        'files': req.files,
+    });
 });
 
 app.use(express.static(path.join(__dirname, "public")));

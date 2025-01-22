@@ -43,7 +43,6 @@ export default function post(dataHandler: DataHandler): Router {
     });
     router.post("/item",
         body('src')
-            .notEmpty().withMessage('empty')
             .isURL().withMessage('not-url'),
         body('date')
             .notEmpty().withMessage('empty'),
@@ -68,57 +67,66 @@ export default function post(dataHandler: DataHandler): Router {
         } else {
             let errorList = validationResult(req);
             let errors: string[] = [];
-            if(errorList.isEmpty()) {
-                if(req.body.state == 'new') {
-                    await dataHandler.nextItemID().then(async id => {
-                        let item = new Item(dataHandler,
-                            id,
-                            req.body.source,
-                            new Date(req.body.date).valueOf(),
-                            ItemType.Image,
-                            {
-                                desc: req.body.desc
-                            }
-                        );
-                        await Promise.all([
-                            item.tagsChanged(dataHandler, dataHandler.tagsFromString(req.body.tags)),
-                            dataHandler.addItem(item)
-                        ]).then(() => {
-                            getArgumentsSimply(
-                                dataHandler, req.session.user, req.query, req.body, 'item', false, false,
-                                [], ['Item created successfully.']
-                            ).then(args => res.render("create-edit", args));
-                        }, (error:Error) => {
-                            errors.push(error.message);
-                        });
-                    });
-                } else {
-                    await dataHandler.updateItem(new Item(
-                        dataHandler,
-                        +req.body.id,
-                        req.body.source,
+            if(req.files == null && req.body.source == '') {
+                errors.push('You must either upload a file or provide a URL');
+            }
+            if(errorList.isEmpty() && errors.length == 0) {
+                let newID: number;
+                let item: Item;
+                let word: string;
+                new Promise<number>((resolve, reject) => {
+                    if (req.body.state == 'new') {
+                        word = 'created';
+                        resolve(dataHandler.nextItemID());
+                    } else {
+                        word = 'updated';
+                        resolve(+req.body.id);
+                    }
+                }).then(id => {
+                    newID = id;
+                    if(req.files == null) {
+                        return <string>req.body.src;
+                    } else {
+                        return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype);
+                    }
+                }).then(src => {
+                    item = new Item(dataHandler,
+                        newID,
+                        src,
                         new Date(req.body.date).valueOf(),
                         ItemType.Image,
                         {
                             desc: req.body.desc
-                        }),
-                        dataHandler.tagsFromString(req.body.tags)
-                    ).then(() => {
-                        getArgumentsSimply(
-                            dataHandler, req.session.user, req.query, req.body, 'item', false, false,
-                            [], ['Item updated successfully.']
-                        ).then(args => res.render("create-edit", args));
-                    }, (error:Error) => {
-                        errors.push(error.message);
-                    });
-                }
+                        }
+                    );
+                    if (req.body.state == 'new') {
+                        return item.tagsChanged(dataHandler, dataHandler.tagsFromString(req.body.tags));
+                    }
+                }).then(() => {
+                    if (req.body.state == 'new') {
+                        return dataHandler.addItem(item);
+                    } else {
+                        return dataHandler.updateItem(item, dataHandler.tagsFromString(req.body.tags));
+                    }
+                }, (error:Error) => {
+                    errors.push(error.message);
+                }).then(() => {
+                    return getArgumentsSimply(
+                        dataHandler, req.session.user, req.query, req.body, 'item', false, false,
+                        [], [`Item ${word} successfully.`]
+                    )
+                }, (error:Error) => {
+                    errors.push(error.message);
+                }).then(args => {
+                    if(args) {
+                        res.render("create-edit", args);
+                    }
+                });
             }
             if(!errorList.isEmpty() || errors.length > 0) {
                 errorList['errors'].forEach((error: any) => {
                     if(error.path == 'src') {
-                        if(error.msg == 'empty') {
-                            errors.push('Source URL is blank');
-                        } else if(error.msg == 'not-url') {
+                        if(error.msg == 'not-url') {
                             errors.push('Source URL is malformed');
                         }
                     } else if(error.path == 'date') {
@@ -497,23 +505,23 @@ async function getArgumentsSimply(
     switch(dataType) {
         case('item'):
             typeName = 'Item';
-            page = 4;
+            page = 5;
             form = edit ? 
-                new RetItemHolder('text/dis', 'text', 'datetime', 'text-area', 'text-area') :
-                new ItemHolder('text', 'datetime', 'text-area', 'text-area')
+                new RetItemHolder('text/dis', 'file', 'text', 'datetime', 'tags', 'text-area') :
+                new ItemHolder('file', 'text', 'datetime', 'tags', 'text-area')
             labels = edit ? 
-            new RetItemHolder('Unique ID*', 'Source URL*', 'Date and Time*', 'Tags', 'Description') :
-            new ItemHolder('Source URL*', 'Date and Time*', 'Tags', 'Description')
+                new RetItemHolder('Unique ID*', 'Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description') :
+                new ItemHolder('Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description')
             if(post) {
                 vals = edit ? 
-                new RetItemHolder(body.id, body.src, body.date, body.tags, body.desc) :
-                new ItemHolder(body.src, body.date, body.tags, body.desc)
+                new RetItemHolder(body.id, '', body.src, body.date, body.tags, body.desc) :
+                new ItemHolder('', body.src, body.date, body.tags, body.desc)
             }
             if(edit && post) {
                 found = true;
             } else if(edit) {
                 await dataHandler.getItem(+query.edit).then(item => {
-                    vals = new RetItemHolder(`${item.id}`, item.source, `${new Date(item.date).toISOString().slice(0, 19)}`, item.tags.join(' '), item.desc);
+                    vals = new RetItemHolder('', `${item.id}`, item.source, `${new Date(item.date).toISOString().slice(0, 19)}`, item.tags.join(' '), item.desc);
                     found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {
@@ -525,8 +533,8 @@ async function getArgumentsSimply(
         break;
         case('tag'):
             typeName = 'Tag';
-            page = 5;
-            form = new TagHolder(`text${edit ? '/dis' : ''}`, 'select', 'text');
+            page = 6;
+            form = new TagHolder(`text${edit ? '/dis' : ''}`, 'select', 'tag');
             labels = new TagHolder('Name*', 'Type*', 'Parent');
             await getTagTypes(dataHandler).then(types => {
                 arrs = {type: types};
@@ -550,7 +558,7 @@ async function getArgumentsSimply(
         break;
         case('tagType'):
             typeName = 'Tag Type';
-            page = 6;
+            page = 7;
             form = new TagTypeHolder(`text${edit ? '/dis' : ''}`, 'color', 'text');
             labels = new TagTypeHolder('Name*', 'Color*', 'Sort Order');
             if(post) {
@@ -627,12 +635,14 @@ async function getArgumentsSimply(
 }
 
 class ItemHolder {
+    file: string;
     src: string;
     date: string;
     tags: string;
     desc: string;
 
-    constructor(src: string, date: string, tags: string, desc: string) {
+    constructor(file: string, src: string, date: string, tags: string, desc: string) {
+        this.file = file;
         this.src = src;
         this.date = date;
         this.tags = tags;
@@ -641,13 +651,15 @@ class ItemHolder {
 }
 class RetItemHolder {
     id: string;
+    file: string;
     src: string;
     date: string;
     tags: string;
     desc: string;
 
-    constructor(id: string, src: string, date: string, tags: string, desc: string) {
+    constructor(id: string, file: string, src: string, date: string, tags: string, desc: string) {
         this.id = id;
+        this.file = file;
         this.src = src;
         this.date = date;
         this.tags = tags;

@@ -1,49 +1,66 @@
 :root {
     --bacground: #202020;
-    --content: #303030;
-    --header: #101010;
+    --content: #303060;
+    --content-h: #242448;
     --foreground: #f0f0f0;
     --error: #603030;
+    --error-h: #482424;
     --success: #306030;
+    --success-h: #244824;
     --message: #505050;
+    --message-h: #3c3c3c;
     --border: var(--foreground), thin, solid;
+
+    --header: 16, 16, 16;
+    --link: 240, 240, 240;
+    --link-h: 180, 180, 180;
+
+    --bs-body-color: var(--foreground);
+    --bs-body-bg: var(--bacground);
+    --bs-primary-rgb: var(--header);
+    --bs-link-color-rgb: var(--link);
+    --bs-link-hover-color-rgb: var(--link-h);
+    --bs-dropdown-link-hover-bg: var(--content);
+    --bs-dropdown-link-active-bg: var(--content);
+    --bs-dropdown-link-active-color: var(--foreground);
 }
 
 .bg-color {
     background-color: var(--bacground);
     color: var(--foreground);
 }
-.hd-color {
-    background-color: var(--header);
-    color: var(--foreground);
-}
 .ct-color {
     background-color: var(--content);
     color: var(--foreground);
+}
+.ct-color:hover {
+    background-color: var(--content-h);
 }
 .gd-color {
     background-color: var(--success);
     color: var(--foreground);
 }
+.gd-color:hover {
+    background-color: var(--success-h);
+}
 .er-color {
     background-color: var(--error);
     color: var(--foreground);
+}
+.er-color:hover {
+    background-color: var(--error-h);
 }
 .ms-color {
     background-color: var(--message);
     color: var(--foreground);
 }
+.ms-color:hover {
+    background-color: var(--message-h);
+}
 .field {
     --bs-body-bg: var(--content);
-    --bs-body-color: var(--foreground);
-}
-
-a {
-    color: var(--foreground);
-}
-
-.btn-selected {
-    color: var(--foreground);
+    --bs-tertiary-bg: var(--content);
+    --bs-secondary-bg: var(--content-h);
 }
 
 .box {

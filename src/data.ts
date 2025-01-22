@@ -618,6 +618,14 @@ export abstract class DataHandler {
             });
         }
     }
+
+    /**
+     * 
+     * @param tempFile file path to the temp file
+     * @param type the mime type of the file
+     * @returns the permanent file path after rehosting
+     */
+    abstract reHost(tempFile: string, type: string): Promise<string>;
 }
 
 export default class Data {

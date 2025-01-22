@@ -3,38 +3,57 @@ extends layout
 block layout-content
     div.container-fluid
         -if(args.target != undefined)
-            form(action=args.target, method='post')
+            form(action=args.target, method='post', enctype="multipart/form-data")
                 - if(args.vals == undefined)
                     input(type='hidden', name='state', value='new')
                     each type, name in args.form
                         div.row.mb-2
                             div.col-sm-3
                             div.col-sm-2.text-end= args.labels[name]
-                            div.col-sm-3
+                            div.col-sm-3.p-0
                                 -if(type.includes('/dis'))
                                     - type = type.replace('/dis', '')
                                     -if(type == 'text-area')
                                         textArea.form-control.field(name=name, rows=5, readonly)
-                                    -else if(type == 'select')
+                                    -else if(type == 'tags')
+                                        textArea#item-search.form-control.field(name=name rows=5 readonly)
+                                    -else if(type == 'select' || type == 'tags')
                                         select.form-control.field(name=name readonly)
                                             each str in args.arrs[name]
                                                 option(value=str)= str
+                                    -else if(type == 'tag')
+                                        input.form-control.field(type='text' name=name readonly)
                                     -else if(type == 'datetime')
-                                        input.form-control.field(type='datetime-local', step=1, readonly)
+                                        input.form-control.field(type='datetime-local' step=1 readonly)
+                                    -else if(type == 'file')
+                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf" readonly)
                                     -else
                                         input.form-control.field(type=type, name=name, readonly)
                                 -else
                                     -if(type == 'text-area')
                                         textArea.form-control.field(name=name, rows=5)
+                                    -else if(type == 'tags')
+                                        textArea#item-search.form-control.field(name=name rows=5 oninput=`handleInput('${baseURL}', 'item', true)`)
                                     -else if(type == 'select')
                                         select.form-control.field(name=name)
                                             each str in args.arrs[name]
                                                 option(value=str)= str
+                                    -else if(type == 'tag')
+                                        input#item-search.form-control.field(type='text' name=name oninput=`handleInput('${baseURL}', 'item', false)`)
                                     -else if(type == 'datetime')
-                                        input.form-control.field(type='datetime-local', step=1)
+                                        input.form-control.field(type='datetime-local', step=1, name=name)
+                                    -else if(type == 'file')
+                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf")
                                     -else
                                         input.form-control.field(type=type, name=name)
-                            div.col-sm-4
+                            div.col-sm-4.p-0
+                                -if(!dis && (type == 'tag' || type == 'tags'))
+                                    button#item-dropdown.btn.box.ct-color.dropdown-toggle.ms-2(type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
+                                    ul#item-menu.ct-color.box.dropdown-menu.pt-0(aria-labelledby='item-dropdown')
+                                    -if(type == 'tag')
+                                        script= `handleInput('${baseURL}', 'item', false)`
+                                    -else
+                                        script= `handleInput('${baseURL}', 'item', true)`
                     div.row.mb-2
                         div.col-sm-5
                         div.col-sm-3.submit-col
@@ -50,21 +69,31 @@ block layout-content
                             div.col-sm-3
                             div.col-sm-2.text-right= args.labels[name]
                             div.col-sm-3
+                                - dis = false;
                                 -if(type.includes('/dis'))
                                     - type = type.replace('/dis', '')
-                                    -if(type == 'text-area')
+                                    - dis = true;
+                                    -if(type == 'text-area' || type == 'tags')
                                         textArea.form-control.field(name=name, rows=5, readonly)= value=args.vals[name]
+                                    -else if(type == 'tags')
+                                        textArea#item-search.form-control.field(name=name rows=5 readonly)= value=args.vals[name]
                                     -else if(type == 'select')
                                         select.form-control.field(name=name readonly value=args.vals[name])
                                             each str in args.arrs[name]
                                                 option(value=str)= str
+                                    -else if(type == 'tag')
+                                        input#item-search.form-control.field(type='text' name=name readonly)
                                     -else if(type == 'datetime')
                                         input.form-control.field(type='datetime-local', step=1, readonly, value=args.vals[name])
+                                    -else if(type == 'file')
+                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf" readonly)
                                     -else
                                         input.form-control.field(type=type, name=name, readonly, value=args.vals[name])
                                 -else
                                     -if(type == 'text-area')
                                         textArea.form-control.field(name=name, rows=5)= args.vals[name]
+                                    -else if(type == 'tags')
+                                        textArea#item-search.form-control.field(name=name, rows=5, oninput=`handleInput('${baseURL}', 'item', true)`)= args.vals[name]
                                     -else if(type == 'select')
                                         select.form-control.field(name=name)
                                             each str in args.arrs[name]
@@ -72,11 +101,22 @@ block layout-content
                                                     option(value=str, selected='selected')= str
                                                 -else
                                                     option(value=str)= str
+                                    -else if(type == 'tag')
+                                        input#item-search.form-control.field(type='text', name=name, value=args.vals[name], oninput=`handleInput('${baseURL}', 'item', false)`)
                                     -else if(type == 'datetime')
                                         input.form-control.field(type='datetime-local', step=1, value=args.vals[name])
+                                    -else if(type == 'file')
+                                        input.form-control.field(type="file" name=name accept="image/png, image/jpeg, application/pdf")
                                     -else
                                         input.form-control.field(type=type, name=name, value=args.vals[name])
                             div.col-sm-4
+                                -if(!dis && (type == 'tag' || type == 'tags'))
+                                    button#item-dropdown.btn.box.ct-color.dropdown-toggle.ms-2(type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
+                                    ul#item-menu.ct-color.box.dropdown-menu.pt-0(aria-labelledby='item-dropdown')
+                                    -if(type == 'tag')
+                                        script= `handleInput('${baseURL}', 'item', false)`
+                                    -else
+                                        script= `handleInput('${baseURL}', 'item', true)`
                     div.row.mb-2
                         div.col-sm-5
                         div.col-sm-3.submit-col

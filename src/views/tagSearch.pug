@@ -8,9 +8,9 @@ block layout-content
                 div.col-sm-3.text-end
                     span.bg-item Search Tags
                 div.col-sm-6
-                    input.width-full.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
+                    input#small-search.width-full.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
                 div.col-sm-3
-                    button.btn.gd-color(onclick=`window.location.href='${baseURL}/search/tags?tagMatch='+document.getElementById('smallSearchBar').value;`) Go
+                    button.btn.gd-color(onclick=`window.location.href='${baseURL}/search/tags?tagMatch='+document.getElementById('small-search').value;`) Go
             div.col-sm-3
         div.row.mt-3
             div.col-sm-1

@@ -37,7 +37,7 @@ export default function userCenter(dataHandler: DataHandler): Router {
                 res.render('user', getArguments(
                     req.session.user,
                     'Manage Center',
-                    7,
+                    4,
                     `${results.total} result(s) matching "${search}"`,
                     '',
                     {

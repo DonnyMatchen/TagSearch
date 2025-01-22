@@ -1,9 +1,9 @@
 extends layout
 
 block layout-content
-    - url = args.item.source
     - itm = args.item
-    - if(args.item != null)
+    -if(itm != null)
+        - url = args.item.source
         div.container-fluid
             div.row
                 div.col-sm-1
@@ -33,5 +33,5 @@ block layout-content
                     h3.mt-3 Link
                     a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
                 div.col-sm-1
-    - if(args.item == null)
-        h2 The specified item could not be loaded or does not exist
+    -else
+        h2.text-center The specified item could not be loaded or does not exist

@@ -8,9 +8,9 @@ block layout-content
                 div.col-sm-3.text-end
                     span.bg-item Search Users
                 div.col-sm-6
-                    input.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
+                    input#small-search.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
                 div.col-sm-3
-                    button.btn.ct-color(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('smallSearchBar').value;`) Go
+                    button.btn.ct-color(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('small-search').value;`) Go
             div.col-sm-3
         div.row.mt-3
             div.col-sm-1

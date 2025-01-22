@@ -1,4 +1,8 @@
-import { TagType, Tag, Item, DataHandler, SearchOptions, SearchResults, User, getRandomString, Role } from "@rt/data";
+import fs from 'fs';
+import {createHash} from 'crypto';
+import path from "path";
+
+import { TagType, Tag, Item, DataHandler, SearchOptions, SearchResults, User, getRandomString, Role, ItemType } from "@rt/data";
 
 export default class InMem extends DataHandler {
     //InMem data-stores
@@ -435,5 +439,30 @@ export default class InMem extends DataHandler {
             }
         });
         this.items.delete(item.id);
+    }
+
+    async reHost(tempFile: string, type: string): Promise<string> {
+        console.log(`[server]: Rehosting ${tempFile}`);
+        return new Promise<string>((resolve, reject) => {
+            fs.readFile(tempFile, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    let newPath = `${createHash('sha-256').update(data).digest('hex')}.${type.split('/')[1]}`;
+                    fs.writeFile(`../public/assets/${newPath}`, data, (err) => {
+                        if(err) {
+                            reject(err);
+                        } else {
+                            fs.rm(tempFile, (err) => {
+                                if(err) {
+                                    console.log(`[server]: Cleanup required (${tempFile})`);
+                                }
+                            });
+                            resolve(newPath);
+                        }
+                    });
+                }
+            });
+        });
     }
 }
