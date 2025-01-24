@@ -30,7 +30,7 @@ block layout-content
                         div.col-sm-2
                             a(href=`${baseURL}/tag?name=${tag.name}`)= tag.name
                         div.col-sm-2
-                            a(style=`color: ${args.types.get(tag.type).hue};`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
+                            a(style=`color: ${args.types.get(tag.type).getColorString(config.tagLum)};`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
                         div.col-sm-2= tag.refs.length
                         div.col-sm-3
             div.col-sm-1

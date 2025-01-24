@@ -24,8 +24,8 @@ block layout-content
                         b= type.name
                         ul
                             each tag in args.tags.get(type.name)
-                                li(style=`padding-left: ${args.indents.get(tag.name) * 20}px;color:${type.color}`)
-                                    a(style=`color:${type.color}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
+                                li(style=`padding-left: ${args.indents.get(tag.name) * 17}px;color:${type.getColorString(config.tagLum)}`)
+                                    a(style=`color:${type.getColorString(config.tagLum)}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
                     h3.mt-3 Timestamp
                     div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
                     h3.mt-3 Description

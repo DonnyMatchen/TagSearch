@@ -445,7 +445,7 @@ export default function post(dataHandler: DataHandler): Router {
         } else {
             let errorList = validationResult(req);
             let errors: string[] = [];
-            let user: User = new User(req.body.name, req.body.role);
+            let user: User = new User(req.body.name, req.body.role, User.getDefaultConfig());
             user.setPassword('', req.body.pass).then(async () => {
                 if(errorList.isEmpty()) {
                     if(req.body.state == 'new') {

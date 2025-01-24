@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { randomBytes } from 'crypto';
 import { Buffer } from 'buffer';
-import { hues, lums } from "@utl/appColor";
+import { HslColor, Hue, Lum } from "@utl/appColor";
 
 class Diff {
     added: string[] = [];
@@ -19,6 +19,18 @@ export class TagType {
         this.hue = hue;
         this.order = order;
         this.grey = grey;
+    }
+
+    getColor(lum: number): HslColor {
+        if(this.grey) {
+            return new HslColor(0, 0, this.hue);
+        } else {
+            return new HslColor(this.hue, 80, lum);
+        }
+    }
+    getColorString(lum: number) {
+        let color = this.getColor(lum);
+        return `HSL(${color.h}, ${color.s}%, ${color.l}%)`
     }
 }
 
@@ -259,15 +271,21 @@ export enum UserState {
 }
 
 export class User {
+    static getDefaultConfig(): PersonalConfig {
+        return {dark: true, tagLum: Lum.bright, theme: Hue.teal, themeLum: Lum.dark, bad: Hue.red, good: Hue.green};
+    }
+
     state: UserState;
 
     readonly username: string;
     hash: string;
     salt: string;
     role: Role;
+    config: PersonalConfig;
 
-    constructor(username: string, role: Role | string, options?: {hash: string, salt: string}) {
+    constructor(username: string, role: Role | string, config: PersonalConfig, options?: {hash: string, salt: string}) {
         this.username = username;
+        this.config = config;
         if(typeof role == 'string') {
             this.role = roleFromString(role);
         } else {
@@ -350,8 +368,12 @@ export class SearchResults<E> {
 }
 
 export class PersonalConfig {
-    tagLum: lums;
+    dark: boolean;
+    tagLum: Lum;
     theme: number;
+    themeLum: Lum;
+    bad: number;
+    good: number;
 }
 
 export abstract class DataHandler {
@@ -619,11 +641,10 @@ export abstract class DataHandler {
             }
         });
         if(!foundAdmin) {
-            let admin: User = new User('admin', Role.Admin);
+            let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
             admin.setPassword('', 'toor').then(() => {
-                this.addUser(admin);
-                console.log(`[server]: Default admin account created.  Change the password ASAP`);
-            });
+                return this.addUser(admin);
+            }).then(() => console.log(`[server]: Default admin account created.  Change the password ASAP`));
         }
     }
 
@@ -639,9 +660,9 @@ export abstract class DataHandler {
 export default class Data {
     static async init(handler: DataHandler) {
         let def: TagType = new TagType('default', 90, 10, true);
-        let sub: TagType = new TagType('Subjects', hues.lime, 0);
-        let cont: TagType = new TagType('Context', hues.yellow, 1);
-        let desc: TagType = new TagType('Descriptions', hues.cyan, 2);
+        let sub: TagType = new TagType('Subjects', Hue.lime, 0);
+        let cont: TagType = new TagType('Context', Hue.yellow, 1);
+        let desc: TagType = new TagType('Descriptions', Hue.cyan, 2);
         handler.addTagType(def);
         handler.addTagType(sub);
         handler.addTagType(cont);

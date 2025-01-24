@@ -1,14 +1,14 @@
 import convert from 'color-convert';
 
-export function getRGB(params: {h: number, l: lums} | HslColor): number[] {
-    if((<any>params).s) {
+export function getRGB(params: {h: number, l: Lum} | HslColor): number[] {
+    if(params instanceof HslColor) {
         return convert.hsl.rgb([params.h, (<any>params).s, params.l]);
     } else {
         return convert.hsl.rgb([params.h, 80, params.l]);
     }
 }
 
-export enum hues {
+export enum Hue {
     red = 0,
     orange = 30,
     yellow = 60,
@@ -22,7 +22,7 @@ export enum hues {
     magenta = 300,
     pink = 330
 }
-export enum lums {
+export enum Lum {
     dark = 25,
     bright = 50,
     light = 75
@@ -48,47 +48,47 @@ export class HslColor{
     }
 }
 
-export function formColor(h: number, l: lums) {
+export function formColor(h: number, l: Lum) {
     return new HslColor(h, 80, l);
 }
 
 export const prefabs = {
-    red_dark: new HslColor(hues.red, 80, lums.dark),
-    red: new HslColor(hues.red, 80, lums.bright),
-    red_light: new HslColor(hues.red, 80, lums.light),
-    orange_dark: new HslColor(hues.orange, 80, lums.dark),
-    orange: new HslColor(hues.orange, 80, lums.bright),
-    orange_light: new HslColor(hues.orange, 80, lums.light),
-    yellow_dark: new HslColor(hues.yellow, 80, lums.dark),
-    yellow: new HslColor(hues.yellow, 80, lums.bright),
-    yellow_light: new HslColor(hues.yellow, 80, lums.light),
-    lime_dark: new HslColor(hues.lime, 80, lums.dark),
-    lime: new HslColor(hues.lime, 80, lums.bright),
-    lime_light: new HslColor(hues.lime, 80, lums.light),
-    green_dark: new HslColor(hues.green, 80, lums.dark),
-    green: new HslColor(hues.green, 80, lums.bright),
-    green_light: new HslColor(hues.green, 80, lums.light),
-    puse_dark: new HslColor(hues.puse, 80, lums.dark),
-    puse: new HslColor(hues.puse, 80, lums.bright),
-    puse_light: new HslColor(hues.puse, 80, lums.light),
-    cyan_dark: new HslColor(hues.cyan, 80, lums.dark),
-    cyan: new HslColor(hues.cyan, 80, lums.bright),
-    cyan_light: new HslColor(hues.cyan, 80, lums.light),
-    teal_dark: new HslColor(hues.teal, 80, lums.dark),
-    teal: new HslColor(hues.teal, 80, lums.bright),
-    teal_light: new HslColor(hues.teal, 80, lums.light),
-    blue_dark: new HslColor(hues.blue, 80, lums.dark),
-    blue: new HslColor(hues.blue, 80, lums.bright),
-    blue_light: new HslColor(hues.blue, 80, lums.light),
-    purple_dark: new HslColor(hues.purple, 80, lums.dark),
-    purple: new HslColor(hues.purple, 80, lums.bright),
-    purple_light: new HslColor(hues.purple, 80, lums.light),
-    magenta_dark: new HslColor(hues.magenta, 80, lums.dark),
-    magenta: new HslColor(hues.magenta, 80, lums.bright),
-    magenta_light: new HslColor(hues.magenta, 80, lums.light),
-    pink_dark: new HslColor(hues.pink, 80, lums.dark),
-    pink: new HslColor(hues.pink, 80, lums.bright),
-    pink_light: new HslColor(hues.pink, 80, lums.light),
+    red_dark: new HslColor(Hue.red, 80, Lum.dark),
+    red: new HslColor(Hue.red, 80, Lum.bright),
+    red_light: new HslColor(Hue.red, 80, Lum.light),
+    orange_dark: new HslColor(Hue.orange, 80, Lum.dark),
+    orange: new HslColor(Hue.orange, 80, Lum.bright),
+    orange_light: new HslColor(Hue.orange, 80, Lum.light),
+    yellow_dark: new HslColor(Hue.yellow, 80, Lum.dark),
+    yellow: new HslColor(Hue.yellow, 80, Lum.bright),
+    yellow_light: new HslColor(Hue.yellow, 80, Lum.light),
+    lime_dark: new HslColor(Hue.lime, 80, Lum.dark),
+    lime: new HslColor(Hue.lime, 80, Lum.bright),
+    lime_light: new HslColor(Hue.lime, 80, Lum.light),
+    green_dark: new HslColor(Hue.green, 80, Lum.dark),
+    green: new HslColor(Hue.green, 80, Lum.bright),
+    green_light: new HslColor(Hue.green, 80, Lum.light),
+    puse_dark: new HslColor(Hue.puse, 80, Lum.dark),
+    puse: new HslColor(Hue.puse, 80, Lum.bright),
+    puse_light: new HslColor(Hue.puse, 80, Lum.light),
+    cyan_dark: new HslColor(Hue.cyan, 80, Lum.dark),
+    cyan: new HslColor(Hue.cyan, 80, Lum.bright),
+    cyan_light: new HslColor(Hue.cyan, 80, Lum.light),
+    teal_dark: new HslColor(Hue.teal, 80, Lum.dark),
+    teal: new HslColor(Hue.teal, 80, Lum.bright),
+    teal_light: new HslColor(Hue.teal, 80, Lum.light),
+    blue_dark: new HslColor(Hue.blue, 80, Lum.dark),
+    blue: new HslColor(Hue.blue, 80, Lum.bright),
+    blue_light: new HslColor(Hue.blue, 80, Lum.light),
+    purple_dark: new HslColor(Hue.purple, 80, Lum.dark),
+    purple: new HslColor(Hue.purple, 80, Lum.bright),
+    purple_light: new HslColor(Hue.purple, 80, Lum.light),
+    magenta_dark: new HslColor(Hue.magenta, 80, Lum.dark),
+    magenta: new HslColor(Hue.magenta, 80, Lum.bright),
+    magenta_light: new HslColor(Hue.magenta, 80, Lum.light),
+    pink_dark: new HslColor(Hue.pink, 80, Lum.dark),
+    pink: new HslColor(Hue.pink, 80, Lum.bright),
+    pink_light: new HslColor(Hue.pink, 80, Lum.light),
     black: new HslColor(0, 0, 0),
     grey_1: new HslColor(0, 0, 10),
     grey_2: new HslColor(0, 0, 20),
