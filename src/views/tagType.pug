@@ -20,7 +20,7 @@ block layout-content
                     div.col-sm-2
                         b Name
                     div.col-sm-2
-                        b Color
+                        b Hue
                     div.col-sm-2
                         b Precedence
                     div.col-sm-2
@@ -32,8 +32,15 @@ block layout-content
                         div.col-sm-2
                         div.col-sm-2= type.name
                         div.col-sm-2
-                            span= type.color
-                            span(style=`color:${type.color};`)  ■
+                            -if(type.grey)
+                                span Grey
+                                span(style=`color:hsl(0, 0%, ${100 - type.hue}%);`)  ■
+                                span(style=`color:hsl(0, 0%, ${type.hue}%);`)  ■
+                            -else
+                                span= type.hue
+                                span(style=`color:hsl(${type.hue}, 80%, 25%);`)  ■
+                                span(style=`color:hsl(${type.hue}, 80%, 50%);`)  ■
+                                span(style=`color:hsl(${type.hue}, 80%, 75%);`)  ■
                         div.col-sm-2= type.order
                         div.col-sm-2
                             -if(user != undefined && user.role >= 2)

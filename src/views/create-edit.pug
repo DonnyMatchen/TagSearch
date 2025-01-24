@@ -1,127 +1,201 @@
 extends layout
 
 block layout-content
+    mixin defaultInput(inputType, inputName, inputValue, dis)
+        -if(dis)
+            input.form-control.field(type=inputType, name=inputName, value=inputValue, readonly)
+        -else
+            input.form-control.field(type=inputType, name=inputName, value=inputValue)
+
+    mixin largeInput(inputName, inputValue, dis)
+        -if(dis)
+            textArea.form-control.field(name=inputName, rows=5, readonly)= inputValue
+        -else
+            textArea.form-control.field(name=inputName, rows=5)= inputValue
+
+    mixin selectInput(inputName, inputValue, arr, dis)
+        -if(dis)
+            select.form-control.field(inputName, readonly)
+                each str in arr
+                    -if(str == inputValue)
+                        option(value=str, selected='selected')= str
+                    -else
+                        option(value=str)= str
+        -else
+            select.form-control.field(inputName, readonly)
+                each str in arr
+                    -if(str == inputValue)
+                        option(value=str, selected='selected')= str
+                    -else
+                        option(value=str)= str
+
+    mixin dateTimeInput(inputName, inputValue, dis)
+        -if(dis)
+            input.form-control.field(type='datetime-local', name=inputName, step=1, value=inputValue, readonly)
+        -else
+            input.form-control.field(type='datetime-local', name=inputName, step=1, value=inputValue)
+
+    mixin tagsInput(inputName, inputValue, dis)
+        -if(dis)
+            textArea.form-control.field(id=`${inputName}-search`, name=inputName, rows=5, readonly)= inputValue
+        -else
+            textArea.form-control.field(id=`${inputName}-search`, name=inputName, rows=5, oninput=`handleInput('${baseURL}', '${inputName}', true)`)= inputValue
+
+    mixin tagInput(inputName, inputValue, dis)
+        -if(dis)
+            input.form-control.field(id=`${inputName}-search`, type='text', name=inputName, value=inputValue, readonly)
+        -else
+            input.form-control.field(id=`${inputName}-search`, type='text', name=inputName, value=inputValue, oninput=`handleInput('${baseURL}', '${inputName}', false)`)
+
+    mixin hueInput(inputName, inputValue, dis)
+        -huePresent = true
+        -if(dis)
+            input.form-control.field(type='number', min=0, max = 359, name=inputName, value=inputValue, readonly)
+        -else
+            input.form-control.field(type='number', min=0, max = 359, name=inputName, value=inputValue)
+
+    mixin fileInput(inputName, dis)
+        -if(dis)
+            input.form-control.field(type="file", name=inputName, accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf", readonly)
+        -else
+            input.form-control.field(type="file", name=inputName, accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
+
+    mixin formRow(inputType, inputName, inputLabel, arrs, inputValue)
+        -dis = false
+        -if(inputType.includes('/dis'))
+            -inputType = inputType.replace('/dis', '')
+            -dis = true
+        div.row.mb-2
+            div.col-sm-5.text-end= inputLabel
+            div.col-sm-6.p-0
+                -if(inputType == 'select')
+                    +selectInput(inputName, inputValue, arrs[inputName], dis)
+                -else if(inputType == 'datetime')
+                    +dateTimeInput(inputName, inputValue, dis)
+                -else if(inputType == 'text-area')
+                    +largeInput(inputName, inputValue, dis)
+                -else if(inputType == 'tags')
+                    +tagsInput(inputName, inputValue, dis)
+                -else if(inputType == 'tag')
+                    +tagInput(inputName, inputValue, dis)
+                -else if(inputType == 'hue')
+                    +hueInput(inputName, inputValue, dis)
+                -else if(inputType == 'file')
+                    +fileInput(inputName, dis)
+                -else
+                    +defaultInput(inputType, inputName, inputValue, dis)
+            div.col-sm-1.p-0
+                -if(!dis && (inputType == 'tag' || inputType == 'tags'))
+                    button.btn.box.ct-color.dropdown-toggle.ms-2(id=`${inputName}-dropdown`, type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
+                    ul.ct-color.box.dropdown-menu.pt-0(id=`${inputName}-menu`, aria-labelledby='item-dropdown')
+                    script= `handleInput('${baseURL}', '${inputName}', ${inputType=='tags'})`
+            
+                
     div.container-fluid
         -if(args.target != undefined)
             form(action=args.target, method='post', enctype="multipart/form-data")
-                - if(args.vals == undefined)
-                    input(type='hidden', name='state', value='new')
-                    each type, name in args.form
+                input(type='hidden', name='state', value='new')
+                div.row
+                    div.col-sm-1
+                    div.col-sm-7
+                        each type, name in args.form
+                            -val = ''
+                            -if(args.vals)
+                                -val = args.vals[name]
+                            +formRow(type, name, args.labels[name], args.arrs, val)
                         div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.text-end= args.labels[name]
-                            div.col-sm-3.p-0
-                                -if(type.includes('/dis'))
-                                    - type = type.replace('/dis', '')
-                                    -if(type == 'text-area')
-                                        textArea.form-control.field(name=name, rows=5, readonly)
-                                    -else if(type == 'tags')
-                                        textArea#item-search.form-control.field(name=name rows=5 readonly)
-                                    -else if(type == 'select' || type == 'tags')
-                                        select.form-control.field(name=name readonly)
-                                            each str in args.arrs[name]
-                                                option(value=str)= str
-                                    -else if(type == 'tag')
-                                        input.form-control.field(type='text' name=name readonly)
-                                    -else if(type == 'datetime')
-                                        input.form-control.field(type='datetime-local' step=1 readonly)
-                                    -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf" readonly)
-                                    -else
-                                        input.form-control.field(type=type, name=name, readonly)
+                            div.col-sm-5
+                            div.col-sm-6.p-0
+                                -if(args.update)
+                                    input.btn.gd-color(type='submit', value='Update')
                                 -else
-                                    -if(type == 'text-area')
-                                        textArea.form-control.field(name=name, rows=5)
-                                    -else if(type == 'tags')
-                                        textArea#item-search.form-control.field(name=name rows=5 oninput=`handleInput('${baseURL}', 'item', true)`)
-                                    -else if(type == 'select')
-                                        select.form-control.field(name=name)
-                                            each str in args.arrs[name]
-                                                option(value=str)= str
-                                    -else if(type == 'tag')
-                                        input#item-search.form-control.field(type='text' name=name oninput=`handleInput('${baseURL}', 'item', false)`)
-                                    -else if(type == 'datetime')
-                                        input.form-control.field(type='datetime-local', step=1, name=name)
-                                    -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
-                                    -else
-                                        input.form-control.field(type=type, name=name)
-                            div.col-sm-4.p-0
-                                -if(!dis && (type == 'tag' || type == 'tags'))
-                                    button#item-dropdown.btn.box.ct-color.dropdown-toggle.ms-2(type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
-                                    ul#item-menu.ct-color.box.dropdown-menu.pt-0(aria-labelledby='item-dropdown')
-                                    -if(type == 'tag')
-                                        script= `handleInput('${baseURL}', 'item', false)`
-                                    -else
-                                        script= `handleInput('${baseURL}', 'item', true)`
-                    div.row.mb-2
-                        div.col-sm-5
-                        div.col-sm-3.submit-col
-                            -if(args.update)
-                                input.btn.gd-color(type='submit', value='Update')
-                            -else
-                                input.btn.gd-color(type='submit', value='Add')
-                        div.col-sm-4
-                - else
-                    input(type='hidden', name='state', value='update')
-                    each type, name in args.form
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.text-right= args.labels[name]
-                            div.col-sm-3
-                                - dis = false;
-                                -if(type.includes('/dis'))
-                                    - type = type.replace('/dis', '')
-                                    - dis = true;
-                                    -if(type == 'text-area' || type == 'tags')
-                                        textArea.form-control.field(name=name, rows=5, readonly)= value=args.vals[name]
-                                    -else if(type == 'tags')
-                                        textArea#item-search.form-control.field(name=name rows=5 readonly)= value=args.vals[name]
-                                    -else if(type == 'select')
-                                        select.form-control.field(name=name readonly value=args.vals[name])
-                                            each str in args.arrs[name]
-                                                option(value=str)= str
-                                    -else if(type == 'tag')
-                                        input#item-search.form-control.field(type='text' name=name readonly)
-                                    -else if(type == 'datetime')
-                                        input.form-control.field(type='datetime-local', step=1, readonly, value=args.vals[name])
-                                    -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf" readonly)
-                                    -else
-                                        input.form-control.field(type=type, name=name, readonly, value=args.vals[name])
-                                -else
-                                    -if(type == 'text-area')
-                                        textArea.form-control.field(name=name, rows=5)= args.vals[name]
-                                    -else if(type == 'tags')
-                                        textArea#item-search.form-control.field(name=name, rows=5, oninput=`handleInput('${baseURL}', 'item', true)`)= args.vals[name]
-                                    -else if(type == 'select')
-                                        select.form-control.field(name=name)
-                                            each str in args.arrs[name]
-                                                -if(str == args.vals[name])
-                                                    option(value=str, selected='selected')= str
-                                                -else
-                                                    option(value=str)= str
-                                    -else if(type == 'tag')
-                                        input#item-search.form-control.field(type='text', name=name, value=args.vals[name], oninput=`handleInput('${baseURL}', 'item', false)`)
-                                    -else if(type == 'datetime')
-                                        input.form-control.field(type='datetime-local', step=1, value=args.vals[name])
-                                    -else if(type == 'file')
-                                        input.form-control.field(type="file" name=name accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
-                                    -else
-                                        input.form-control.field(type=type, name=name, value=args.vals[name])
-                            div.col-sm-4
-                                -if(!dis && (type == 'tag' || type == 'tags'))
-                                    button#item-dropdown.btn.box.ct-color.dropdown-toggle.ms-2(type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
-                                    ul#item-menu.ct-color.box.dropdown-menu.pt-0(aria-labelledby='item-dropdown')
-                                    -if(type == 'tag')
-                                        script= `handleInput('${baseURL}', 'item', false)`
-                                    -else
-                                        script= `handleInput('${baseURL}', 'item', true)`
-                    div.row.mb-2
-                        div.col-sm-5
-                        div.col-sm-3.submit-col
-                            -if(args.update)
-                                input.btn.gd-color(type='submit', value='Update')
-                            -else
-                                input.btn.gd-color(type='submit', value='Add')
-                        div.col-sm-4
+                                    input.btn.gd-color(type='submit', value='Add')
+                            div.col-sm-1
+                    div.col-sm-3
+                        -if(huePresent)
+                            div.box.p-2
+                                div.row
+                                    div.col-sm-4.text-center red
+                                    div.col-sm-4.text-center 0
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(0, 80%, 25%)') ■
+                                        span(style='color: hsl(0, 80%, 50%)') ■
+                                        span(style='color: hsl(0, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center orange
+                                    div.col-sm-4.text-center 30
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(30, 80%, 25%)') ■
+                                        span(style='color: hsl(30, 80%, 50%)') ■
+                                        span(style='color: hsl(30, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center yellow
+                                    div.col-sm-4.text-center 60
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(60, 80%, 25%)') ■
+                                        span(style='color: hsl(60, 80%, 50%)') ■
+                                        span(style='color: hsl(60, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center lime
+                                    div.col-sm-4.text-center 90
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(90, 80%, 25%)') ■
+                                        span(style='color: hsl(90, 80%, 50%)') ■
+                                        span(style='color: hsl(90, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center green
+                                    div.col-sm-4.text-center 120
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(120, 80%, 25%)') ■
+                                        span(style='color: hsl(120, 80%, 50%)') ■
+                                        span(style='color: hsl(120, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center puse
+                                    div.col-sm-4.text-center 150
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(150, 80%, 25%)') ■
+                                        span(style='color: hsl(150, 80%, 50%)') ■
+                                        span(style='color: hsl(150, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center cyan
+                                    div.col-sm-4.text-center 180
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(180, 80%, 25%)') ■
+                                        span(style='color: hsl(180, 80%, 50%)') ■
+                                        span(style='color: hsl(180, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center teal
+                                    div.col-sm-4.text-center 210
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(210, 80%, 25%)') ■
+                                        span(style='color: hsl(210, 80%, 50%)') ■
+                                        span(style='color: hsl(210, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center blue
+                                    div.col-sm-4.text-center 240
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(240, 80%, 25%)') ■
+                                        span(style='color: hsl(240, 80%, 50%)') ■
+                                        span(style='color: hsl(240, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center purple
+                                    div.col-sm-4.text-center 270
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(270, 80%, 25%)') ■
+                                        span(style='color: hsl(270, 80%, 50%)') ■
+                                        span(style='color: hsl(270, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center magenta
+                                    div.col-sm-4.text-center 300
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(300, 80%, 25%)') ■
+                                        span(style='color: hsl(300, 80%, 50%)') ■
+                                        span(style='color: hsl(300, 80%, 75%)') ■
+                                div.row
+                                    div.col-sm-4.text-center pink
+                                    div.col-sm-4.text-center 330
+                                    div.col-sm-4.text-center
+                                        span(style='color: hsl(330, 80%, 25%)') ■
+                                        span(style='color: hsl(330, 80%, 50%)') ■
+                                        span(style='color: hsl(330, 80%, 75%)') ■
+                    div.col-sm-1

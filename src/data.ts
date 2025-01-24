@@ -1,6 +1,7 @@
 import argon2 from "argon2";
 import { randomBytes } from 'crypto';
 import { Buffer } from 'buffer';
+import { hues, lums } from "@utl/appColor";
 
 class Diff {
     added: string[] = [];
@@ -9,13 +10,15 @@ class Diff {
 
 export class TagType {
     readonly name: string;
-    color: string;
+    hue: number;
+    grey: boolean;
     order: number;
 
-    constructor(name: string, color: string, order: number) {
+    constructor(name: string, hue: number, order: number, grey?: boolean) {
         this.name = name;
-        this.color = color;
+        this.hue = hue;
         this.order = order;
+        this.grey = grey;
     }
 }
 
@@ -346,6 +349,11 @@ export class SearchResults<E> {
     }
 }
 
+export class PersonalConfig {
+    tagLum: lums;
+    theme: number;
+}
+
 export abstract class DataHandler {
     /**
      * 
@@ -630,10 +638,10 @@ export abstract class DataHandler {
 
 export default class Data {
     static async init(handler: DataHandler) {
-        let def: TagType = new TagType('default', '#f0f0f0', 10);
-        let sub: TagType = new TagType('Subjects', '#20f020', 0);
-        let cont: TagType = new TagType('Context', '#20f0f0', 1);
-        let desc: TagType = new TagType('Descriptions', '#f0f020', 2);
+        let def: TagType = new TagType('default', 90, 10, true);
+        let sub: TagType = new TagType('Subjects', hues.lime, 0);
+        let cont: TagType = new TagType('Context', hues.yellow, 1);
+        let desc: TagType = new TagType('Descriptions', hues.cyan, 2);
         handler.addTagType(def);
         handler.addTagType(sub);
         handler.addTagType(cont);

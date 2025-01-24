@@ -361,7 +361,7 @@ export default class InMem extends DataHandler {
     async updateTagType(type: TagType) {
         let errorString: string = '';
         await this.getTagType(type.name).then(old => {
-            old.color = type.color;
+            old.hue = type.hue;
             old.order = type.order;
         }, async (error:Error) => {
             await this.addTagType(type).then(() => {}, (error:Error) => {errorString = error.message;});

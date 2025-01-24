@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 import { DataHandler, Item, ItemType, Role, Tag, TagType, User, roleToString } from '@rt/data';
 import getArguments from "@utl/getArguments";
+import { colorNames } from "@utl/appColor";
 
 export default function post(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -42,8 +43,6 @@ export default function post(dataHandler: DataHandler): Router {
         }
     });
     router.post("/item",
-        body('src')
-            .isURL().withMessage('not-url'),
         body('date')
             .notEmpty().withMessage('empty'),
         async function (req, res) {
@@ -73,11 +72,7 @@ export default function post(dataHandler: DataHandler): Router {
             let abort = errors.length > 0;
             if(!errorList.isEmpty() || errors.length > 0) {
                 errorList['errors'].forEach((error: any) => {
-                    if(error.path == 'src') {
-                        if(error.msg == 'not-url') {
-                            errors.push('Source URL is malformed');
-                        }
-                    } else if(error.path == 'date') {
+                    if(error.path == 'date') {
                         if(error.msg == 'empty') {
                             errors.push('Date is blank');
                             abort = true;
@@ -195,7 +190,7 @@ export default function post(dataHandler: DataHandler): Router {
         if(req.session.user == undefined || req.session.user.role < 1) {
             res.render("create-edit", getArguments(
                 req.session.user,
-                'New Item',
+                'New Tag',
                 -1,
                 'Access Denied',
                 '',
@@ -316,34 +311,54 @@ export default function post(dataHandler: DataHandler): Router {
         async function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if(req.session.user == undefined || req.session.user.role < Role.Admin) {
+            res.render("create-edit", getArguments(
+                req.session.user,
+                'New Tag Type',
+                -1,
+                'Access Denied',
+                '',
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
+                {},
+                ["You are not permitted to create or edit tags."]
+            ));
+        } else {
             let errorList = validationResult(req);
             let errors: string[] = [];
             if(errorList.isEmpty()) {
-                if(req.body.state == 'new') {
-                    await dataHandler.addTagType(new TagType(
-                        req.body.name,
-                        req.body.colr,
-                        req.body.ordr
-                    )).then(() => {
-                        getArgumentsSimply(
-                            dataHandler, req.session.user, req.query, req.body, 'tagType', false, false,
-                            [], ['Tag Type created successfully.']
-                        ).then(args => res.render('create-edit', args));
-                    }, (error:Error) => {
-                        errors.push(error.message);
-                    });
-                } else {
-                    await dataHandler.updateTagType(new TagType(
-                        req.body.name, req.body.colr, req.body.ordr
-                    )).then(() => {
-                        getArgumentsSimply(
-                            dataHandler, req.session.user, req.query, req.body, 'tagType', false, false,
-                            [], ['Tag Type updated successfully.']
-                        ).then(args => res.render('create-edit', args));
-                    }, (error:Error) => {
-                        errors.push(error.message);
-                    });
-                }
+                let word: string;
+                new Promise((resolve, reject) => {
+                    if(req.body.state == 'new') {
+                        word = 'created';
+                        return dataHandler.addTagType(new TagType(
+                            req.body.name,
+                            req.body.chue,
+                            req.body.ordr
+                        ));
+                    } else {
+                        word = 'updated';
+                        return dataHandler.updateTagType(new TagType(
+                            req.body.name,
+                            req.body.chue,
+                            req.body.ordr
+                        ));
+                    }
+                }).then(() => {
+                    return getArgumentsSimply(
+                        dataHandler, req.session.user, req.query, req.body, 'tagType', req.body.state != 'new', false,
+                        [], [`Tag Type ${word} successfully.`]
+                    );
+                }, (error:Error) => {
+                    errors.push(error.message);
+                }).then(args => {
+                    if(args) {
+                        res.render('create-edit', args);
+                    }
+                });
             }
             if(!errorList.isEmpty() || errors.length > 0) {
                 errorList['errors'].forEach((error: any) => {
@@ -516,8 +531,8 @@ async function getArgumentsSimply(
             typeName = 'Item';
             page = 5;
             form = edit ? 
-                new RetItemHolder('text/dis', 'file', 'text', 'datetime', 'tags', 'text-area') :
-                new ItemHolder('file', 'text', 'datetime', 'tags', 'text-area')
+                new RetItemHolder('text/dis', 'file', 'url', 'datetime', 'tags', 'text-area') :
+                new ItemHolder('file', 'url', 'datetime', 'tags', 'text-area')
             labels = edit ? 
                 new RetItemHolder('Unique ID*', 'Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description') :
                 new ItemHolder('Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description')
@@ -546,7 +561,7 @@ async function getArgumentsSimply(
             form = new TagHolder(`text${edit ? '/dis' : ''}`, 'select', 'tag');
             labels = new TagHolder('Name*', 'Type*', 'Parent');
             await getTagTypes(dataHandler).then(types => {
-                arrs = {type: types};
+                (<any>arrs).type = types;
             });
             if(post) {
                 vals = new TagHolder(body.name, body.type, body.prnt);
@@ -568,16 +583,17 @@ async function getArgumentsSimply(
         case('tagType'):
             typeName = 'Tag Type';
             page = 7;
-            form = new TagTypeHolder(`text${edit ? '/dis' : ''}`, 'color', 'text');
-            labels = new TagTypeHolder('Name*', 'Color*', 'Sort Order');
+            form = new TagTypeHolder(`text${edit ? '/dis' : ''}`, 'hue', 'number');
+            labels = new TagTypeHolder('Name*', 'Hue*', 'Sort Order');
+            (<any>arrs).chue = colorNames;
             if(post) {
-                vals = new TagTypeHolder(body.name, body.colr, body.ordr);
+                vals = new TagTypeHolder(body.name, body.chue, body.ordr);
             }
             if(edit && post) {
                 found = true;
             } else if(edit) {
                 await dataHandler.getTagType(query.edit).then(type => {
-                    vals = new TagTypeHolder(type.name, type.color, `${type.order}`);
+                    vals = new TagTypeHolder(type.name, `${type.hue}`, `${type.order}`);
                     found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {
@@ -688,12 +704,12 @@ class TagHolder {
 }
 class TagTypeHolder {
     name: string;
-    colr: string;
+    chue: string;
     ordr: string;
 
-    constructor(name: string, colr: string, ordr: string) {
+    constructor(name: string, chue: string, ordr: string) {
         this.name = name;
-        this.colr = colr;
+        this.chue = chue;
         this.ordr = ordr;
     }
 }

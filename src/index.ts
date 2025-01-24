@@ -17,6 +17,7 @@ import deleter from "@pg/delete";
 import userCenter from "@pg/userCenter";
 import login from "@pg/login";
 import api from "@pg/api";
+import { prep } from "@utl/appColor";
 
 declare module "express-session" {
     interface SessionData {
@@ -35,6 +36,7 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 const secret = process.env.SESSION_SECRET || 'You should set a session secret.';
 Arguments.url = process.env.BASE_URL || `http://localhost:${port}`
+prep();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
