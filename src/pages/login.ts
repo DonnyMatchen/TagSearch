@@ -34,20 +34,26 @@ export default function login(dataHandler: DataHandler): Router {
         let errorList = validationResult(req);
         let failure: boolean = false;
         if(errorList.isEmpty()) {
-            await dataHandler.getUser(req.body.uname).then(async user => {
-                if(user.state == UserState.Set) {
-                    await user.check(req.body.pass).then(check => {
-                        if(check) {
-                            req.session.user = user;
-                            res.redirect('/search');
-                        } else {
-                            failure = true;
-                        }
-                    }, (error:Error) => {
-                        failure = true;
-                    });
+            let user: User;
+            await dataHandler.getUser(req.body.uname).then(async foundUser => {
+                user = foundUser;
+                if(foundUser.state == UserState.Set) {
+                    return foundUser.check(req.body.pass);
                 } else {
-                    res.redirect(`/login/set?username=${user.username}`);
+                    return true;
+                }
+            }, (error:Error) => {
+                failure = true;
+            }).then(check => {
+                if(check) {
+                    req.session.user = user;
+                    if(user.state == UserState.Set) {
+                        res.redirect('/search');
+                    } else {
+                        res.redirect(`/login/set?username=${user.username}`);
+                    }
+                } else {
+                    failure = true;
                 }
             }, (error:Error) => {
                 failure = true;
