@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 
-import { DataHandler, User, UserState, SearchResults } from "@rt/data";
+import { DataHandler, User, UserState, SearchResults, PersonalConfig } from "@rt/data";
+import { getCssVars } from "@utl/appColor";
 
 export default function api(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -51,6 +52,36 @@ export default function api(dataHandler: DataHandler): Router {
             });
         }
     });
+
+    router.get('/colors', (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        let config: PersonalConfig = User.getDefaultConfig();
+        if (req.query.thm) {
+            config.theme = +req.query.thm;
+        }
+        if (req.query.thmL) {
+            config.themeLum = +req.query.thmL;
+        }
+        if (req.query.tagL) {
+            config.tagLum = +req.query.tagL;
+        }
+        if (req.query.bad) {
+            config.bad = +req.query.bad;
+        }
+        if (req.query.good) {
+            config.good = +req.query.good;
+        }
+        if (req.query.dark) {
+            config.dark = req.query.dark == 'yes';
+        }
+        res.send({
+            'status': statuses.get(200),
+            'messages': [],
+            'errors': [],
+            'returned': getCssVars(config)
+        });
+    });
+
     return router;
 }
 

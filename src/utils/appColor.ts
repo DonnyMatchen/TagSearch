@@ -1,3 +1,4 @@
+import { PersonalConfig } from '@rt/data';
 import convert from 'color-convert';
 
 export function getRGB(params: {h: number, l: Lum} | HslColor): number[] {
@@ -132,4 +133,18 @@ export function prep() {
     colorCodex.set('purple', 270);
     colorCodex.set('magenta', 300);
     colorCodex.set('pink', 330);
+}
+
+export function getCssVars(config: PersonalConfig): string {
+    let theme = new HslColor(config.theme, 80, config.themeLum);
+    let themeH = theme.getHover();
+    let bad = new HslColor(config.bad, 80, config.themeLum);
+    let badH = bad.getHover();
+    let good = new HslColor(config.good, 80, config.themeLum);
+    let goodH = good.getHover();
+    let header = getRGB(new HslColor(0, 0, 10));
+    let foreground = new HslColor(0, 0, config.dark ? 90 : 10);
+    let link = getRGB(foreground);
+    let linkH = getRGB(foreground.getHover());
+    return `:root {--bacground: 0, 0%, ${config.dark ? 20 : 80}%;--foreground: 0, 0%, ${config.dark ? 90 : 10}%;--content: ${theme.h}, 80%, ${theme.l}%;--content-h: ${themeH.h}, 80%, ${themeH.l}%;--error: ${bad.h}, 80%, ${bad.l}%;--error-h: ${badH.h}, 80%, ${badH.l}%;--success: ${good.h}, 80%, ${good.l}%;--success-h: ${goodH.h}, 80%, ${goodH.l}%;--message: 0, 0%, ${config.dark ? 30 : 70}%;--message-h: 0, 0%, ${config.dark ? 22.5 : 77.5}%;--header: ${header[0]}, ${header[1]}, ${header[2]};--link: ${link[0]}, ${link[1]}, ${link[2]};--link-h: ${linkH[0]}, ${linkH[1]}, ${linkH[2]};}`;
 }
