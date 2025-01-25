@@ -18,6 +18,7 @@ import userCenter from "@pg/userCenter";
 import login from "@pg/login";
 import api from "@pg/api";
 import { prep } from "@utl/appColor";
+import config from "@pg/config";
 
 declare module "express-session" {
     interface SessionData {
@@ -92,7 +93,6 @@ app.post('/test', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send({
         'body': req.body,
-        'filesType': req.files['jkl;'].constructor.name,
         'files': req.files,
     });
 });
@@ -107,6 +107,7 @@ app.use("/delete", deleter());
 app.use('/userCenter', userCenter(dataHandler));
 app.use('/login', login(dataHandler));
 app.use('/api', api(dataHandler));
+app.use('/config', config(dataHandler));
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

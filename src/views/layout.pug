@@ -67,6 +67,10 @@ html
                             span.btn.m-1.bg-item Change Password
                         -else
                             a.btn.m-1.ct-color(href=`${baseURL}/login/change`) Change Password
+                        -if(webPage == 103)
+                            span.btn.m-1.bg-item Settings
+                        -else
+                            a.btn.m-1.ct-color(href=`${baseURL}/config`) Settings
                         a.btn.m-1.er-color(href=`${baseURL}/logout`) Log Out
         div.bg-item
             each error in errors

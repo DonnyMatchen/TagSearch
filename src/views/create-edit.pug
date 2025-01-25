@@ -15,14 +15,14 @@ block layout-content
 
     mixin selectInput(inputName, inputValue, arr, dis)
         -if(dis)
-            select.form-control.field(inputName, readonly)
+            select.form-control.field(name=inputName, readonly)
                 each str in arr
                     -if(str == inputValue)
                         option(value=str, selected='selected')= str
                     -else
                         option(value=str)= str
         -else
-            select.form-control.field(inputName, readonly)
+            select.form-control.field(name=inputName)
                 each str in arr
                     -if(str == inputValue)
                         option(value=str, selected='selected')= str
@@ -60,6 +60,24 @@ block layout-content
         -else
             input.form-control.field(type="file", name=inputName, accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
 
+    mixin radioInput(inputName, inputValue, arr, dis)
+        each str in arr
+            div.form-check.form-check-inline
+                -if(inputValue == str)
+                    -if(dis)
+                        input.form-check-input(type="radio", name=inputName, id=str, value=str, checked="checked", readonly)
+                    -else
+                        input.form-check-input(type="radio", name=inputName, id=str, value=str, checked="checked")
+                -else
+                    -if(dis)
+                        input.form-check-input(type="radio", name=inputName, id=str, value=str, readonly)
+                    -else
+                        input.form-check-input(type="radio", name=inputName, id=str, value=str)
+                label.form-check-label(for=str)= str
+    
+    mixin onOffInput(inputName, inputValue, dis)
+        +radioInput(inputName, inputValue, ['On', 'Off'], dis)
+
     mixin formRow(inputType, inputName, inputLabel, arrs, inputValue)
         -dis = false
         -if(inputType.includes('/dis'))
@@ -82,6 +100,10 @@ block layout-content
                     +hueInput(inputName, inputValue, dis)
                 -else if(inputType == 'file')
                     +fileInput(inputName, dis)
+                -else if(inputType == 'on/off')
+                    +onOffInput(inputName, inputValue, dis)
+                -else if(inputType == 'radio')
+                    +radioInput(inputName, inputValue, dis)
                 -else
                     +defaultInput(inputType, inputName, inputValue, dis)
             div.col-sm-1.p-0
@@ -89,8 +111,7 @@ block layout-content
                     button.btn.box.ct-color.dropdown-toggle.ms-2(id=`${inputName}-dropdown`, type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
                     ul.ct-color.box.dropdown-menu.pt-0(id=`${inputName}-menu`, aria-labelledby='item-dropdown')
                     script= `handleInput('${baseURL}', '${inputName}', ${inputType=='tags'})`
-            
-                
+
     div.container-fluid
         -if(args.target != undefined)
             form(action=args.target, method='post', enctype="multipart/form-data")
@@ -199,3 +220,4 @@ block layout-content
                                         span(style='color: hsl(330, 80%, 50%)') ■
                                         span(style='color: hsl(330, 80%, 75%)') ■
                     div.col-sm-1
+    block scripts

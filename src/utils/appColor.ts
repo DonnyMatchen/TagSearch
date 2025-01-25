@@ -142,7 +142,7 @@ export function getCssVars(config: PersonalConfig): string {
     let badH = bad.getHover();
     let good = new HslColor(config.good, 80, config.themeLum);
     let goodH = good.getHover();
-    let header = getRGB(new HslColor(0, 0, 10));
+    let header = getRGB(new HslColor(0, 0, config.dark ? 10 : 90));
     let foreground = new HslColor(0, 0, config.dark ? 90 : 10);
     let link = getRGB(foreground);
     let linkH = getRGB(foreground.getHover());
