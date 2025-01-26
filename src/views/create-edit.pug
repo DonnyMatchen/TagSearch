@@ -103,7 +103,7 @@ block layout-content
                 -else if(inputType == 'on/off')
                     +onOffInput(inputName, inputValue, dis)
                 -else if(inputType == 'radio')
-                    +radioInput(inputName, inputValue, dis)
+                    +radioInput(inputName, inputValue, arrs[inputName], dis)
                 -else
                     +defaultInput(inputType, inputName, inputValue, dis)
             div.col-sm-1.p-0
@@ -115,7 +115,7 @@ block layout-content
     div.container-fluid
         -if(args.target != undefined)
             form(action=args.target, method='post', enctype="multipart/form-data")
-                input(type='hidden', name='state', value='new')
+                input(type='hidden', name='state', value=args.vals ? 'update' : 'new')
                 div.row
                     div.col-sm-1
                     div.col-sm-7
