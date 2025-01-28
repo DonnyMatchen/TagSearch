@@ -2,7 +2,7 @@ extends layout
 
 block layout-content
     -if(args.cancel != undefined)
-        form#script-target(target='/', method='DELETE')
+        form#script-target
             input(type='hidden', name='del', value=args.delete)
         div.text-center
             a.btn.ct-color.ms-2.me-2(href=`${baseURL}${args.cancel}`) Cancel
