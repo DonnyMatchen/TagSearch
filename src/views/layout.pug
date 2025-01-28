@@ -25,7 +25,7 @@ html
         link(rel="stylesheet", type='text/css', href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
         script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
         link(rel='stylesheet', type='text/css', href='/css/main.css')
-        script(src="/js/tagSuggest.js")
+        script(src="/js/main.js")
         meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
         title= `${title} | Tag Search`
         style= themeSheet
@@ -40,7 +40,7 @@ html
                         button#main-dropdown.btn.box.ct-color.dropdown-toggle.ms-2(type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
                         ul#main-menu.ct-color.box.dropdown-menu.pt-0(aria-labelledby='main')
                     div.col-sm-6.p-0
-                        input#main-search.width-full.field.form-control(type='text' name='search' value=search oninput=`handleInput('${baseURL}', 'main', true)`)
+                        input#main-search.width-full.field.form-control(type='text' name='search' value=search oninput=`tagSuggest('${baseURL}', 'main', true)`)
                     div.col-sm-3
                         button.btn.gd-color(onclick=`window.location.href='${baseURL}/search?tags='+document.getElementById('main-search').value.replace(' ', '+');`) Go
                 div.col-sm-2
@@ -72,16 +72,16 @@ html
                         -else
                             a.btn.m-1.ct-color(href=`${baseURL}/config`) Settings
                         a.btn.m-1.er-color(href=`${baseURL}/logout`) Log Out
-        div.bg-item
+        div#banners.bg-item
             each error in errors
-                div.er-color.p-3.mb-2.text-center= error
+                div.banner.er-color.p-3.mb-2.text-center= error
             each success in successes
-                div.gd-color.p-3.text-center= success
+                div.banner.gd-color.p-3.mb-2.text-center= success
             each message in messages
-                div.ms-color.p-3.text-center= message
+                div.banner.ms-color.p-3.mb-2.text-center= message
         h3.text-center.mb-3= legend
         block layout-content
-        script= `handleInput('${baseURL}', 'main', true)`
+        script= `tagSuggest('${baseURL}', 'main', true)`
         -if(pages.active)
             -if(pages.pageNumber <= 0)
                 -pages.pageNumber = 1

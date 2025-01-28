@@ -43,7 +43,8 @@ export default function deleter(): Router {
                 },
                 {
                     cancel: `/item?id=${itemID}`,
-                    delete: `Item ${itemID}`
+                    target: '/api/data/item',
+                    delete: `${itemID}`
                 }
             ));
         }
@@ -83,7 +84,8 @@ export default function deleter(): Router {
                 },
                 {
                     cancel: `/tag?name=${name}`,
-                    delete: `Tag ${name}`
+                    target: '/api/data/tag',
+                    delete: `${name}`
                 }
             ));
         }
@@ -140,7 +142,8 @@ export default function deleter(): Router {
                     },
                     {
                         cancel: `/search/tagTypes?tagMatch=${name}`,
-                        delete: `TagType ${name}`
+                        target: '/api/data/tagType',
+                        delete: `${name}`
                     }
                 ));
             }
@@ -181,7 +184,8 @@ export default function deleter(): Router {
                 },
                 {
                     cancel: `/user?username=${username}`,
-                    delete: `User ${username}`
+                    target: '/api/data/user',
+                    delete: `${username}`
                 }
             ));
         }
