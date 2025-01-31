@@ -32,15 +32,12 @@ block layout-content
                         div.col-sm-2
                         div.col-sm-2= type.name
                         div.col-sm-2
-                            -if(type.grey)
-                                span Grey
-                                span(style=`color:hsl(0, 0%, ${100 - type.hue}%);`)  ■
-                                span(style=`color:hsl(0, 0%, ${type.hue}%);`)  ■
-                            -else
-                                span= type.hue
-                                span(style=`color:hsl(${type.hue}, 80%, 25%);`)  ■
-                                span(style=`color:hsl(${type.hue}, 80%, 50%);`)  ■
-                                span(style=`color:hsl(${type.hue}, 80%, 75%);`)  ■
+                            -colorA = type.color.getHSL(25)
+                            -colorB = type.color.getHSL(50)
+                            -colorC = type.color.getHSL(75)
+                            span(style=`color:hsl(${colorA.h}, ${colorA.s}%, ${colorA.l}%);`)  ■
+                            span(style=`color:hsl(${colorB.h}, ${colorB.s}%, ${colorB.l}%);`)  ■
+                            span(style=`color:hsl(${colorC.h}, ${colorC.s}%, ${colorC.l}%);`)  ■
                         div.col-sm-2= type.order
                         div.col-sm-2
                             -if(user != undefined && user.role >= 2)

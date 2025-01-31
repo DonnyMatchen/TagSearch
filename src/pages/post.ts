@@ -208,11 +208,11 @@ async function getArgumentsSimply(
             typeName = 'Tag Type';
             page = 7;
             form = new TagTypeHolder(`text${edit ? '/dis' : ''}`, 'hue', 'number');
-            labels = new TagTypeHolder('Name*', 'Hue*', 'Sort Order');
+            labels = new TagTypeHolder('Name*', 'Color*', 'Sort Order');
             (<any>arrs).chue = colorNames;
             if(edit) {
                 await dataHandler.getTagType(query.edit).then(type => {
-                    vals = new TagTypeHolder(type.name, `${type.hue}`, `${type.order}`);
+                    vals = new TagTypeHolder(type.name, `${type.color.encoded}`, `${type.order}`);
                     found = true;
                 }, (error:Error) => {
                     if(errors == undefined) {

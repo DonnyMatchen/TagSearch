@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { randomBytes } from 'crypto';
 import { Buffer } from 'buffer';
-import { HslColor, Hue, Lum } from "@utl/appColor";
+import { ColorConv, formColor, HslColor, Hue, Lum } from "@utl/appColor";
 
 class Diff {
     added: string[] = [];
@@ -10,25 +10,19 @@ class Diff {
 
 export class TagType {
     readonly name: string;
-    hue: number;
-    grey: boolean;
+    color: ColorConv;
     order: number;
 
-    constructor(name: string, hue: number, order: number, grey?: boolean) {
+    constructor(name: string, color: string, order: number) {
         this.name = name;
-        this.hue = hue;
+        this.color = new ColorConv(color);
         this.order = order;
-        this.grey = grey;
     }
 
-    getColor(lum: number): HslColor {
-        if(this.grey) {
-            return new HslColor(0, 0, this.hue);
-        } else {
-            return new HslColor(this.hue, 80, lum);
-        }
+    getColor(lum: Lum): HslColor {
+        return this.color.getHSL(lum);
     }
-    getColorString(lum: number) {
+    getColorString(lum: Lum) {
         let color = this.getColor(lum);
         return `HSL(${color.h}, ${color.s}%, ${color.l}%)`
     }
@@ -272,7 +266,16 @@ export enum UserState {
 
 export class User {
     static getDefaultConfig(): PersonalConfig {
-        return {dark: true, tagLum: Lum.bright, theme: Hue.teal, themeLum: Lum.dark, bad: Hue.red, good: Hue.green};
+        return {
+            tagLum: Lum.bright,
+            bg: new HslColor(0, 0, 20),
+            fg: new HslColor(0, 0, 90),
+            msg: new HslColor(0, 0, 30),
+            header: new HslColor(0, 0, 10),
+            theme: formColor(Hue.teal, Lum.dark),
+            bad: formColor(Hue.red, Lum.dark),
+            good: formColor(Hue.green, Lum.dark)
+        };
     }
 
     state: UserState;
@@ -368,12 +371,14 @@ export class SearchResults<E> {
 }
 
 export class PersonalConfig {
-    dark: boolean;
     tagLum: Lum;
-    theme: number;
-    themeLum: Lum;
-    bad: number;
-    good: number;
+    bg: HslColor;
+    fg: HslColor;
+    header: HslColor;
+    msg: HslColor;
+    theme: HslColor;
+    bad: HslColor;
+    good: HslColor;
 }
 
 export abstract class DataHandler {
@@ -659,10 +664,10 @@ export abstract class DataHandler {
 
 export default class Data {
     static async init(handler: DataHandler) {
-        let def: TagType = new TagType('default', 90, 10, true);
-        let sub: TagType = new TagType('Subjects', Hue.lime, 0);
-        let cont: TagType = new TagType('Context', Hue.yellow, 1);
-        let desc: TagType = new TagType('Descriptions', Hue.cyan, 2);
+        let def: TagType = new TagType('default', 'Grayscale:90', 10);
+        let sub: TagType = new TagType('Subjects', `Color:${Hue.lime}`, 0);
+        let cont: TagType = new TagType('Context', `Color:${Hue.yellow}`, 1);
+        let desc: TagType = new TagType('Descriptions', `Color:${Hue.cyan}`, 2);
         handler.addTagType(def);
         handler.addTagType(sub);
         handler.addTagType(cont);

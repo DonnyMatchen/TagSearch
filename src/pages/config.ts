@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 import { DataHandler, PersonalConfig, User, UserState } from "@rt/data";
 import getArguments from "@utl/getArguments";
-import { Lum } from "@utl/appColor";
+import { HslColor, Lum } from "@utl/appColor";
 
 export default function config(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -14,12 +14,6 @@ export default function config(dataHandler: DataHandler): Router {
         res.render('settings', getArgumentsSimply(req.session.user, config));
     });
     router.post('/',
-        body('them')
-            .notEmpty().withMessage('empty'),
-        body('bad')
-            .notEmpty().withMessage('empty'),
-        body('good')
-            .notEmpty().withMessage('empty'),
         (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         if(!req.session.user) {
@@ -27,17 +21,19 @@ export default function config(dataHandler: DataHandler): Router {
         } else {
             let errorList = validationResult(req);
             let config: PersonalConfig = {
-                dark: req.body.dark == 'On',
                 tagLum: lumFromString(req.body.tagl),
-                theme: +req.body.them,
-                themeLum: lumFromString(req.body.thml),
-                bad: +req.body.bad,
-                good: +req.body.good
+                bg: new HslColor(`${req.body.bgA}:${req.body.bgB}:${req.body.bgC}`),
+                fg: new HslColor(`${req.body.fgA}:${req.body.fgB}:${req.body.fgC}`),
+                header: new HslColor(`${req.body.hdA}:${req.body.hdB}:${req.body.hdC}`),
+                msg: new HslColor(`${req.body.msgA}:${req.body.msgB}:${req.body.msgC}`),
+                theme: new HslColor(`${req.body.thmA}:${req.body.thmB}:${req.body.thmC}`),
+                bad: new HslColor(`${req.body.bdA}:${req.body.bdB}:${req.body.bdC}`),
+                good: new HslColor(`${req.body.gdA}:${req.body.gdB}:${req.body.gdC}`),
             };
             if(errorList.isEmpty()) {
                 dataHandler.getUser(req.session.user.username).then(user => {
                     user.config = config;
-                    req.session.user.config = config;
+                    req.session.user = user;
                     return dataHandler.updateUser(user);
                 }).then(() => {
                     res.render('settings', getArgumentsSimply(req.session.user, config, [], ['Settings updated successfully.']));
@@ -70,19 +66,38 @@ export default function config(dataHandler: DataHandler): Router {
 }
 
 function getArgumentsSimply(user: User, config: PersonalConfig, errors?: string[], successes?: string[], messages?: string[]): object {
-    let form: object = new ConfigHolder('on/off', 'select', 'hue', 'select', 'hue', 'hue');
-    let labels: object = new ConfigHolder('Dark Mode', 'Tag Luminance', 'Theme Color', 'Theme Luminance', 'Delete/Error Color', 'Edit/Success Color');
+    let form: object = new ConfigHolder(
+        'select',
+        'hl-color',
+        'hl-color',
+        'hl-color',
+        'hl-color',
+        'hl-color',
+        'hl-color',
+        'hl-color'
+    );
+    let labels: object = new ConfigHolder(
+        'Tag Luminance',
+        'Background Color',
+        'Text Color',
+        'Header Color',
+        'Message Color',
+        'Theme Color',
+        'Delete/Error Color',
+        'Edit/Success Color'
+    );
     let arrs: object = {
-        tagl: ['Dark', 'Bright', 'Light'],
-        thml: ['Dark', 'Bright', 'Light']
+        tagl: ['Dark', 'Bright', 'Light']
     };
     let vals = new ConfigHolder(
-        config.dark ? 'On' : 'Off',
         `${getLum(config.tagLum)}`,
-        `${config.theme}`,
-        `${getLum(config.themeLum)}`,
-        `${config.bad}`,
-        `${config.good}`
+        `${HslColor.data(config.bg)}`,
+        `${HslColor.data(config.fg)}`,
+        `${HslColor.data(config.header)}`,
+        `${HslColor.data(config.msg)}`,
+        `${HslColor.data(config.theme)}`,
+        `${HslColor.data(config.bad)}`,
+        `${HslColor.data(config.good)}`
     );
     return getArguments(
         user,
@@ -111,20 +126,24 @@ function getArgumentsSimply(user: User, config: PersonalConfig, errors?: string[
 }
 
 class ConfigHolder {
-    dark: string;
     tagl: string;
-    them: string;
-    thml: string;
-    bad: string;
-    good: string;
+    bg: string;
+    fg: string;
+    hd: string;
+    msg: string;
+    thm: string;
+    bd: string;
+    gd: string;
 
-    constructor(dark: string, tagl: string, them: string, thml: string, bad: string, good: string) {
-        this.dark = dark;
+    constructor(tagl: string, bg: string, fg: string, hd: string, msg: string, thm: string, bd: string, gd: string) {
         this.tagl = tagl;
-        this.them = them;
-        this.thml = thml;
-        this.bad = bad;
-        this.good = good;
+        this.bg = bg;
+        this.fg = fg;
+        this.hd = hd;
+        this.msg = msg;
+        this.thm = thm;
+        this.bd = bd;
+        this.gd = gd;
     }
 }
 

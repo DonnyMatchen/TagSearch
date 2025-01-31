@@ -375,7 +375,7 @@ export default class InMem extends DataHandler {
     async updateTagType(type: TagType): Promise<void> {
         return new Promise((resolve, reject) => {
             this.getTagType(type.name).then(old => {
-                old.hue = type.hue;
+                old.color = type.color;
                 old.order = type.order;
             }, (error:Error) => {
                 return this.addTagType(type);

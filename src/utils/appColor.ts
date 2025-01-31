@@ -1,12 +1,8 @@
 import { PersonalConfig } from '@rt/data';
 import convert from 'color-convert';
 
-export function getRGB(params: {h: number, l: Lum} | HslColor): number[] {
-    if(params instanceof HslColor) {
-        return convert.hsl.rgb([params.h, (<any>params).s, params.l]);
-    } else {
-        return convert.hsl.rgb([params.h, 80, params.l]);
-    }
+export function getRGB(params: HslColor): number[] {
+    return convert.hsl.rgb([params.h, (<any>params).s, params.l]);
 }
 
 export enum Hue {
@@ -30,21 +26,68 @@ export enum Lum {
 }
 
 export class HslColor{
+    static getHover(color: HslColor): HslColor {
+        if(color.l > 5) {
+            return new HslColor(color.h, color.s, color.l * 3/4);
+        } else {
+            return new HslColor(color.h, color.s, color.l * 5/4);
+        }
+    }
+    static toString(color: HslColor): string {
+        return `${color.h}, ${color.s}%, ${color.l}%`;
+    }
+    static data(color: HslColor): string {
+        if(color.s == 0) {
+            return `Grayscale::${color.l}`;
+        } else {
+            return `Color:${color.h}:${color.l}`
+        }
+    }
+
     h: number;
     s: number;
     l: number;
 
-    constructor(h: number, s: number, l: number) {
-        this.h = h;
-        this.s = s;
-        this.l = l;
+    constructor(str: string);
+    constructor(h: number, s: number, l: number);
+
+    constructor(hOrStr: any, s?: number, l?: number) {
+        if(s != undefined && l != undefined) {
+            this.h = hOrStr;
+            this.s = s;
+            this.l = l;
+        } else {
+            let parts = (<string>hOrStr).split(':');
+            if(parts[0] == 'Color') {
+                this.h = +parts[1];
+                this.s = 80;
+                this.l = +parts[2];
+            } else {
+                this.h = 0;
+                this.s = 0;
+                this.l = +parts[2];
+            }
+        }
+    }
+}
+
+export class ColorConv {
+    encoded: string;
+
+    constructor(encoded: string) {
+        this.encoded = encoded;
     }
 
-    getHover(): HslColor {
-        if(this.l > 5) {
-            return new HslColor(this.h, this.s, this.l * 3/4);
+    getHSL(lum: Lum): HslColor {
+        let parts = this.encoded.split(':');
+        if (parts[0] == 'Color') {
+            return new HslColor(+parts[1], 80, lum);
         } else {
-            return new HslColor(this.h, this.s, this.l * 5/4);
+            switch(lum) {
+                case Lum.dark: return new HslColor(0,0,+parts[1] < 50 ? +parts[1] : 100-+parts[1]);
+                case Lum.light:
+                case Lum.bright: return new HslColor(0,0,+parts[1] > 50 ? +parts[1] : 100-+parts[1]);
+            }
         }
     }
 }
@@ -136,15 +179,38 @@ export function prep() {
 }
 
 export function getCssVars(config: PersonalConfig): string {
-    let theme = new HslColor(config.theme, 80, config.themeLum);
-    let themeH = theme.getHover();
-    let bad = new HslColor(config.bad, 80, config.themeLum);
-    let badH = bad.getHover();
-    let good = new HslColor(config.good, 80, config.themeLum);
-    let goodH = good.getHover();
-    let header = getRGB(new HslColor(0, 0, config.dark ? 10 : 90));
-    let foreground = new HslColor(0, 0, config.dark ? 90 : 10);
-    let link = getRGB(foreground);
-    let linkH = getRGB(foreground.getHover());
-    return `:root {--bacground: 0, 0%, ${config.dark ? 20 : 80}%;--foreground: 0, 0%, ${config.dark ? 90 : 10}%;--content: ${theme.h}, 80%, ${theme.l}%;--content-h: ${themeH.h}, 80%, ${themeH.l}%;--error: ${bad.h}, 80%, ${bad.l}%;--error-h: ${badH.h}, 80%, ${badH.l}%;--success: ${good.h}, 80%, ${good.l}%;--success-h: ${goodH.h}, 80%, ${goodH.l}%;--message: 0, 0%, ${config.dark ? 30 : 70}%;--message-h: 0, 0%, ${config.dark ? 22.5 : 77.5}%;--header: ${header[0]}, ${header[1]}, ${header[2]};--link: ${link[0]}, ${link[1]}, ${link[2]};--link-h: ${linkH[0]}, ${linkH[1]}, ${linkH[2]};}`;
+    let msgH = HslColor.getHover(config.msg);
+    let themeH = HslColor.getHover(config.theme);
+    let badH = HslColor.getHover(config.bad);
+    let goodH = HslColor.getHover(config.good);
+    let header = getRGB(config.header);
+    let link = getRGB(config.fg);
+    let linkH = getRGB(HslColor.getHover(config.fg));
+    return `:root {--bacground: ${
+        HslColor.toString(config.bg)
+    };--foreground: ${
+        HslColor.toString(config.fg)
+    };--content: ${
+        HslColor.toString(config.theme)
+    };--content-h: ${
+        HslColor.toString(themeH)
+    };--error: ${
+        HslColor.toString(config.bad)
+    };--error-h: ${
+        HslColor.toString(badH)
+    };--success: ${
+        HslColor.toString(config.good)
+    };--success-h: ${
+        HslColor.toString(goodH)
+    };--message: ${
+        HslColor.toString(config.msg)
+    };--message-h: ${
+        HslColor.toString(msgH)
+    };--header: ${
+        header[0]}, ${header[1]}, ${header[2]
+    };--link: ${
+        link[0]}, ${link[1]}, ${link[2]
+    };--link-h: ${
+        linkH[0]}, ${linkH[1]}, ${linkH[2]
+    };}`;
 }

@@ -38,31 +38,6 @@ export default function api(dataHandler: DataHandler): Router {
         }
     });
 
-    router.get('/colors', (req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        let config: PersonalConfig = User.getDefaultConfig();
-        if (req.query.thm) {
-            config.theme = +req.query.thm;
-        }
-        if (req.query.thmL) {
-            config.themeLum = +req.query.thmL;
-        }
-        if (req.query.tagL) {
-            config.tagLum = +req.query.tagL;
-        }
-        if (req.query.bad) {
-            config.bad = +req.query.bad;
-        }
-        if (req.query.good) {
-            config.good = +req.query.good;
-        }
-        if (req.query.dark) {
-            config.dark = req.query.dark == 'yes';
-        }
-        res.status(200);
-        res.send(new Response(statuses.get(200), [], [], [], getCssVars(config)));
-    });
-
     router.use('/data', data(dataHandler));
 
     return router;

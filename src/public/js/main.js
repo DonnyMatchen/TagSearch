@@ -89,6 +89,13 @@ function getDeleteFromAPI(baseURL, target, method, handleResults) {
     });
 }
 
+function showHideHL(inputName, lHidden) {
+    let select = document.getElementById(`${inputName}A`).value;
+    let state = select == 'Color';
+    document.getElementById(`${inputName}B-row`).hidden = !state;
+    document.getElementById(`${inputName}C-row`).hidden = state && lHidden;
+}
+
 function makeBanner(colorClass, message) {
     let item = document.createElement('div');
     item.classList.add('banner');
