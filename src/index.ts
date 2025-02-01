@@ -8,6 +8,7 @@ import fileUpload from 'express-fileupload';
 import Data, { DataHandler, User } from "@rt/data";
 import InMem from "@dh/inmem";
 import getArguments, { Arguments } from "@utl/getArguments";
+import { prep } from "@utl/appColor";
 
 import search from "@pg/search";
 import item from "@pg/item";
@@ -17,7 +18,6 @@ import deleter from "@pg/delete";
 import userCenter from "@pg/userCenter";
 import login from "@pg/login";
 import api from "@pg/api";
-import { prep } from "@utl/appColor";
 import config from "@pg/config";
 
 declare module "express-session" {
