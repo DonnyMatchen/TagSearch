@@ -40,7 +40,8 @@ export default class PGDB extends DataHandler {
                         tags TEXT,
                         des TEXT,
                         typ INT,
-                        pub BOOLEAN
+                        pub BOOLEAN,
+                        fp TEXT
                     )`);
                 } else {
                     console.log(`[Server:DB] Failed to query: ${error.message}`);
@@ -128,7 +129,8 @@ export default class PGDB extends DataHandler {
             raw.typ,
             raw.pub,
             this.sqlUnEscape(raw.des),
-            this.sqlUnEscape(raw.tags).split(' ')
+            this.sqlUnEscape(raw.tags).split(' '),
+            this.sqlUnEscape(raw.fp)
         );
     }
     private resolveUser(raw: any): User {
@@ -462,8 +464,16 @@ export default class PGDB extends DataHandler {
     async addItem(item: Item) {
         return new Promise<void>((resolve, reject) => {
             this.changeTags([], item.tags, item.id).then(() => {
-                let query = `INSERT INTO items (id, src, dt, tags, des, typ, pub)
-                    VALUES ('${item.id}', '${this.sqlEscape(item.source)}', ${item.date}, '${this.sqlEscape(item.tags.sort((a, b) => {return a.localeCompare(b)}).join(' '))}', '${this.sqlEscape(item.desc)}', ${item.type}, ${item.pub})`;
+                let query = `INSERT INTO items (id, src, dt, tags, des, typ, pub, fp)
+                    VALUES (
+                    ${item.id},
+                    '${this.sqlEscape(item.source)}',
+                    ${item.date},
+                    '${this.sqlEscape(item.tags.sort((a, b) => {return a.localeCompare(b)}).join(' '))}',
+                    '${this.sqlEscape(item.desc)}',
+                    ${item.type},
+                    ${item.pub},
+                    '${this.sqlEscape(item.filePath)}')`;
                 this.client.query(query)
                 .then(result => {
                     resolve();
@@ -565,16 +575,32 @@ export default class PGDB extends DataHandler {
     }
     async updateItem(item: Item) {
         new Promise<void>((resolve, reject) => {
-            this.getItem(item.id).then(itm => {
-                if(itm) {
-                    this.changeTags(itm.tags, item.tags, item.id).then(() => {
+            this.getItem(item.id).then(old => {
+                if(old) {
+                    this.changeTags(old.tags, item.tags, item.id).then(() => {
+                        return new Promise<void>((resolve1, reject1) => {
+                            if(old.filePath != item.filePath && old.filePath != '') {
+                                fs.rm(old.filePath, (error) => {
+                                    if(error) {
+                                        console.log(`[Server:DB] Cleanup required (${old.filePath})`);
+                                        reject(error);
+                                    } else {
+                                        resolve1();
+                                    }
+                                });
+                            } else {
+                                resolve1();
+                            }
+                        });
+                    }).then(() => {
                         let query: string = `UPDATE items SET
                             src = '${this.sqlEscape(item.source)}',
                             dt = ${item.date},
                             tags = '${this.sqlEscape(item.tags.sort((a, b) => {return a.localeCompare(b)}).join(' '))}',
                             des = '${this.sqlEscape(item.desc)}',
                             typ = ${item.type},
-                            pub = ${item.pub}
+                            pub = ${item.pub},
+                            fp = '${this.sqlEscape(item.filePath)}'
                             WHERE id = ${item.id}`;
                         this.client.query(query).then(result => {
                             resolve();
@@ -673,7 +699,22 @@ export default class PGDB extends DataHandler {
     }
     async deleteItem(item: Item) {
         return new Promise<void>((resolve, reject) => {
-            this.changeTags(item.tags, [], item.id).then(() => {
+            new Promise<void>((resolve1, reject1) => {
+                if(item.filePath != '') {
+                    fs.rm(item.filePath, (error) => {
+                        if(error) {
+                            console.log(`[Server:DB] Cleanup required (${item.filePath})`);
+                            reject(error);
+                        } else {
+                            resolve1();
+                        }
+                    });
+                } else {
+                    resolve1();
+                }
+            }).then(() => {
+                return this.changeTags(item.tags, [], item.id);
+            }).then(() => {
                 return this.client.query(`DELETE FROM items WHERE id = ${item.id}`);
             }).then(result => resolve(), error => reject(error));
         });
@@ -701,27 +742,31 @@ export default class PGDB extends DataHandler {
     }
 
     //other
-    async reHost(tempFile: string, type: string, id: number): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            fs.readFile(tempFile, (err, data) => {
-                if (err) {
-                    reject(err);
+    async reHost(tempFile: string, type: string, id: number): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            fs.readFile(tempFile, (error, data) => {
+                if (error) {
+                    reject(error);
                 } else {
                     let extension = type.split('/')[1];
                     if(extension == 'svg+xml') {
                         extension = 'svg';
                     }
-                    let newPath = `${createHash('sha-256').update(data).digest('hex')}_${id}.${extension}`;
-                    fs.writeFile(path.join(__dirname, '..', 'public', 'img', newPath), data, (err) => {
-                        if(err) {
-                            reject(err);
+                    let fileName = `${createHash('sha-256').update(data).digest('hex')}_${id}.${extension}`;
+                    let newPath = path.join(__dirname, '..', 'public', 'img', fileName);
+                    fs.writeFile(newPath, data, (error) => {
+                        if(error) {
+                            reject(error);
                         } else {
-                            fs.rm(tempFile, (err) => {
-                                if(err) {
-                                    console.log(`[Server:InMem] Cleanup required (${tempFile})`);
+                            fs.rm(tempFile, (error) => {
+                                if(error) {
+                                    console.log(`[Server:DB] Cleanup required (${tempFile})`);
                                 }
                             });
-                            resolve(`${Arguments.url}/assets/${newPath}`);
+                            resolve([
+                                `${Arguments.url}/img/${fileName}`,
+                                newPath
+                            ]);
                         }
                     });
                 }

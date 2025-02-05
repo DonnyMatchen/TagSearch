@@ -74,19 +74,21 @@ function data(dataHandler: DataHandler): Router {
                     }).then(id => {
                         newID = id;
                         if(req.files == null) {
-                            return <string>req.body.src;
+                            return [<string>req.body.src, ''];
                         } else {
                             return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype, id);
                         }
                     }).then(src => {
                         let item = new Item(
                             newID,
-                            src,
+                            src[0],
                             new Date(req.body.date).valueOf(),
                             ItemType.Image,
                             req.body.pub == 'Public',
-                            req.body.desc
+                            req.body.desc,
+                            req.body.tags.split(' ')
                         );
+                        item.filePath = src[1];
                         if (req.body.state == 'new') {
                             return dataHandler.addItem(item);
                         } else {

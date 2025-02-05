@@ -51,7 +51,9 @@ export class Tag {
         this.refs = [];
         if(refs) {
             refs.forEach(str => {
-                this.refs.push(+str);
+                if(str != '') {
+                    this.refs.push(+str);
+                }
             });
         }
     }
@@ -114,18 +116,17 @@ export class Item {
     desc: string;
     type: ItemType;
     pub: boolean;
+    filePath: string;
 
-    constructor(id: number, source: string, date: number, type: ItemType, pub: boolean, desc?: string, tags?: string[]) {
+    constructor(id: number, source: string, date: number, type: ItemType, pub: boolean, desc?: string, tags?: string[], filePath?: string) {
         this.id = id;
         this.source = source;
         this.date = date;
         this.type = type;
         this.tags = [];
         this.pub = pub;
-        this.desc = desc;
-        if(!this.desc) {
-            this.desc = '';
-        }
+        this.desc = desc ? desc : '';
+        this.filePath = filePath ? filePath : '';
         if(tags) {
             tags.forEach(tag => {
                 this.tags.push(tag);
@@ -640,6 +641,25 @@ export abstract class DataHandler {
      * @param ref the reference id for the item that is changing tags
      */
     protected async changeTags(oldList: string[], newList: string[], ref: number) {
+        console.log(`[Server:Test] ${JSON.stringify(oldList)}, ${JSON.stringify(newList)}, ${ref}`);
+        let rem: number[] = [];
+        for(let i = 0; i < oldList.length; i++) {
+            if(oldList[i] == '') {
+                rem.push(i);
+            }
+        }
+        for(let i = 0; i < rem.length; i++) {
+            oldList = oldList.splice(rem[i], 1);
+        }
+        rem = [];
+        for(let i = 0; i < newList.length; i++) {
+            if(newList[i] == '') {
+                rem.push(i);
+            }
+        }
+        for(let i = 0; i < rem.length; i++) {
+            newList = newList.splice(rem[i], 1);
+        }
         //diff
         let diff = this.diffTags(oldList, newList);
         let merge = this.mergeTags(oldList, newList);
@@ -694,7 +714,7 @@ export abstract class DataHandler {
      * @param type the mime type of the file
      * @returns the permanent file path after rehosting
      */
-    abstract reHost(tempFile: string, type: string, id: number): Promise<string>;
+    abstract reHost(tempFile: string, type: string, id: number): Promise<string[]>;
 }
 
 export default class Data {

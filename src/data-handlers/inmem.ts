@@ -381,12 +381,31 @@ export default class InMem extends DataHandler {
         });
     }
     async updateItem(item: Item, tags: string[]): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.getItem(item.id).then(async old => {
-                return this.changeTags(old.tags, item.tags, item.id);
-            }).then(() => {
-                this.items.set(item.id, item);
-                resolve();
+        new Promise<void>((resolve, reject) => {
+            this.getItem(item.id).then(old => {
+                if(old) {
+                    this.changeTags(old.tags, item.tags, item.id).then(() => {
+                        return new Promise<void>((resolve1, reject1) => {
+                            if(old.filePath != item.filePath && old.filePath != '') {
+                                fs.rm(old.filePath, (error) => {
+                                    if(error) {
+                                        console.log(`[Server:InMem] Cleanup required (${old.filePath})`);
+                                        reject(error);
+                                    } else {
+                                        resolve1();
+                                    }
+                                });
+                            } else {
+                                resolve1();
+                            }
+                        });
+                    }).then(() => {
+                        this.items.set(item.id, item);
+                        resolve();
+                    });
+                } else {
+                    resolve(this.addItem(item));
+                }
             });
         });
     }
@@ -473,42 +492,54 @@ export default class InMem extends DataHandler {
         });
     }
     async deleteItem(item: Item): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.getTags(item.tags).then(async tags => {
-                for(let i = 0; i < tags.length; i++) {
-                    tags[i].removeRef(item.id);
-                    await this.updateTag(tags[i]);
-                }
-                if(this.items.delete(item.id)) {
-                    resolve();
+        return new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve1, reject1) => {
+                if(item.filePath != '') {
+                    fs.rm(item.filePath, (error) => {
+                        if(error) {
+                            console.log(`[Server:InMem] Cleanup required (${item.filePath})`);
+                            reject(error);
+                        } else {
+                            resolve1();
+                        }
+                    });
                 } else {
-                    reject(new Error('The Item was not deleted.'));
+                    resolve1();
                 }
+            }).then(() => {
+                return this.changeTags(item.tags, [], item.id);
+            }).then(() => {
+                this.items.delete(item.id);
+                resolve();
             });
         });
     }
 
-    async reHost(tempFile: string, type: string, id: number): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            fs.readFile(tempFile, (err, data) => {
-                if (err) {
-                    reject(err);
+    async reHost(tempFile: string, type: string, id: number): Promise<string[]> {
+        return new Promise<string[]>((resolve, reject) => {
+            fs.readFile(tempFile, (error, data) => {
+                if (error) {
+                    reject(error);
                 } else {
                     let extension = type.split('/')[1];
                     if(extension == 'svg+xml') {
                         extension = 'svg';
                     }
-                    let newPath = `${createHash('sha-256').update(data).digest('hex')}_${id}.${extension}`;
-                    fs.writeFile(path.join(__dirname, '..', 'public', 'img', newPath), data, (err) => {
-                        if(err) {
-                            reject(err);
+                    let fileName = `${createHash('sha-256').update(data).digest('hex')}_${id}.${extension}`;
+                    let newPath = path.join(__dirname, '..', 'public', 'img', fileName);
+                    fs.writeFile(newPath, data, (error) => {
+                        if(error) {
+                            reject(error);
                         } else {
-                            fs.rm(tempFile, (err) => {
-                                if(err) {
-                                    console.log(`[Server:InMem] Cleanup required (${tempFile})`);
+                            fs.rm(tempFile, (error) => {
+                                if(error) {
+                                    console.log(`[Server:DB] Cleanup required (${tempFile})`);
                                 }
                             });
-                            resolve(`${Arguments.url}/assets/${newPath}`);
+                            resolve([
+                                `${Arguments.url}/img/${fileName}`,
+                                newPath
+                            ]);
                         }
                     });
                 }
