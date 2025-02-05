@@ -572,7 +572,7 @@ export abstract class DataHandler {
                 if(type) {
                     resolve();
                 } else {
-                    this.addTagType(new TagType('default', 'Grayscale:90', 10)).then(() => {
+                    this.addTagType(new TagType('default', 'Grayscale:90', 100)).then(() => {
                         resolve();
                     }, error => reject(error));
                 }
@@ -701,16 +701,16 @@ export default class Data {
     static async init(handler: DataHandler) {
         return new Promise<void[]>((resolve, reject) => {
             resolve(Promise.all([
-                handler.addTagType(new TagType('default', 'Grayscale:90', 10)),
-                handler.addTagType(new TagType('Subjects', `Color:${Hue.purple}`, 0)),
-                handler.addTagType(new TagType('Context', `Color:${Hue.yellow}`, 1)),
-                handler.addTagType(new TagType('Descriptions', `Color:${Hue.cyan}`, 2))
+                handler.addTagType(new TagType('Subjects', `Color:${Hue.green}`, 10)),
+                handler.addTagType(new TagType('Photographer', `Color:${Hue.magenta}`, 20)),
+                handler.addTagType(new TagType('Location', `Color:${Hue.cyan}`, 30)),
+                handler.addTagType(new TagType('Context', `Color:${Hue.yellow}`, 40))
             ]));
         }).then(() => {
             return Promise.all([
                 handler.addTag(new Tag('x', 'Context')),
                 handler.addTag(new Tag('y', 'Subjects')),
-                handler.addTag(new Tag('z', 'Descriptions'))
+                handler.addTag(new Tag('z', 'Location'))
             ]);
         }).then(() => {
             return Promise.all([

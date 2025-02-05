@@ -246,14 +246,14 @@ function data(dataHandler: DataHandler): Router {
                             word = 'created';
                             resolve(dataHandler.addTagType(new TagType(
                                 req.body.name,
-                                req.body.chue,
+                                `${req.body.chueA}:${req.body.chueB}`,
                                 req.body.ordr
                             )));
                         } else {
                             word = 'updated';
                             resolve(dataHandler.updateTagType(new TagType(
                                 req.body.name,
-                                req.body.chue,
+                                `${req.body.chueA}:${req.body.chueB}`,
                                 req.body.ordr
                             )));
                         }

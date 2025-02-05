@@ -16,7 +16,7 @@ export default function item(dataHandler: DataHandler): Router {
             search = '';
         }
         dataHandler.getItem(+id).then(item => {
-            if(item.pub || (req.session.user != undefined && req.session.user.role >= 1)) {
+            if(item && (item.pub || (req.session.user != undefined && req.session.user.role >= 1))) {
                 let tagCodex: TagsCodex;
                 let types: TagType[] = [];
                 getTagObject(dataHandler, item.tags).then(codex => {

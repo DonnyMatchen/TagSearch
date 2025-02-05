@@ -258,7 +258,6 @@ export default class PGDB extends DataHandler {
                 ${search == '' ? '' : ` WHERE name LIKE '%${this.sqlEscape(search)}%'`}
                 ORDER BY ordr ASC
                 ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber-1)*pageSize}`}`;
-            console.log(`[Server:Test] ${query}`);
             let count = `SELECT COUNT(*) FROM tag_types${search == '' ? '' : ` WHERE name LIKE '%${this.sqlEscape(search)}%'`}`;
             this.client.query(count).then(count => {
                 total = count.rows[0].count;
@@ -491,11 +490,10 @@ export default class PGDB extends DataHandler {
         new Promise<void>((resolve, reject) => {
             this.getTagType(type.name).then(typ => {
                 if(typ) {
-                    let query: string = `UPDATE tag_types SET (
+                    let query: string = `UPDATE tag_types SET
                         clr = '${type.color.encoded}',
                         ordr = ${type.order}
-                    ) WHERE name = '${this.sqlEscape(type.name)}'`;
-
+                    WHERE name = '${this.sqlEscape(type.name)}'`;
                     this.client.query(query).then(result => {
                         resolve();
                     }, (error:Error) => {
@@ -534,6 +532,21 @@ export default class PGDB extends DataHandler {
                             }
                         });
                     }).then(() => {
+                        return new Promise<void[]>((resolve1, reject1) => {
+                            if(tag.type != old.type && tag.children.length > 0) {
+                                let children: Promise<void>[] = [];
+                                for(let i = 0; i < tag.children.length; i++) {
+                                    this.getTag(tag.children[i]).then(child => {
+                                        child.type = tag.type;
+                                        children.push(this.updateTag(child));
+                                    });
+                                }
+                                resolve1(Promise.all(children));
+                            } else {
+                                resolve1(null);
+                            }
+                        })
+                    }).then(() => {
                         let query: string = `UPDATE tags SET 
                             typ = '${this.sqlEscape(tag.type)}',
                             prnt = '${this.sqlEscape(tag.parent)}',
@@ -555,15 +568,14 @@ export default class PGDB extends DataHandler {
             this.getItem(item.id).then(itm => {
                 if(itm) {
                     this.changeTags(itm.tags, item.tags, item.id).then(() => {
-                        let query: string = `UPDATE items SET (
+                        let query: string = `UPDATE items SET
                             src = '${this.sqlEscape(item.source)}',
                             dt = ${item.date},
                             tags = '${this.sqlEscape(item.tags.sort((a, b) => {return a.localeCompare(b)}).join(' '))}',
                             des = '${this.sqlEscape(item.desc)}',
                             typ = ${item.type},
                             pub = ${item.pub}
-                        ) WHERE id = ${item.id}`;
-    
+                            WHERE id = ${item.id}`;
                         this.client.query(query).then(result => {
                             resolve();
                         }, (error:Error) => {
@@ -580,14 +592,13 @@ export default class PGDB extends DataHandler {
         new Promise<void>((resolve, reject) => {
             this.getUser(user.username).then(usr => {
                 if(usr) {
-                    let query: string = `UPDATE users SET (
+                    let query: string = `UPDATE users SET
                         state = ${user.state},
                         hash = '${this.sqlEscape(user.hash)}',
                         salt = '${this.sqlEscape(user.salt)}',
                         role = ${user.role},
                         conf = '${this.sqlEscape(JSON.stringify(user.config))}'
-                    ) WHERE uname = '${this.sqlEscape(user.username)}'`;
-
+                        WHERE uname = '${this.sqlEscape(user.username)}'`;
                     this.client.query(query).then(result => {
                         resolve();
                     }, (error:Error) => {
