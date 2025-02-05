@@ -62,7 +62,6 @@ function data(dataHandler: DataHandler): Router {
                 }
                 if(errorList.isEmpty() && errors.length == 0) {
                     let newID: number;
-                    let item: Item;
                     let word: string;
                     new Promise<number>((resolve, reject) => {
                         if (req.body.state == 'new') {
@@ -77,31 +76,21 @@ function data(dataHandler: DataHandler): Router {
                         if(req.files == null) {
                             return <string>req.body.src;
                         } else {
-                            return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype);
+                            return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype, id);
                         }
                     }).then(src => {
-                        item = new Item(dataHandler,
+                        let item = new Item(
                             newID,
                             src,
                             new Date(req.body.date).valueOf(),
                             ItemType.Image,
-                            {
-                                desc: req.body.desc,
-                                pub: req.body.pub == 'Public'
-                            }
+                            req.body.pub == 'Public',
+                            req.body.desc
                         );
                         if (req.body.state == 'new') {
-                            return item.tagsChanged(dataHandler, dataHandler.tagsFromString(req.body.tags));
-                        }
-                    }, (error:Error) => {
-                        errors.push(error.message);
-                    }).then(() => {
-                        if(errors.length == 0) {
-                            if (req.body.state == 'new') {
-                                return dataHandler.addItem(item);
-                            } else {
-                                return dataHandler.updateItem(item, dataHandler.tagsFromString(req.body.tags));
-                            }
+                            return dataHandler.addItem(item);
+                        } else {
+                            return dataHandler.updateItem(item, dataHandler.tagsFromString(req.body.tags));
                         }
                     }, (error:Error) => {
                         errors.push(error.message);
@@ -183,10 +172,10 @@ function data(dataHandler: DataHandler): Router {
                     if(errorList.isEmpty() && errors.length == 0) {
                         if(req.body.state == 'new') {
                             word = 'created';
-                            return dataHandler.addTag(new Tag(req.body.name, tagType, <Tag>parent));
+                            return dataHandler.addTag(new Tag(req.body.name, tagType.name, parent ? parent.name : ''));
                         } else {
                             word = 'updated';
-                            return dataHandler.updateTag(new Tag(req.body.name, tagType, <Tag>parent));
+                            return dataHandler.updateTag(new Tag(req.body.name, tagType.name, parent ? parent.name : ''));
                         }
                     }
                 }, (error:Error) => {

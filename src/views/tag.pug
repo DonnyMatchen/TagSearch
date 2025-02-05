@@ -7,7 +7,7 @@ block layout-content
                 div.col-sm-1
                 div.col-sm-5.box.ps-3.pe-3.pb-3
                     h3.mt-3 Parent
-                    -if(args.tag.parent == null)
+                    -if(args.tag.parent == '')
                         div (None)
                     - else
                         div

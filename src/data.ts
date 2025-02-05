@@ -22,7 +22,7 @@ export class TagType {
     getColor(lum: Lum): HslColor {
         return this.color.getHSL(lum);
     }
-    getColorString(lum: Lum) {
+    getColorString(lum: Lum): string {
         let color = this.getColor(lum);
         return `HSL(${color.h}, ${color.s}%, ${color.l}%)`
     }
@@ -35,21 +35,25 @@ export class Tag {
     children: string[];
     readonly refs: number[];
 
-    constructor(name: string, type: TagType, parent?: Tag, refs?: number[]) {
+    constructor(name: string, type: string, parent?: string, refs?: string[], children?: string[]) {
         this.name = name;
-        if(parent != undefined) {
-            this.parent = parent.name;
-            this.type = parent.type;
-            parent.addChild(name);
-        } else {
-            this.parent = null;
-            this.type = type.name;
+        this.parent = '';
+        if(parent) {
+            this.parent = parent;
         }
+        this.type = type;
         this.children = [];
-        if(refs == undefined) {
-            refs = [];
+        if(children) {
+            children.forEach(str => {
+                this.children.push(str);
+            });
         }
-        this.refs = refs;
+        this.refs = [];
+        if(refs) {
+            refs.forEach(str => {
+                this.refs.push(+str);
+            });
+        }
     }
 
     async getParent(dataHandler: DataHandler): Promise<Tag> {
@@ -84,7 +88,7 @@ export class Tag {
 
     async getProximity(dataHandler: DataHandler): Promise<number> {
         let out: number = 0;
-        if(this.parent == null) {
+        if(this.parent == '') {
             return out;
         } else {
             await this.getParent(dataHandler).then(async parent => {
@@ -95,11 +99,6 @@ export class Tag {
             return out;
         }
     }
-}
-
-class ItemOptions {
-    desc?: string;
-    pub?: boolean;
 }
 
 export enum ItemType {
@@ -116,124 +115,22 @@ export class Item {
     type: ItemType;
     pub: boolean;
 
-    constructor(dataHandler: DataHandler, id: number, source: string, date: number, type: ItemType, options?: ItemOptions) {
+    constructor(id: number, source: string, date: number, type: ItemType, pub: boolean, desc?: string, tags?: string[]) {
         this.id = id;
         this.source = source;
         this.date = date;
         this.type = type;
         this.tags = [];
-        this.pub = false;
-        if(options != undefined) {
-            if(options.pub != undefined) {
-                this.pub = options.pub;
-            }
-            if (options.desc == undefined || options.desc == null) {
-                options.desc = '';
-            }
-            this.desc = options.desc;
-        } else {
+        this.pub = pub;
+        this.desc = desc;
+        if(!this.desc) {
             this.desc = '';
         }
-    }
-
-    /**
-     * ONLY USE THIS FUNCTION TO ALTER THE TAGS LIST!
-     * @param newList the new list of tags
-     */
-    async tagsChanged(dataHandler: DataHandler, newList: string[]) {
-        let error: Error = null;
-        await this.expandTags(dataHandler, newList).then(async expanded => {
-            let changes: Diff = this.diffTags(this.tags, expanded);
-            for(let i = 0; i < changes.removed.length; i++) {
-                let tagName: string = changes.removed[i];
-                await dataHandler.getTag(tagName).then(tag => {
-                    tag.removeRef(this.id);
-                    dataHandler.updateTag(tag);
-                }, err => {
-                    error = err;
-                });
-            }
-            if(error == null) {
-                for(let i = 0; i < changes.added.length; i++) {
-                    let tag = changes.added[i];
-                    let foundTag: Tag;
-                    await dataHandler.getTag(tag).then(found => {
-                        foundTag = found;
-                    }, async (error:Error) => {
-                        await dataHandler.getTagType('default').then(async type => {
-                            foundTag = new Tag(tag, type);
-                            await dataHandler.addTag(foundTag);
-                        });
-                    }).finally(() => {
-                        foundTag.addRef(this.id);
-                        dataHandler.updateTag(foundTag);
-                    });
-                }
-                this.tags.splice(0, this.tags.length);
-                expanded.forEach(tag => this.tags.push(tag));
-            }
-        }, err => {
-            error = err;
-        });
-        if(error != null) {
-            throw error;
-        }
-    }
-
-    private async expandTags(dataHandler: DataHandler, list: string[]) {
-        let out: string[] = [];
-        for(let i = 0; i < list.length; i++) {
-            let tagName = list[i];
-            let wrong: boolean = false;
-            await dataHandler.getTag(tagName).then(async tag => {
-                if(!out.includes(tag.name)) {
-                    out.push(tag.name);
-                }
-                let parent = tag.parent;
-                while(parent != null) {
-                    await dataHandler.getTag(parent).then(tag => {
-                        if(!out.includes(tag.name)) {
-                            out.push(tag.name);
-                        }
-                        parent = tag.parent;
-                    });
-                }
-            }, error => {
-                wrong = true;
+        if(tags) {
+            tags.forEach(tag => {
+                this.tags.push(tag);
             });
-            if(wrong) {
-                throw new Error(tagName);
-            }
         }
-        return out;
-    }
-
-    /**
-     * 
-     * @param oldList the original list
-     * @param newList the replacement list
-     * @returns a Diff object that contains a list of added and removed elements
-     */
-    private diffTags(oldList: string[], newList: string[]): Diff {
-        let changes: Diff = new Diff();
-        oldList.forEach(tag => {
-            if(!newList.includes(tag)) {
-                changes.removed.push(tag);
-            }
-        });
-        newList.forEach(newTag => {
-            let contains: boolean = false;
-            oldList.forEach(oldTag => {
-                if(oldTag == newTag) {
-                    contains = true;
-                    return;
-                }
-            });
-            if(!contains) {
-                changes.added.push(newTag)
-            }
-        });
-        return changes;
     }
 }
 
@@ -259,9 +156,9 @@ export function roleFromString(str: string): Role {
 }
 
 export enum UserState {
-    New,
-    Set,
-    Error
+    New = 0,
+    Set = 1,
+    Error = -1
 }
 
 export class User {
@@ -286,17 +183,17 @@ export class User {
     role: Role;
     config: PersonalConfig;
 
-    constructor(username: string, role: Role | string, config: PersonalConfig, options?: {hash: string, salt: string}) {
+    constructor(username: string, role: Role, config: string | PersonalConfig, hash?: string, salt?: string) {
         this.username = username;
-        this.config = config;
-        if(typeof role == 'string') {
-            this.role = roleFromString(role);
+        if(typeof config == 'string') {
+            this.config = new PersonalConfig(config);
         } else {
-            this.role = role;
+            this.config = config;
         }
-        if(options != undefined) {
-            this.hash = options.hash;
-            this.salt = options.salt;
+        this.role = role;
+        if(hash && salt) {
+            this.hash = hash;
+            this.salt = salt;
             this.state = UserState.Set;
         } else {
             this.state = UserState.New;
@@ -379,9 +276,26 @@ export class PersonalConfig {
     theme: HslColor;
     bad: HslColor;
     good: HslColor;
+
+    constructor(raw: string) {
+        let rawObj: any = JSON.parse(raw);
+        this.tagLum = rawObj.tagLum;
+        this.bg = new HslColor(rawObj.bg.h, rawObj.bg.s, rawObj.bg.l);
+        this.fg = new HslColor(rawObj.fg.h, rawObj.fg.s, rawObj.fg.l);
+        this.header = new HslColor(rawObj.header.h, rawObj.header.s, rawObj.header.l);
+        this.msg = new HslColor(rawObj.msg.h, rawObj.msg.s, rawObj.msg.l);
+        this.theme = new HslColor(rawObj.theme.h, rawObj.theme.s, rawObj.theme.l);
+        this.bad = new HslColor(rawObj.bad.h, rawObj.bad.s, rawObj.bad.l);
+        this.good = new HslColor(rawObj.good.h, rawObj.good.s, rawObj.good.l);
+    }
 }
 
 export abstract class DataHandler {
+    /**
+     * This is for initializing data connections
+     */
+    abstract init(): Promise<void>;
+
     /**
      * 
      * @returns the next avaiable item ID
@@ -649,8 +563,129 @@ export abstract class DataHandler {
             let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
             admin.setPassword('', 'toor').then(() => {
                 return this.addUser(admin);
-            }).then(() => console.log(`[server]: Default admin account created.  Change the password ASAP`));
+            }).then(() => console.log(`[Server:Data] Default admin account created.  Change the password ASAP`));
         }
+    }
+    async ensureDefaultType() {
+        return new Promise<void>((resolve, reject) => {
+            this.getTagType('default').then(type => {
+                if(type) {
+                    resolve();
+                } else {
+                    this.addTagType(new TagType('default', 'Grayscale:90', 10)).then(() => {
+                        resolve();
+                    }, error => reject(error));
+                }
+            }, error => reject(error));
+        });
+    }
+
+    /**
+     * 
+     * @param oldList the original list
+     * @param newList the replacement list
+     * @returns a Diff object that contains a list of added and removed elements
+     */
+    private diffTags(oldList: string[], newList: string[]): Diff {
+        let changes: Diff = new Diff();
+        oldList.forEach(tag => {
+            if(!newList.includes(tag)) {
+                changes.removed.push(tag);
+            }
+        });
+        newList.forEach(newTag => {
+            let contains: boolean = false;
+            oldList.forEach(oldTag => {
+                if(oldTag == newTag) {
+                    contains = true;
+                    return;
+                }
+            });
+            if(!contains) {
+                changes.added.push(newTag)
+            }
+        });
+        return changes;
+    }
+
+    private mergeTags(oldList: string[], newList: string[]): string[] {
+        let out = [...oldList];
+        newList.forEach(tagName => {
+            if(!out.includes(tagName)) {
+                out.push(tagName);
+            }
+        });
+        return out;
+    }
+
+    private async addParents(newList: string[], diffAdded: String[], fetched: Map<string, Tag>, tag: Tag): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if(tag.parent != '' && !fetched.has(tag.parent)) {
+                this.getTag(tag.parent).then(parent => {
+                    newList.push(parent.name);
+                    diffAdded.push(parent.name);
+                    fetched.set(parent.name, parent);
+                    resolve(this.addParents(newList, diffAdded, fetched, parent));
+                }, error => reject(error));
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    /**
+     * This is a utility function for handling the updating of tags with changes to an item
+     * @param oldList the old list of tags
+     * @param newList the new list of tags
+     * @param ref the reference id for the item that is changing tags
+     */
+    protected async changeTags(oldList: string[], newList: string[], ref: number) {
+        //diff
+        let diff = this.diffTags(oldList, newList);
+        let merge = this.mergeTags(oldList, newList);
+
+        return new Promise<void>((resolve, reject) => {
+            //fetch tags
+            let fetched: Map<string, Tag> = new Map();
+            this.getTags(merge).then(tags => {
+                let parentFetches: Promise<void>[] = [];
+                for(let i = 0; i < tags.length; i++) {
+                    fetched.set(tags[i].name, tags[i]);
+                    //fetch parents
+                    parentFetches.push(this.addParents(newList, diff.added, fetched, tags[i]));
+                }
+                return Promise.all(parentFetches);
+            }).then(() => {
+                //add new tags
+                let adding: Promise<void>[] = [];
+                for(let i = 0; i < newList.length; i++) {
+                    if(!fetched.has(newList[i])) {
+                        let tag = new Tag(newList[i], 'default');
+                        fetched.set(tag.name, tag);
+                        adding.push(this.addTag(tag));
+                    }
+                }
+                return Promise.all(adding);
+            }).then(() => {
+                //update removed tags
+                let updating: Promise<void>[] = [];
+                for (let i = 0; i < diff.removed.length; i++) {
+                    let removed: Tag = fetched.get(diff.removed[i]);
+                    removed.removeRef(ref);
+                    updating.push(this.updateTag(removed));
+                }
+                for (let i = 0; i < diff.added.length; i++) {
+                    let added: Tag = fetched.get(diff.added[i]);
+                    added.addRef(ref);
+                    updating.push(this.updateTag(added));
+                }
+
+                return Promise.all(updating);
+            }).then(() => {
+                resolve();
+            });
+        });
+        //return final list
     }
 
     /**
@@ -659,158 +694,127 @@ export abstract class DataHandler {
      * @param type the mime type of the file
      * @returns the permanent file path after rehosting
      */
-    abstract reHost(tempFile: string, type: string): Promise<string>;
+    abstract reHost(tempFile: string, type: string, id: number): Promise<string>;
 }
 
 export default class Data {
     static async init(handler: DataHandler) {
-        let def: TagType = new TagType('default', 'Grayscale:90', 10);
-        let sub: TagType = new TagType('Subjects', `Color:${Hue.lime}`, 0);
-        let cont: TagType = new TagType('Context', `Color:${Hue.yellow}`, 1);
-        let desc: TagType = new TagType('Descriptions', `Color:${Hue.cyan}`, 2);
-        handler.addTagType(def);
-        handler.addTagType(sub);
-        handler.addTagType(cont);
-        handler.addTagType(desc);
-
-        let x: Tag = new Tag('x', cont);
-        let y: Tag = new Tag('y', sub);
-        let z: Tag = new Tag('z', desc);
-        let zz: Tag = new Tag('zz', null, z);
-        handler.addTag(x);
-        handler.addTag(new Tag('xx', null, x));
-        handler.addTag(y);
-        handler.addTag(new Tag('yy', null, y));
-        handler.addTag(z);
-        handler.addTag(zz);
-        handler.addTag(new Tag('zzz', null, zz));
-        
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/a6/78/__scp_foundation_drawn_by_langbazi__sample-a6788af625a75e6a01cf24170853c751.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'A corner of a room',
-                    pub: true
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['xx']);
+        return new Promise<void[]>((resolve, reject) => {
+            resolve(Promise.all([
+                handler.addTagType(new TagType('default', 'Grayscale:90', 10)),
+                handler.addTagType(new TagType('Subjects', `Color:${Hue.purple}`, 0)),
+                handler.addTagType(new TagType('Context', `Color:${Hue.yellow}`, 1)),
+                handler.addTagType(new TagType('Descriptions', `Color:${Hue.cyan}`, 2))
+            ]));
+        }).then(() => {
+            return Promise.all([
+                handler.addTag(new Tag('x', 'Context')),
+                handler.addTag(new Tag('y', 'Subjects')),
+                handler.addTag(new Tag('z', 'Descriptions'))
+            ]);
+        }).then(() => {
+            return Promise.all([
+                handler.addTag(new Tag('xx', null, 'x')),
+                handler.addTag(new Tag('yy', null, 'y')),
+                handler.addTag(new Tag('zz', null, 'z'))
+            ]);
+        }).then(() => {
+            return handler.addTag(new Tag('zzz', null, 'zz'))
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/a6/78/__scp_foundation_drawn_by_langbazi__sample-a6788af625a75e6a01cf24170853c751.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    true,
+                    'A corner of a room',
+                    ['xx']
+                ));
             });
-        });
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/e1/6d/__ashen_one_dark_souls_and_1_more_drawn_by_conor_burke__sample-e16dd89ec5c0e2210dae609a58be8c04.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'A brave but foolish knight, fallen to flame and blood',
-                    pub: true
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['yy']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/e1/6d/__ashen_one_dark_souls_and_1_more_drawn_by_conor_burke__sample-e16dd89ec5c0e2210dae609a58be8c04.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    true,
+                    'A brave but foolish knight, fallen to flame and blood',
+                    ['yy']
+                ));
             });
-        });
-        
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/88/17/__slave_knight_gael_dark_souls_and_1_more_drawn_by_junjiuk__sample-88172e085d8be0193ee3ced013b26ed1.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'He is forgotten',
-                    pub: true
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['zzz']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/88/17/__slave_knight_gael_dark_souls_and_1_more_drawn_by_junjiuk__sample-88172e085d8be0193ee3ced013b26ed1.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    true,
+                    'He is forgotten',
+                    ['zzz']
+                ));
             });
-        });
-        
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/c9/5f/__hunter_and_micolash_host_of_the_nightmare_bloodborne_drawn_by_rashuu__sample-c95fbd43765275557e0a57e852cea958.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'climb the stairs, you\'ve coem this far'
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['x', 'yy']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/c9/5f/__hunter_and_micolash_host_of_the_nightmare_bloodborne_drawn_by_rashuu__sample-c95fbd43765275557e0a57e852cea958.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    false,
+                    'climb the stairs, you\'ve coem this far',
+                    ['x', 'yy']
+                ));
             });
-        });
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/d8/67/__original_drawn_by_wayukako__sample-d8671b5e581753bf8dde6b7ed762afb4.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'Ever upward'
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['xx', 'z']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/d8/67/__original_drawn_by_wayukako__sample-d8671b5e581753bf8dde6b7ed762afb4.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    false,
+                    'Ever upward',
+                    ['xx', 'z']
+                ));
             });
-        });
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/d7/e8/__original_drawn_by_ashsadila__sample-d7e8c53ac85d834a342c7b752242f258.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'No more fighting... please...',
-                    pub: true
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['y', 'zz']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/d7/e8/__original_drawn_by_ashsadila__sample-d7e8c53ac85d834a342c7b752242f258.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    true,
+                    'No more fighting... please...',
+                    ['y', 'zz']
+                ));
             });
-        });
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://cdn.donmai.us/sample/d7/e1/__girls_frontline__sample-d7e1d1b35bd30d7794469680cc72e45c.jpg',
-                1733066171000,
-                ItemType.Image,
-                {
-                    desc: 'Infinity awaits',
-                    pub: true
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['xx', 'yy', 'zzz']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://cdn.donmai.us/sample/d7/e1/__girls_frontline__sample-d7e1d1b35bd30d7794469680cc72e45c.jpg',
+                    1733066171000,
+                    ItemType.Image,
+                    true,
+                    'Infinity awaits',
+                    ['xx', 'yy', 'zzz']
+                ));
             });
-        });
-        await handler.nextItemID().then(async id => {
-            let item = new Item(
-                handler,
-                id,
-                'https://www.bankersonline.com/sites/default/files/tools/99INVPOL.pdf',
-                1733066171000,
-                ItemType.Document,
-                {
-                    desc: 'A document!  A document!',
-                    pub: true
-                }
-            );
-            await handler.addItem(item).then(async () => {
-                await item.tagsChanged(handler, ['xx', 'yy', 'zzz']);
+        }).then(() => {
+            return handler.nextItemID().then(async id => {
+                return handler.addItem(new Item(
+                    id,
+                    'https://www.bankersonline.com/sites/default/files/tools/99INVPOL.pdf',
+                    1733066171000,
+                    ItemType.Document,
+                    true,
+                    'A document!  A document!',
+                    ['xx', 'yy', 'zzz']
+                ));
             });
         });
     }

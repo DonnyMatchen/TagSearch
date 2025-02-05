@@ -70,7 +70,7 @@ class CodexSet {
         await this.dataHandler.getTagType(tag.type).then(type => {
             this.type = type;
         });
-        if(tag.parent != null) {
+        if(tag.parent != '') {
             this.dataHandler.getTag(tag.parent).then(parent => {
                 for(let i = 0; i < parent.children.length; i++) {
                     let tagName = parent.children[i];

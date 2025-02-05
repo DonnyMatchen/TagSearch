@@ -1,0 +1,2 @@
+- setup PSQL database "TAG_SEARCH"
+- npm install

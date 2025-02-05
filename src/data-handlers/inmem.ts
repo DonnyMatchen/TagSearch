@@ -20,8 +20,10 @@ export default class InMem extends DataHandler {
         this.tagTypes = new Map();
         this.tags = new Map();
         this.items = new Map();
-        this.nextItem = this.nextUser = 0;
+        this.nextItem = this.nextUser = 1;
     }
+
+    async init() {}
 
     async nextItemID(): Promise<number> {
         return this.nextItem++;
@@ -218,7 +220,7 @@ export default class InMem extends DataHandler {
         return new Promise((resolve, reject) => {
             let tag: Tag = this.tags.get(name);;
             if(tag == undefined) {
-                reject(new Error(`${name} not found.`));
+                reject(new Error(`Tag "${name}" not found.`));
             } else {
                 resolve(tag);
             }
@@ -315,8 +317,24 @@ export default class InMem extends DataHandler {
             if(this.tags.has(tag.name)) {
                 reject(new Error('Tag already exists'));
             } else {
-                this.tags.set(tag.name, tag);
-                resolve();
+                let parent: Tag;
+                new Promise<void>((resolve1, reject1) => {
+                    if(tag.parent) {
+                        this.getTag(tag.parent).then(prnt => {
+                            if(prnt) {
+                                parent = prnt;
+                                prnt.addChild(tag.name);
+                                resolve1(this.updateTag(prnt));
+                            }
+                        })
+                    } else {
+                        resolve1();
+                    }
+                }).then(() => {
+                    tag.type = parent ? parent.type : tag.type;
+                    this.tags.set(tag.name, tag);
+                    resolve();
+                }, error => reject(error));
             }
         });
     }
@@ -335,8 +353,10 @@ export default class InMem extends DataHandler {
             if(this.items.has(item.id)) {
                 reject(new Error('Item already exists'));
             } else {
-                this.items.set(item.id, item);
-                resolve();
+                this.changeTags([], item.tags, item.id).then(() => {
+                    this.items.set(item.id, item);
+                    resolve();
+                });
             }
         });
     }
@@ -389,13 +409,11 @@ export default class InMem extends DataHandler {
     async updateItem(item: Item, tags: string[]): Promise<void> {
         return new Promise((resolve, reject) => {
             this.getItem(item.id).then(async old => {
-                old.date = item.date;
-                old.desc = item.desc;
-                old.pub = item.pub;
-                return old.tagsChanged(this, tags);
+                return this.changeTags(old.tags, item.tags, item.id);
             }, (error:Error) => {
                 return this.addItem(item);
             }).then(() => {
+                this.items.set(item.id, item);
                 resolve();
             }, (error:Error) => {
                 reject(new Error(`Unable to update item "${item.id}".\nThis was caused by: ${error.message}`));
@@ -431,7 +449,7 @@ export default class InMem extends DataHandler {
                     resolve1(this.getTags(tag.children).then(async tags => {
                         for(let i = 0; i < tags.length; i++) {
                             let childTag = tags[i];
-                            childTag.parent = null;
+                            childTag.parent = '';
                             await this.updateTag(childTag);
                         }
                     }));
@@ -500,7 +518,7 @@ export default class InMem extends DataHandler {
         });
     }
 
-    async reHost(tempFile: string, type: string): Promise<string> {
+    async reHost(tempFile: string, type: string, id: number): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             fs.readFile(tempFile, (err, data) => {
                 if (err) {
@@ -510,14 +528,14 @@ export default class InMem extends DataHandler {
                     if(extension == 'svg+xml') {
                         extension = 'svg';
                     }
-                    let newPath = `${createHash('sha-256').update(data).digest('hex')}.${extension}`;
+                    let newPath = `${createHash('sha-256').update(data).digest('hex')}_${id}.${extension}`;
                     fs.writeFile(path.join(__dirname, '..', 'public', 'img', newPath), data, (err) => {
                         if(err) {
                             reject(err);
                         } else {
                             fs.rm(tempFile, (err) => {
                                 if(err) {
-                                    console.log(`[server]: Cleanup required (${tempFile})`);
+                                    console.log(`[Server:InMem] Cleanup required (${tempFile})`);
                                 }
                             });
                             resolve(`${Arguments.url}/assets/${newPath}`);
