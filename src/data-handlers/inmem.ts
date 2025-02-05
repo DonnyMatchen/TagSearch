@@ -207,44 +207,16 @@ export default class InMem extends DataHandler {
 
     //Queeries
     async getUser(userName: string): Promise<User> {
-        return new Promise((resolve, reject) => {
-            let user: User = this.users.get(userName);;
-            if(user == undefined) {
-                reject(new Error(`${userName} not found.`));
-            } else {
-                resolve(user);
-            }
-        });
+        return new Promise((resolve, reject) => resolve(this.users.get(userName)));
     }
     async getTag(name: string): Promise<Tag> {
-        return new Promise((resolve, reject) => {
-            let tag: Tag = this.tags.get(name);;
-            if(tag == undefined) {
-                reject(new Error(`Tag "${name}" not found.`));
-            } else {
-                resolve(tag);
-            }
-        });
+        return new Promise((resolve, reject) => resolve(this.tags.get(name)));
     }
     async getTagType(name: string): Promise<TagType> {
-        return new Promise((resolve, reject) => {
-            let type: TagType = this.tagTypes.get(name);;
-            if(type == undefined) {
-                reject(new Error(`${name} not found.`));
-            } else {
-                resolve(type);
-            }
-        });
+        return new Promise((resolve, reject) => resolve(this.tagTypes.get(name)));
     }
     async getItem(id: number): Promise<Item> {
-        return new Promise((resolve, reject) => {
-            let item: Item = this.items.get(id);;
-            if(item == undefined) {
-                reject(new Error(`${id} not found.`));
-            } else {
-                resolve(item);
-            }
-        });
+        return new Promise((resolve, reject) => resolve(this.items.get(id)));
     }
 
     //Multi-Getters
@@ -319,7 +291,7 @@ export default class InMem extends DataHandler {
             } else {
                 let parent: Tag;
                 new Promise<void>((resolve1, reject1) => {
-                    if(tag.parent) {
+                    if(tag.parent != '') {
                         this.getTag(tag.parent).then(prnt => {
                             if(prnt) {
                                 parent = prnt;
@@ -364,59 +336,57 @@ export default class InMem extends DataHandler {
     //Updaters
     async updateUser(user: User): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.getUser(user.username).then(old => {
-                old.role = user.role;
-                old.hash = user.hash;
-                old.salt = user.salt;
-                old.state = user.state;
-            }, (error:Error) => {
-                return this.addUser(user);
-            }).then(() => {
-                resolve();
-            }, (error:Error) => {
-                reject(new Error(`Unable to update user "${user.username}".\nThis was caused by: ${error.message}`));
-            });
+            this.users.set(user.username, user);
+            resolve();
         });
     }
     async updateTag(tag: Tag): Promise<void> {
         return new Promise((resolve, reject) => {
             this.getTag(tag.name).then(old => {
-                old.type = tag.type;
-                old.parent = tag.parent;
-            }, (error:Error) => {
-                return this.addTag(tag);
-            }).then(() => {
-                resolve();
-            }, (error:Error) => {
-                reject(new Error(`Unable to update tag "${tag.name}".\nThis was caused by: ${error.message}`));
+                if(!old) {
+                    resolve(this.addTag(tag));
+                } else {
+                    new Promise<void>((resolve1, reject1) => {
+                        if(old.parent != tag.parent && old.parent != '') {
+                            this.getTag(old.parent).then(oldParent => {
+                                oldParent.removeChild(old.name);
+                                resolve1(this.updateTag(oldParent));
+                            });
+                        } else {
+                            resolve1();
+                        }
+                    }).then(() => {
+                        return new Promise<void>((resolve1, reject1) => {
+                            if(old.parent != tag.parent && tag.parent != '') {
+                                this.getTag(tag.parent).then(newParent => {
+                                    newParent.addChild(tag.name);
+                                    resolve1(this.updateTag(newParent));
+                                });
+                            } else {
+                                resolve1();
+                            }
+                        });
+                    }).then(() => {
+                        this.tags.set(tag.name, tag);
+                        resolve();
+                    });
+                }
             });
         });
     }
     async updateTagType(type: TagType): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.getTagType(type.name).then(old => {
-                old.color = type.color;
-                old.order = type.order;
-            }, (error:Error) => {
-                return this.addTagType(type);
-            }).then(() => {
-                resolve();
-            }, (error:Error) => {
-                reject(new Error(`Unable to update tag type "${type.name}".\nThis was caused by: ${error.message}`));
-            });
+            this.tagTypes.set(type.name, type);
+            resolve();
         });
     }
     async updateItem(item: Item, tags: string[]): Promise<void> {
         return new Promise((resolve, reject) => {
             this.getItem(item.id).then(async old => {
                 return this.changeTags(old.tags, item.tags, item.id);
-            }, (error:Error) => {
-                return this.addItem(item);
             }).then(() => {
                 this.items.set(item.id, item);
                 resolve();
-            }, (error:Error) => {
-                reject(new Error(`Unable to update item "${item.id}".\nThis was caused by: ${error.message}`));
             });
         });
     }
