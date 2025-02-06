@@ -74,7 +74,7 @@ export default function deleter(): Router {
                 req.session.user,
                 'Delete Tag',
                 -1,
-                `Are you sure you want to delete the tag "${name}"`,
+                `Are you sure you want to delete the tag "${name}" and its children?`,
                 '',
                 {
                     active: false,

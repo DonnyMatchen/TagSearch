@@ -641,7 +641,6 @@ export abstract class DataHandler {
      * @param ref the reference id for the item that is changing tags
      */
     protected async changeTags(oldList: string[], newList: string[], ref: number) {
-        console.log(`[Server:Test] ${JSON.stringify(oldList)}, ${JSON.stringify(newList)}, ${ref}`);
         let rem: number[] = [];
         for(let i = 0; i < oldList.length; i++) {
             if(oldList[i] == '') {
@@ -671,7 +670,9 @@ export abstract class DataHandler {
                 let parentFetches: Promise<void>[] = [];
                 for(let i = 0; i < tags.length; i++) {
                     fetched.set(tags[i].name, tags[i]);
-                    //fetch parents
+                }
+                //fetch parents
+                for(let i = 0; i < tags.length; i++) {
                     parentFetches.push(this.addParents(newList, diff.added, fetched, tags[i]));
                 }
                 return Promise.all(parentFetches);
