@@ -214,3 +214,11 @@ export function getCssVars(config: PersonalConfig): string {
         linkH[0]}, ${linkH[1]}, ${linkH[2]
     };}`;
 }
+
+export function lumFromString(str: string): Lum {
+    switch(str) {
+        case 'Dark': return Lum.dark;
+        case 'Bright': return Lum.bright;
+        case 'Light': return Lum.light;
+    }
+}

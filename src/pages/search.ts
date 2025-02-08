@@ -19,6 +19,7 @@ export default function search(dataHandler: DataHandler): Router {
         dataHandler.searchItems(search, dataHandler.getPageLimit(), +page, req.session.user).then(results => {
             res.render('search', getArguments(
                 req.session.user,
+                req.session.config,
                 'Search Results',
                 1,
                 `${results.total} result(s) from search "${search}"`,
@@ -36,6 +37,7 @@ export default function search(dataHandler: DataHandler): Router {
         }, (error:Error) => {
             res.render('search', getArguments(
                 req.session.user,
+                req.session.config,
                 'Search',
                 1,
                 ``,
@@ -84,6 +86,7 @@ export default function search(dataHandler: DataHandler): Router {
             });
             res.render('tagSearch', getArguments(
                 req.session.user,
+                req.session.config,
                 'Search Results',
                 2,
                 `${results.total} result(s) matching "${tagSearch}"`,
@@ -121,6 +124,7 @@ export default function search(dataHandler: DataHandler): Router {
         dataHandler.searchTagTypes(tagSearch, dataHandler.getPageLimit(), +page).then(results => {
             res.render('tagType', getArguments(
                 req.session.user,
+                req.session.config,
                 'Search Results',
                 3,
                 `${results.total} result(s) matching "${tagSearch}"`,

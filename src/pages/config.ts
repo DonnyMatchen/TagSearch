@@ -11,55 +11,7 @@ export default function config(dataHandler: DataHandler): Router {
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         let config = req.session.user ? req.session.user.config : User.getDefaultConfig();
-        res.render('settings', getArgumentsSimply(req.session.user, config));
-    });
-    router.post('/',
-        (req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        if(!req.session.user) {
-            res.render('settings', getArgumentsSimply(req.session.user, User.getDefaultConfig(), ['Settings could not be saved because you are not logged in.']));
-        } else {
-            let errorList = validationResult(req);
-            let config: PersonalConfig = {
-                tagLum: lumFromString(req.body.tagl),
-                bg: new HslColor(`${req.body.bgA}:${req.body.bgB}:${req.body.bgC}`),
-                fg: new HslColor(`${req.body.fgA}:${req.body.fgB}:${req.body.fgC}`),
-                header: new HslColor(`${req.body.hdA}:${req.body.hdB}:${req.body.hdC}`),
-                msg: new HslColor(`${req.body.msgA}:${req.body.msgB}:${req.body.msgC}`),
-                theme: new HslColor(`${req.body.thmA}:${req.body.thmB}:${req.body.thmC}`),
-                bad: new HslColor(`${req.body.bdA}:${req.body.bdB}:${req.body.bdC}`),
-                good: new HslColor(`${req.body.gdA}:${req.body.gdB}:${req.body.gdC}`),
-            };
-            if(errorList.isEmpty()) {
-                dataHandler.getUser(req.session.user.username).then(user => {
-                    user.config = config;
-                    req.session.user = user;
-                    return dataHandler.updateUser(user);
-                }).then(() => {
-                    res.render('settings', getArgumentsSimply(req.session.user, config, [], ['Settings updated successfully.']));
-                }, (error: Error) => {
-                    res.render('settings', getArgumentsSimply(req.session.user, config, ['Failed to update settings.', error.message]));
-                });
-            } else {
-                let errors: string[] = [];
-                errorList['errors'].forEach((error: any) => {
-                    if(error.path == 'them') {
-                        if(error.msg == 'empty') {
-                            errors.push('Theme Color is blank');
-                        }
-                    } else if(error.path == 'bad') {
-                        if(error.msg == 'empty') {
-                            errors.push('Delete/Error Color is blank');
-                        }
-                    } else if(error.path == 'good') {
-                        if(error.msg == 'empty') {
-                            errors.push('Edit/Success Color is blank');
-                        }
-                    }
-                });
-                res.render('settings', getArgumentsSimply(req.session.user, config, errors));
-            }
-        }
+        res.render('create-edit', getArgumentsSimply(req.session.user, config));
     });
 
     return router;
@@ -101,9 +53,10 @@ function getArgumentsSimply(user: User, config: PersonalConfig, errors?: string[
     );
     return getArguments(
         user,
+        config,
         `Settings`,
         103,
-        'Settings will display immediately, but must be saved to be permanent.',
+        'Color settings can be saved without an account.',
         '',
         {
             active: false,
@@ -112,7 +65,7 @@ function getArgumentsSimply(user: User, config: PersonalConfig, errors?: string[
             pageNumber: 0
         },
         {
-            target: `/config`,
+            target: `/api/color`,
             form: form,
             labels: labels,
             arrs: arrs,
@@ -152,12 +105,5 @@ function getLum(lum: Lum): string {
         case Lum.dark: return 'Dark';
         case Lum.bright: return 'Bright';
         case Lum.light: return 'Light';
-    }
-}
-function lumFromString(str: string): Lum {
-    switch(str) {
-        case 'Dark': return Lum.dark;
-        case 'Bright': return Lum.bright;
-        case 'Light': return Lum.light;
     }
 }

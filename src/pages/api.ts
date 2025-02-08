@@ -1,8 +1,8 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
 
-import { DataHandler, User, UserState, SearchResults, PersonalConfig, Item, ItemType, Tag, TagType } from "@rt/data";
-import { getCssVars } from "@utl/appColor";
+import { DataHandler, User, UserState, SearchResults, PersonalConfig, Item, ItemType, Tag, TagType, roleFromString } from "@rt/data";
+import { getCssVars, HslColor, lumFromString } from "@utl/appColor";
 
 export default function api(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -38,7 +38,205 @@ export default function api(dataHandler: DataHandler): Router {
         }
     });
 
+    router.put('/color', (req, res) => {
+        console.log(`[Server:Test] Check`);
+        res.setHeader('Content-Type', 'application/json');
+        let loggedIn = true;
+        if(!req.session.user) {
+            loggedIn = false;
+        }
+        let config: PersonalConfig = {
+            tagLum: lumFromString(req.body.tagl),
+            bg: new HslColor(`${req.body.bgA}:${req.body.bgB}:${req.body.bgC}`),
+            fg: new HslColor(`${req.body.fgA}:${req.body.fgB}:${req.body.fgC}`),
+            header: new HslColor(`${req.body.hdA}:${req.body.hdB}:${req.body.hdC}`),
+            msg: new HslColor(`${req.body.msgA}:${req.body.msgB}:${req.body.msgC}`),
+            theme: new HslColor(`${req.body.thmA}:${req.body.thmB}:${req.body.thmC}`),
+            bad: new HslColor(`${req.body.bdA}:${req.body.bdB}:${req.body.bdC}`),
+            good: new HslColor(`${req.body.gdA}:${req.body.gdB}:${req.body.gdC}`),
+        };
+        new Promise<void>((resolve, reject) => {
+            console.log(`[Server:Test] A`);
+            if(loggedIn) {
+                dataHandler.getUser(req.session.user.username).then(user => {
+                    user.config = config;
+                    req.session.config = config;
+                    req.session.user = user;
+                    resolve(dataHandler.updateUser(user));
+                });
+            } else {
+                console.log(`[Server:Test] B`);
+                req.session.config = config;
+                resolve();
+            }
+        }).then(() => {
+            res.status(200);
+            res.send(new Response(statuses.get(200), [], ['Settings Updated, reload the page to see yoru changes.'], [], null));
+        });
+    });
+
     router.use('/data', data(dataHandler));
+    router.use('/admin', admin(dataHandler));
+
+    return router;
+}
+
+function admin(dataHandler: DataHandler): Router {
+    const router: Router = express.Router();
+
+    router.put('/passChange',
+            body('oPass')
+                .notEmpty().withMessage('empty'),
+            body('nPass1')
+                .notEmpty().withMessage('empty')
+                .isLength({min: 16}).withMessage('short'),
+            body('nPass2')
+                .notEmpty().withMessage('empty')
+                .isLength({min: 16}).withMessage('short'),
+            (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        if(!req.session.user) {
+            res.status(400);
+            res.send(new Response(statuses.get(400), ['You are not logged in.'], [], [], null));
+        } else {
+            let errorList = validationResult(req);
+            let errors: string[] = [];
+            let oldPass: string = req.body.oPass;
+            let newPass1: string = req.body.nPass1;
+            let newPass2: string = req.body.nPass2;
+            if(newPass1 != newPass2) {
+                errors.push('Passwords do nto match.');
+            }
+            dataHandler.getUser(req.session.user.username).then(user => {
+                return new Promise<string>((resolve, reject) => {
+                    if(errorList.isEmpty() && errors.length == 0) {
+                        user.setPassword(oldPass, newPass1).then(() => {
+                            return dataHandler.updateUser(user);
+                        }, (error:Error) => {
+                            errors.push(error.message);
+                            reject();
+                        }).then(() => {
+                            resolve('Password chagned successfully!');
+                        }, (error:Error) => {
+                            errors.push(error.message);
+                            reject();
+                        });
+                    } else {
+                        reject();
+                    }
+                });
+            }, (error:Error) => {
+                errors.push(error.message);
+            }).then(message => {
+                if(message) {
+                    res.status(200);
+                    res.send(new Response(statuses.get(200), [], [message], [], true));
+                }
+            }).finally(() => {
+                if(!errorList.isEmpty() || errors.length > 0) {
+                    errorList['errors'].forEach((error: any) => {
+                        if(error.path == 'oPass') {
+                            if(error.msg == 'empty') {
+                                errors.push('Old password is blank');
+                            }
+                        } else if(error.path == 'nPass1') {
+                            if(error.msg == 'empty') {
+                                errors.push('New password is blank');
+                            } else if(error.msg == 'short') {
+                                errors.push('New password is shorter than 16 characters.');
+                            }
+                        } else if(error.path == 'nPass2') {
+                            if(error.msg == 'empty') {
+                                errors.push('New password re-entry is blank');
+                            } else if(error.msg == 'short') {
+                                errors.push('New password re-entry is shorter than 16 characters.');
+                            }
+                        }
+                    });
+                    res.status(500);
+                    res.send(new Response(statuses.get(500), errors, [], [], null));
+                }
+            });;
+        }
+    });
+    router.put('/activate',
+            body('uname')
+                .notEmpty().withMessage('empty'),
+            body('pass1')
+                .notEmpty().withMessage('empty')
+                .isLength({min: 16}).withMessage('short'),
+            body('pass2')
+                .notEmpty().withMessage('empty')
+                .isLength({min: 16}).withMessage('short'),
+            (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        let errorList = validationResult(req);
+        let errors: string[] = [];
+        let username: string = req.body.uname;
+        let newPass1: string = req.body.Pass1;
+        let newPass2: string = req.body.Pass2;
+        if(newPass1 != newPass2) {
+            errors.push('Passwords do not match.');
+        }
+        dataHandler.getUser(username).then(user => {
+            if(user) {
+                if(user.state == UserState.New) {
+                    return new Promise<string>((resolve, reject) => {
+                        if(errorList.isEmpty() && errors.length == 0) {
+                            user.setPassword('', newPass1).then(() => {
+                                return dataHandler.updateUser(user);
+                            }, (error:Error) => {
+                                errors.push(error.message);
+                                reject();
+                            }).then(() => {
+                                resolve('Password Set successfully!');
+                            }, (error:Error) => {
+                                errors.push(error.message);
+                                reject();
+                            });
+                        } else {
+                            reject();
+                        }
+                    });
+                } else {
+                    errors.push('The username is already activated, or does not exist.');
+                }
+            } else {
+                errors.push('The username is already activated, or does not exist.');
+            }
+        }, (error:Error) => {
+            errors.push(error.message);
+        }).then(message => {
+            if(message) {
+                res.status(200);
+                res.send(new Response(statuses.get(200), [], [message], [], true));
+            }
+        }).finally(() => {
+            if(!errorList.isEmpty() || errors.length > 0) {
+                errorList['errors'].forEach((error: any) => {
+                    if(error.path == 'uname') {
+                        if(error.msg == 'empty') {
+                            errors.push('Username is blank.');
+                        }
+                    } else if(error.path == 'pass1') {
+                        if(error.msg == 'empty') {
+                            errors.push('Password is blank.');
+                        } else if(error.msg == 'short') {
+                            errors.push('Password is shorter than 16 characters.');
+                        }
+                    } else if(error.path == 'nPass2') {
+                        if(error.msg == 'empty') {
+                            errors.push('Password re-entry is blank.');
+                        } else if(error.msg == 'short') {
+                            errors.push('Password re-entry is shorter than 16 characters.');
+                        }
+                    }
+                });
+                res.status(500);
+                res.send(new Response(statuses.get(500), errors, [], [], null));
+            }
+        });;
+    });
 
     return router;
 }
@@ -309,54 +507,67 @@ function data(dataHandler: DataHandler): Router {
         }
     });
 
-    router.put("/user",
+    router.put('/user',
         body('name')
             .notEmpty().withMessage('empty')
             .isLength({min: 4}).withMessage('short'),
-        body('pass')
-            .notEmpty().withMessage('empty')
-            .isLength({min: 16}).withMessage('short'),
         function (req, res) {
             res.setHeader('Content-Type', 'application/json');
-            if(req.session.user == undefined || req.session.user.role < 2) {
+            if(!req.session.user || req.session.user.role < 2) {
                 res.status(401)
                 res.send(new Response(statuses.get(401), ['You are not permitted to create or edit users.'], [], [], null));
             } else {
                 let errorList = validationResult(req);
                 let errors: string[] = [];
-                let user: User = new User(req.body.name, req.body.role, User.getDefaultConfig());
+                let setPass: boolean = req.body.pass && req.body.pass != '';
+                let user: User = new User(req.body.name, roleFromString(req.body.role), User.getDefaultConfig());
                 let word: string;
-                user.setPassword('', req.body.pass).then(async () => {
-                    if(errorList.isEmpty()) {
-                        if(req.body.state == 'new') {
-                            word = 'created';
-                            return dataHandler.addUser(user);
+                new Promise<void>((resolve, reject) => {
+                    if(setPass) {
+                        if((<string>req.body.pass).length >= 16) {
+                            user.setPassword('', req.body.pass).then(() => {
+                                resolve();
+                            }, error => reject(error));
                         } else {
-                            word = 'updated';
-                            return dataHandler.updateUser(user);
+                            reject(new Error('Password must be at least 16 characters long.'));
                         }
+                    } else {
+                        resolve();
+                    }
+                }).then(() => {
+                    return new Promise((resolve, reject) => {
+                        if(errorList.isEmpty()) {
+                            if(req.body.state == 'new') {
+                                word = 'created';
+                                resolve(dataHandler.addUser(user));
+                            } else {
+                                word = 'updated';
+                                dataHandler.getUser(user.username).then(old => {
+                                    user.config = old.config;
+                                    if(!setPass) {
+                                        user.hash = old.hash;
+                                        user.salt = old.salt;
+                                    }
+                                    resolve(dataHandler.updateUser(user));
+                                }, error => reject(error));
+                            }
+                        }
+                    });
+                }, (error:Error) => errors.push(error.message)).then(() => {
+                    if(errorList.isEmpty() && errors.length == 0) {
+                        res.status(200);
+                        res.send(new Response(statuses.get(200), [], [`User ${word} successfully.`], [], true));
                     }
                 }, (error:Error) => {
                     errors.push(error.message);
-                }).then(() => {
-                    res.status(200);
-                    res.send(new Response(statuses.get(200), [], [`User ${word} successfully.`], [], true));
-                }, (error:Error) => {
-                    errors.push(error.message);
                 }).finally(() => {
-                    if(!errorList.isEmpty || errors.length > 0) {
+                    if(!errorList.isEmpty() || errors.length > 0) {
                         errorList['errors'].forEach((error: any) => {
                             if(error.path == 'name') {
                                 if(error.msg == 'empty') {
                                     errors.push('Username is blank');
                                 } else if(error.msg == 'short') {
                                     errors.push('Username must be at least 4 characters long.');
-                                }
-                            } else if(error.path == 'pass') {
-                                if(error.msg == 'empty') {
-                                    errors.push('Password is blank.');
-                                } else if(error.msg == 'short') {
-                                    errors.push('Password must be at least 16 characters long.');
                                 }
                             }
                         });

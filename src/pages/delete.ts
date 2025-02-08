@@ -14,6 +14,7 @@ export default function deleter(): Router {
         if(req.session.user == undefined || req.session.user.role < 1) {
             res.render('delete', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete Item',
                 -1,
                 `Access denied`,
@@ -31,6 +32,7 @@ export default function deleter(): Router {
             let itemID: number = +<string>req.query.id;
             res.render('delete', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete Item',
                 -1,
                 `Are you sure you want to delete item#${itemID}?`,
@@ -55,6 +57,7 @@ export default function deleter(): Router {
         if(req.session.user == undefined || req.session.user.role < 1) {
             res.render('delete', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete Tag',
                 -1,
                 `Access Denied`,
@@ -72,6 +75,7 @@ export default function deleter(): Router {
             let name: string = <string>req.query.name;
             res.render('delete', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete Tag',
                 -1,
                 `Are you sure you want to delete the tag "${name}" and its children?`,
@@ -96,6 +100,7 @@ export default function deleter(): Router {
         if(req.session.user == undefined || req.session.user.role <= 1) {
             res.render('layout', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete Tag Type',
                 -1,
                 `Access Denied`,
@@ -114,6 +119,7 @@ export default function deleter(): Router {
             if(name == 'default') {
                 res.render('layout', getArguments(
                     req.session.user,
+                    req.session.config,
                     'Delete Tag Type',
                     -1,
                     `You cannot delete the default tag type`,
@@ -130,6 +136,7 @@ export default function deleter(): Router {
             } else {
                 res.render('delete', getArguments(
                     req.session.user,
+                    req.session.config,
                     'Delete Tag Type',
                     -1,
                     `Are you sure you want to delete the tag type '${name}'?`,
@@ -155,6 +162,7 @@ export default function deleter(): Router {
         if(req.session.user == undefined || req.session.user.role <= 1) {
             res.render('layout', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete User',
                 -1,
                 `Access Denied`,
@@ -172,6 +180,7 @@ export default function deleter(): Router {
             let username: string = <string>req.query.username;
             res.render('delete', getArguments(
                 req.session.user,
+                req.session.config,
                 'Delete User',
                 -1,
                 `Are you sure you want to delete the user credentials for '${username}'?`,

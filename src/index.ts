@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import session from 'express-session';
 import fileUpload from 'express-fileupload';
 
-import Data, { DataHandler, User } from "@rt/data";
+import Data, { DataHandler, PersonalConfig, User } from "@rt/data";
 import PGDB from "@dh/pgdb";
 import getArguments, { Arguments } from "@utl/getArguments";
 import { prep } from "@utl/appColor";
@@ -22,7 +22,8 @@ import config from "@pg/config";
 
 declare module "express-session" {
     interface SessionData {
-      user: User;
+        user: User;
+        config: PersonalConfig;
     }
 }
 
@@ -69,6 +70,7 @@ dataHandler.init().then(() => {
         res.setHeader('Content-Type', 'text/html');
         res.render('index', getArguments(
             req.session.user,
+            req.session.config,
             'Home',
             0,
             'Yes, the site is working.',

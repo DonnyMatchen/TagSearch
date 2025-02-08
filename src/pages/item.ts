@@ -31,6 +31,7 @@ export default function item(dataHandler: DataHandler): Router {
                     });
                     res.render('item', getArguments(
                         req.session.user,
+                        req.session.config,
                         'Item',
                         -1,
                         `Item Number: ${id}`,
@@ -52,6 +53,7 @@ export default function item(dataHandler: DataHandler): Router {
             } else {
                 res.render('item', getArguments(
                     req.session.user,
+                    req.session.config,
                     'Item',
                     -1,
                     `Access Denied`,
@@ -69,6 +71,7 @@ export default function item(dataHandler: DataHandler): Router {
         }, (error:Error) => {
             res.render('item', getArguments(
                 req.session.user,
+                req.session.config,
                 'Item',
                 -1,
                 `No item here`,

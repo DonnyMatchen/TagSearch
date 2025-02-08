@@ -2,12 +2,12 @@ import { PersonalConfig, User } from "@rt/data";
 import { getCssVars, getRGB, HslColor } from "./appColor";
 
 export default function getArguments(
-    user: User,
+     user: User, config: PersonalConfig,
      title: string, webPage: number, legend: string,
      search: string, pages: Pages, args: object,
      errors?: string[], successes?: string[], messages?: string[]
 ): object {
-    return new Arguments(user, title, webPage, legend, search, pages, args, errors, successes, messages);
+    return new Arguments(user, config, title, webPage, legend, search, pages, args, errors, successes, messages);
 }
 
 export class Arguments {
@@ -27,7 +27,7 @@ export class Arguments {
     config: PersonalConfig;
 
     constructor(
-         user: User,
+         user: User, config: PersonalConfig,
          title: string, webPage: number, legend: string,
          search: string, pages: Pages, args: object,
          errors?: string[], successes?: string[], messages?: string[]
@@ -38,7 +38,7 @@ export class Arguments {
         this.legend = legend;
         this.search = search;
         this.pages = pages;
-        this.config = (user) ? user.config : User.getDefaultConfig();
+        this.config = (user) ? user.config : config ? config : User.getDefaultConfig();
         this.themeSheet = getCssVars(this.config);
         this.args = args;
         if(errors == undefined) {

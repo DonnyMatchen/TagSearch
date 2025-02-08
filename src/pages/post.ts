@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
 
-import { DataHandler, Item, ItemType, Role, Tag, TagType, User, roleToString } from '@rt/data';
+import { DataHandler, Item, ItemType, PersonalConfig, Role, Tag, TagType, User, roleToString } from '@rt/data';
 import getArguments from "@utl/getArguments";
 import { colorNames } from "@utl/appColor";
 
@@ -17,6 +17,7 @@ export default function post(dataHandler: DataHandler): Router {
         if(req.session.user == undefined || req.session.user.role < 1) {
             res.render("create-edit", getArguments(
                 req.session.user,
+                req.session.config,
                 'New Item',
                 -1,
                 'Access Denied',
@@ -33,11 +34,11 @@ export default function post(dataHandler: DataHandler): Router {
         } else {
             if(req.query.edit == null) {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'item', false
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'item', false
                 ).then(args => res.render("create-edit", args));
             } else {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'item', true
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'item', true
                 ).then( args => res.render("create-edit", args));
             }
         }
@@ -48,6 +49,7 @@ export default function post(dataHandler: DataHandler): Router {
         if(req.session.user == undefined || req.session.user.role < 1) {
             res.render('create-edit', getArguments(
                 req.session.user,
+                req.session.config,
                 'New Tag',
                 -1,
                 'Access Denied',
@@ -64,11 +66,11 @@ export default function post(dataHandler: DataHandler): Router {
         }else {
             if(req.query.edit == null) {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'tag', false
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'tag', false
                 ).then(args => res.render("create-edit", args));
             } else {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'tag', true
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'tag', true
                 ).then(args => res.render("create-edit", args));
             }
         }
@@ -79,6 +81,7 @@ export default function post(dataHandler: DataHandler): Router {
         if(req.session.user == undefined || req.session.user.role == 0) {
             res.render('create-edit', getArguments(
                 req.session.user,
+                req.session.config,
                 'New Tag',
                 -1,
                 'Access Denied',
@@ -95,11 +98,11 @@ export default function post(dataHandler: DataHandler): Router {
         }else {
             if(req.query.edit == null) {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'tagType', false
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'tagType', false
                 ).then(args => res.render('create-edit', args));
             } else {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'tagType', true
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'tagType', true
                 ).then(args => res.render('create-edit', args));
             }
         }
@@ -110,6 +113,7 @@ export default function post(dataHandler: DataHandler): Router {
         if(req.session.user == undefined || req.session.user.role < Role.Admin) {
             res.render("create-edit", getArguments(
                 req.session.user,
+                req.session.config,
                 'New User',
                 -1,
                 'Access Denied',
@@ -126,11 +130,11 @@ export default function post(dataHandler: DataHandler): Router {
         } else {
             if(req.query.edit == null) {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'user', false
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'user', false
                 ).then(args => res.render('create-edit', args));
             } else {
                 getArgumentsSimply(
-                    dataHandler, req.session.user, req.query, req.body, 'user', true
+                    dataHandler, req.session.user, req.session.config, req.query, req.body, 'user', true
                 ).then(args => res.render('create-edit', args));
             }
         }
@@ -150,7 +154,7 @@ async function getTagTypes(dataHandler: DataHandler): Promise<string[]> {
 }
 
 async function getArgumentsSimply(
-         dataHandler: DataHandler, user: User, query: any, body: any,
+         dataHandler: DataHandler, user: User, config: PersonalConfig, query: any, body: any,
          dataType: string, edit: boolean,
          errors?: string[], successes?: string[], messages?: string[]
     ): Promise<object> {
@@ -243,6 +247,7 @@ async function getArgumentsSimply(
     }
     return getArguments(
         user,
+        config,
         `${edit && found ? 'Edit': 'New'} ${typeName}`,
         edit && found ? -1 : page,
         'Required fields are marked by a *',

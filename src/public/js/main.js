@@ -55,7 +55,7 @@ function putPostToAPI(baseURL, target, method, handleResults) {
             handleResults(json.returned);
         }
         if(json.returned) {
-            delayRedirect(`${baseURL}/search`, 2500);
+            delayRedirect(`${baseURL}/search`, 1500);
         }
     });
 }

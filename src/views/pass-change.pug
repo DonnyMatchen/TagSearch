@@ -1,59 +1,26 @@
-extends layout
+extends form
 
-block layout-content
+block form-content
     div.container-fluid
+        div.row.mb-2
+            div.col-sm-2
+            div.col-sm-8
+                form#script-target(action=`/api/admin/${args.set ? 'activate' : 'passChange'}`, method='POST', enctype="multipart/form-data")
+                    -if(args.set)
+                        h1.text-center Set Password
+                        +formRow(`text${args.username ? '/dis' : ''}`, 'uname', 'Username', null, args.username ? args.username : '')
+                        +formRow('password', 'pass1', 'Password', null, '')
+                        +formRow('password', 'pass2', 'Re-Enter Password', null, '')
+                    -else
+                        h1.text-center Change Password
+                        +formRow('password', 'oPass', 'Current Password', null, '')
+                        +formRow('password', 'nPass1', 'New Password', null, '')
+                        +formRow('password', 'nPass2', 'Re-Enter Password', null, '')
+            div.col-sm-2
         div.row
             div.col-sm-2
-            div.col-sm-8.box.p-4.text-center
-                form(action=`/login/${args.set ? 'set' : 'change'}`, method='post')
-                    -if(args.set)
-                        h1 Set Password
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.labelCol Username
-                            div.col-sm-3.fieldCol
-                                input.form-control.field(type="text" name="uname")
-                            div.col-sm-4
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.labelCol Password
-                            div.col-sm-3.fieldCol
-                                input.form-control.field(type="password" name="pass1")
-                            div.col-sm-4
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.labelCol Re-Enter Password
-                            div.col-sm-3.fieldCol
-                                input.form-control.field(type="password" name="pass2")
-                            div.col-sm-4
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-5.submitCol
-                                input.btn.gd-color(type="submit" value="Set")
-                            div.col-sm-4
-                    -else
-                        h1 Change Password
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.labelCol Current Password
-                            div.col-sm-3.fieldCol
-                                input.form-control.field(type="password" name="oPass")
-                            div.col-sm-4
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.labelCol New Password
-                            div.col-sm-3.fieldCol
-                                input.form-control.field(type="password" name="nPass1")
-                            div.col-sm-4
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-2.labelCol Re-Enter Password
-                            div.col-sm-3.fieldCol
-                                input.form-control.field(type="password" name="nPass2")
-                            div.col-sm-4
-                        div.row.mb-2
-                            div.col-sm-3
-                            div.col-sm-5.submitCol
-                                input.btn.gd-color(type="submit" value="Update")
-                            div.col-sm-4
+            div.col-sm-8.row
+                div.col-sm-5
+                div.col-sm-7
+                    button.btn.gd-color(onclick=`putPostToAPI('${baseURL}', '/api/admin/${args.set ? 'activate' : 'passChange'}', 'PUT')`)= args.set ? 'Set Password' : 'Change Password'
             div.col-sm-2

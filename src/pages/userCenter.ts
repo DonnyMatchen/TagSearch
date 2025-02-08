@@ -11,6 +11,7 @@ export default function userCenter(dataHandler: DataHandler): Router {
         if(req.session.user == undefined || req.session.user.role < 1) {
             res.render('layout', getArguments(
                 req.session.user,
+                req.session.config,
                 'User Center',
                 -1,
                 `Access Denied`,
@@ -36,6 +37,7 @@ export default function userCenter(dataHandler: DataHandler): Router {
             dataHandler.searchUsers(search, dataHandler.getPageLimit(), +page).then(results => {
                 res.render('user', getArguments(
                     req.session.user,
+                    req.session.config,
                     'Manage Center',
                     4,
                     `${results.total} result(s) matching "${search}"`,

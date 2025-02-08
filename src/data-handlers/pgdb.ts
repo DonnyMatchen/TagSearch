@@ -486,7 +486,14 @@ export default class PGDB extends DataHandler {
     async addUser(user: User) {
         return new Promise<void>((resolve, reject) => {
             this.client.query(`INSERT INTO users (uname, state, hash, salt, role, conf)
-                VALUES ('${this.sqlEscape(user.username)}', ${user.state}, '${this.sqlEscape(user.hash)}', '${this.sqlEscape(user.salt)}', ${user.role}, '${this.sqlEscape(JSON.stringify(user.config))}')`)
+                VALUES (
+                '${this.sqlEscape(user.username)}',
+                ${user.state},
+                '${this.sqlEscape(user.hash)}',
+                '${this.sqlEscape(user.salt)}',
+                ${user.role},
+                '${this.sqlEscape(JSON.stringify(user.config))}'
+                )`)
             .then(result => {
                 resolve();
             }, error => {

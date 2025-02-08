@@ -199,6 +199,7 @@ export class User {
         } else {
             this.state = UserState.New;
             this.salt = getRandomString(15);
+            this.hash = '';
         }
     }
 
@@ -207,31 +208,30 @@ export class User {
     }
 
     async setPassword(oldPassword: string, newPassword: string) {
-        let change: boolean = false;
-        if(this.state != UserState.Set) {
-            change = true;
-        } else {
-            if(this.check(oldPassword)) {
-                change = true;
+        return new Promise<boolean>((resolve, reject) => {
+            if(this.state != UserState.Set) {
+                resolve(true);
+            } else {
+                resolve(this.check(oldPassword));
             }
-        }
-        if(change) {
-            let newSalt: string = getRandomString(15);
-            let err:Error = null;
-            await argon2.hash(newPassword + newSalt).then(hash => {
-                this.hash = hash;
-                this.state = UserState.Set;
-                this.salt = newSalt;
-            }, (error:Error) => {
-                this.state = UserState.Error;
-                err = error;
+        }).then(change => {
+            return new Promise<void>((resolve, reject) => {
+                if(change) {
+                    let newSalt: string = getRandomString(15);
+                    argon2.hash(`${newPassword}${newSalt}`).then(hash => {
+                        this.hash = hash;
+                        this.state = UserState.Set;
+                        this.salt = newSalt;
+                        resolve();
+                    }, (error:Error) => {
+                        this.state = UserState.Error;
+                        reject(error);
+                    });
+                } else {
+                    reject(new Error('Verification failed'));
+                }
             });
-            if(err != null) {
-                throw err;
-            }
-        } else {
-            throw new Error('Verification failed');
-        }
+        });
     }
 
     roleToString() {

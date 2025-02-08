@@ -20,6 +20,7 @@ export default function tag(dataHandler: DataHandler): Router {
             await codex.setup(tag);
             res.render('tag', getArguments(
                 req.session.user,
+                req.session.config,
                 'Tag',
                 -1,
                 `Tag Named "${name}"`,
@@ -38,6 +39,7 @@ export default function tag(dataHandler: DataHandler): Router {
         }, (error:Error) => {
             res.render('tag', getArguments(
                 req.session.user,
+                req.session.config,
                 'Tag',
                 -1,
                 `Tag Named "${name}"`,

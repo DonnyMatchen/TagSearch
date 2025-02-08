@@ -11,6 +11,7 @@ export default function login(dataHandler: DataHandler): Router {
         res.setHeader('Content-Type', 'text/html');
         res.render('login', getArguments(
             req.session.user,
+            req.session.config,
             'Sign In',
             101,
             req.session.user == undefined ? '': 'You are already logged in',
@@ -29,45 +30,88 @@ export default function login(dataHandler: DataHandler): Router {
                 .notEmpty().withMessage('empty'),
             body('pass')
                 .notEmpty().withMessage('empty'),
-            async (req, res) => {
+            (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         let errorList = validationResult(req);
         let failure: boolean = false;
-        if(errorList.isEmpty()) {
-            let user: User;
-            await dataHandler.getUser(req.body.uname).then(async foundUser => {
+        let passBlank: boolean = false;
+        errorList['errors'].forEach((error: any) => {
+            if(error.path == 'uname') {
+                if(error.msg == 'empty') {
+                    failure = true;
+                }
+            } else if(error.path == 'pass') {
+                if(error.msg == 'empty') {
+                    passBlank = true;
+                }
+            }
+        });
+        let user: User;
+        new Promise<User>((resolve, reject) => {
+            if(!failure) {
+                resolve(dataHandler.getUser(req.body.uname))
+            } else {
+                reject();
+            }
+        }).then(foundUser => {
+            if(foundUser) {
                 user = foundUser;
                 if(foundUser.state == UserState.Set) {
-                    return foundUser.check(req.body.pass);
+                    return passBlank ? false : foundUser.check(req.body.pass);
                 } else {
                     return true;
                 }
-            }, (error:Error) => {
-                failure = true;
-            }).then(check => {
-                if(check) {
-                    req.session.user = user;
-                    if(user.state == UserState.Set) {
-                        res.redirect('/search');
-                    } else {
-                        res.redirect(`/login/set?username=${user.username}`);
-                    }
+            } else {
+                return false;
+            }
+        }, (error:Error) => {
+            return false;
+        }).then(check => {
+            if(check) {
+                req.session.user = user;
+                req.session.config = user.config;
+                if(user.state == UserState.Set) {
+                    res.redirect('/search');
                 } else {
-                    failure = true;
+                    res.redirect(`/login/set?username=${user.username}`);
                 }
-            }, (error:Error) => {
+            } else {
                 failure = true;
-            });
-        } else {
-            failure = true;
-        }
+            }
+        }).finally(() => {
+            if(failure) {
+                res.render('login', getArguments(
+                    req.session.user,
+                    req.session.config,
+                    'Sign In',
+                    101,
+                    req.session.user == undefined ? '': 'You are already logged in',
+                    '',
+                    {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
+                    {},
+                    ['Incorrect username or password.']
+                ));
+            }
+        });
         
-        if(failure) {
-            res.render('login', getArguments(
+        
+        
+    });
+
+    router.get('/change', (req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        if(!req.session.user) {
+            res.render("create-edit", getArguments(
                 req.session.user,
-                'Sign In',
-                101,
-                req.session.user == undefined ? '': 'You are already logged in',
+                req.session.config,
+                'Change Password',
+                -1,
+                'Access Denied',
                 '',
                 {
                     active: false,
@@ -76,125 +120,35 @@ export default function login(dataHandler: DataHandler): Router {
                     pageNumber: 0
                 },
                 {},
-                ['Incorrect username or password.']
+                ['You are not logged in.']
+            ));
+        } else {
+            res.render('pass-change', getArguments(
+                req.session.user,
+                req.session.config,
+                'Change Password',
+                102,
+                '',
+                '',
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
+                {
+                    set: false
+                },
             ));
         }
-    });
-
-    router.get('/change', (req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        res.render('pass-change', getArguments(
-            req.session.user,
-            'Change Password',
-            102,
-            '',
-            '',
-            {
-                active: false,
-                pageURL: '',
-                pageCount: 0,
-                pageNumber: 0
-            },
-            {
-                set: false
-            },
-        ));
-    });
-    router.post('/change',
-            body('oPass')
-        .notEmpty().withMessage('empty'),
-            body('nPass1')
-        .notEmpty().withMessage('empty')
-        .isLength({min: 16}).withMessage('short'),
-            body('nPass2')
-        .notEmpty().withMessage('empty')
-        .isLength({min: 16}).withMessage('short'),
-    (req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        let errorList = validationResult(req);
-        let errors: string[] = [];
-        let oldPass: string = req.body.oPass;
-        let newPass1: string = req.body.nPass1;
-        let newPass2: string = req.body.nPass2;
-        if(newPass1 != newPass2) {
-            errors.push('Passwords do nto match.');
-        }
-        dataHandler.getUser(req.session.user.username).then(async user => {
-            if(errorList.isEmpty() && errors.length == 0) {
-                await user.setPassword(oldPass, newPass1).then(async () => {
-                    await dataHandler.updateUser(user).then(() => {
-                        res.render('pass-change', getArguments(
-                            req.session.user,
-                            'Change Password',
-                            102,
-                            '',
-                            '',
-                            {
-                                active: false,
-                                pageURL: '',
-                                pageCount: 0,
-                                pageNumber: 0
-                            },
-                            {
-                                set: false
-                            },
-                            [], ['Password chagned successfully!']
-                        ));
-                    }, (error:Error) => {
-                        errors.push(error.message);
-                    });
-                }, (error:Error) => {
-                    errors.push(error.message);
-                });
-            }
-        }, (error:Error) => {
-            errors.push(error.message);
-        }).finally(() => {
-            if(!errorList.isEmpty() || errors.length > 0) {
-                errorList['errors'].forEach((error: any) => {
-                    if(error.path == 'oPass') {
-                        if(error.msg == 'empty') {
-                            errors.push('Old password is blank');
-                        }
-                    } else if(error.path == 'nPass1') {
-                        if(error.msg == 'empty') {
-                            errors.push('New password is blank');
-                        } else if(error.msg == 'short') {
-                            errors.push('New password is shorter than 16 characters.');
-                        }
-                    } else if(error.path == 'nPass2') {
-                        if(error.msg == 'empty') {
-                            errors.push('New password re-entry is blank');
-                        } else if(error.msg == 'short') {
-                            errors.push('New password re-entry is shorter than 16 characters.');
-                        }
-                    }
-                });
-                res.render('pass-change', getArguments(
-                    req.session.user,
-                    'Change Password',
-                    102,
-                    '',
-                    '',
-                    {
-                        active: false,
-                        pageURL: '',
-                        pageCount: 0,
-                        pageNumber: 0
-                    },
-                    {
-                        set: false
-                    },
-                    errors
-                ));
-            }
-        });;
+        
     });
 
     router.get('/set', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         res.render('pass-change', getArguments(
             req.session.user,
+            req.session.config,
             'Set Password',
             102,
             '',
@@ -207,99 +161,9 @@ export default function login(dataHandler: DataHandler): Router {
             },
             {
                 set: true,
-                user: req.query.username
+                username: req.query.username
             },
         ));
-    });
-    router.post('/set',
-        body('uname')
-    .notEmpty().withMessage('empty'),
-        body('pass1')
-    .notEmpty().withMessage('empty')
-    .isLength({min: 16}).withMessage('short'),
-        body('pass2')
-    .notEmpty().withMessage('empty')
-    .isLength({min: 16}).withMessage('short'),
-    (req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        let errorList = validationResult(req);
-        let errors: string[] = [];
-        let username: string = req.body.uname;
-        let newPass1: string = req.body.Pass1;
-        let newPass2: string = req.body.Pass2;
-        if(newPass1 != newPass2) {
-            errors.push('Passwords do nto match.');
-        }
-        dataHandler.getUser(username).then(async user => {
-            if(errorList.isEmpty() && errors.length == 0) {
-                await user.setPassword('', newPass1).then(async () => {
-                    await dataHandler.updateUser(user).then(() => {
-                        res.render('pass-change', getArguments(
-                            req.session.user,
-                            'Set Password',
-                            102,
-                            '',
-                            '',
-                            {
-                                active: false,
-                                pageURL: '',
-                                pageCount: 0,
-                                pageNumber: 0
-                            },
-                            {
-                                set: true
-                            },
-                            [], ['Password chagned successfully!']
-                        ));
-                    }, (error:Error) => {
-                        errors.push(error.message);
-                    });
-                }, (error:Error) => {
-                    errors.push(error.message);
-                });
-            }
-        }, (error:Error) => {
-            errors.push(error.message);
-        }).finally(() => {
-            if(!errorList.isEmpty() || errors.length > 0) {
-                errorList['errors'].forEach((error: any) => {
-                    if(error.path == 'oPass') {
-                        if(error.msg == 'empty') {
-                            errors.push('Old password is blank');
-                        }
-                    } else if(error.path == 'nPass1') {
-                        if(error.msg == 'empty') {
-                            errors.push('New password is blank');
-                        } else if(error.msg == 'short') {
-                            errors.push('New password is shorter than 16 characters.');
-                        }
-                    } else if(error.path == 'nPass2') {
-                        if(error.msg == 'empty') {
-                            errors.push('New password re-entry is blank');
-                        } else if(error.msg == 'short') {
-                            errors.push('New password re-entry is shorter than 16 characters.');
-                        }
-                    }
-                });
-                res.render('pass-change', getArguments(
-                    req.session.user,
-                    'Set Password',
-                    102,
-                    '',
-                    '',
-                    {
-                        active: false,
-                        pageURL: '',
-                        pageCount: 0,
-                        pageNumber: 0
-                    },
-                    {
-                        set: true
-                    },
-                    errors
-                ));
-            }
-        });;
     });
 
     return router;
