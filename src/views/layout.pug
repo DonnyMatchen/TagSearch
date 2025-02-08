@@ -57,12 +57,16 @@ html
                                         span.btn.m-1.bg-item= triad[0]
                 div.col-sm-4.text-end
                     -if(user == undefined)
+                        -if(webPage == 103)
+                            span.btn.m-1.bg-item Settings
+                        -else
+                            a.btn.m-1.ct-color(href=`${baseURL}/config`) Settings
                         -if(webPage == 101)
                             span.btn.m-1.bg-item Login
                         -else
                             a.btn.m-1.gd-color(href=`${baseURL}/login`) Log In
                     -else
-                        span.btn.m-1.bg-item= user.username
+                        b.btn.box.m-1.bg-item= user.username
                         -if(webPage == 102)
                             span.btn.m-1.bg-item Change Password
                         -else
