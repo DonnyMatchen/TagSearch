@@ -70,7 +70,7 @@ export default function search(dataHandler: DataHandler): Router {
         if(req.query.tagMatch == null) {
             tagSearch = '';
         }
-        dataHandler.searchTags(tagSearch, dataHandler.getPageLimit(), +page).then(async results => {
+        dataHandler.searchTags(tagSearch, dataHandler.getPageLimit(), +page).then(results => {
             let list: string[] = [];
             for(let i = 0; i < results.results.length; i++) {
                 let tag = results.results[i];
@@ -79,32 +79,32 @@ export default function search(dataHandler: DataHandler): Router {
                 }
             }
             let map: Map<string, TagType> = new Map();
-            await dataHandler.getTagTypes(list).then(types => {
+            dataHandler.getTagTypes(list).then(types => {
                 for(let i = 0; i < types.length; i++) {
                     map.set(types[i].name, types[i]);
                 }
+            }).then(() => {
+                res.render('tagSearch', getArguments(
+                    req.session.user,
+                    req.session.config,
+                    'Search Results',
+                    2,
+                    `${results.total} result(s) matching "${tagSearch}"`,
+                    search,
+                    {
+                        active: true,
+                        pageURL: `${Arguments.url}/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
+                        pageCount: results.pageCount,
+                        pageNumber: +page
+                    },
+                    {
+                        results: results.results,
+                        types: map,
+                        tagSearch: tagSearch
+                    }
+                ));
             });
-            res.render('tagSearch', getArguments(
-                req.session.user,
-                req.session.config,
-                'Search Results',
-                2,
-                `${results.total} result(s) matching "${tagSearch}"`,
-                search,
-                {
-                    active: true,
-                    pageURL: `${Arguments.url}/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
-                    pageCount: results.pageCount,
-                    pageNumber: +page
-                },
-                {
-                    results: results.results,
-                    types: map,
-                    tagSearch: tagSearch
-                }
-            ));
         });
-        
     });
 
     router.get("/tagTypes", (req, res) => {

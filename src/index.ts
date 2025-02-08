@@ -55,8 +55,7 @@ dataHandler.init().then(() => {
     return dataHandler.ensureAdmin();;
 }).then(() => {
     return dataHandler.ensureDefaultType();
-}).then(async () => {
-    //await Data.init(dataHandler);
+}).then(() => {
     app.use(session({
         secret: secret,
         resave: false,

@@ -15,27 +15,28 @@ export default function tag(dataHandler: DataHandler): Router {
         if(search == undefined) {
             search = '';
         }
-        dataHandler.getTag(name).then(async tag => {
+        dataHandler.getTag(name).then(tag => {
             let codex: CodexSet = new CodexSet(dataHandler);
-            await codex.setup(tag);
-            res.render('tag', getArguments(
-                req.session.user,
-                req.session.config,
-                'Tag',
-                -1,
-                `Tag Named "${name}"`,
-                search,
-                {
-                    active: false,
-                    pageURL: '',
-                    pageCount: 0,
-                    pageNumber: 0
-                },
-                {
-                    tag: tag,
-                    codex: codex
-                }
-            ));
+            codex.setup(tag).then(() => {
+                res.render('tag', getArguments(
+                    req.session.user,
+                    req.session.config,
+                    'Tag',
+                    -1,
+                    `Tag Named "${name}"`,
+                    search,
+                    {
+                        active: false,
+                        pageURL: '',
+                        pageCount: 0,
+                        pageNumber: 0
+                    },
+                    {
+                        tag: tag,
+                        codex: codex
+                    }
+                ));
+            });
         }, (error:Error) => {
             res.render('tag', getArguments(
                 req.session.user,
@@ -69,18 +70,19 @@ class CodexSet {
     }
 
     async setup(tag: Tag) {
-        await this.dataHandler.getTagType(tag.type).then(type => {
+        return this.dataHandler.getTagType(tag.type).then(type => {
             this.type = type;
-        });
-        if(tag.parent != '') {
-            this.dataHandler.getTag(tag.parent).then(parent => {
-                for(let i = 0; i < parent.children.length; i++) {
-                    let tagName = parent.children[i];
-                    if(tagName != tag.name) {
-                        this.siblings.push(tagName);
+        }).then(() => {
+            if(tag.parent != '') {
+                this.dataHandler.getTag(tag.parent).then(parent => {
+                    for(let i = 0; i < parent.children.length; i++) {
+                        let tagName = parent.children[i];
+                        if(tagName != tag.name) {
+                            this.siblings.push(tagName);
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     }
 }

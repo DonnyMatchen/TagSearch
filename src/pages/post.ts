@@ -144,13 +144,15 @@ export default function post(dataHandler: DataHandler): Router {
 }
 
 async function getTagTypes(dataHandler: DataHandler): Promise<string[]> {
-    let out: string[] = [];
-    await dataHandler.searchTagTypes('', -1, 1).then(results => {
-        for(let i = 0; i < results.results.length; i++) {
-            out.push(results.results[i].name);
-        }
+    return new Promise<string[]>((resolve, reject) => {
+        let out: string[] = [];
+        dataHandler.searchTagTypes('', -1, 1).then(results => {
+            for(let i = 0; i < results.results.length; i++) {
+                out.push(results.results[i].name);
+            }
+            resolve(out);
+        }, error => reject(error));
     });
-    return out;
 }
 
 async function getArgumentsSimply(
@@ -158,124 +160,140 @@ async function getArgumentsSimply(
          dataType: string, edit: boolean,
          errors?: string[], successes?: string[], messages?: string[]
     ): Promise<object> {
-    let typeName: string = '';
-    let page: number = 0;
-    let form: object = {};
-    let labels: object = {};
-    let arrs: object = {};
-    let vals: object = {};
-    let found = false;
-    switch(dataType) {
-        case('item'):
-            typeName = 'Item';
-            page = 5;
-            (<any>arrs).pub = ['Public', 'Private'];
-            form = edit ? 
-                new RetItemHolder('text/dis', 'file', 'url', 'datetime', 'tags', 'text-area', 'radio') :
-                new ItemHolder('file', 'url', 'datetime', 'tags', 'text-area', 'radio')
-            labels = edit ? 
-                new RetItemHolder('Unique ID*', 'Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description', 'Visibility') :
-                new ItemHolder('Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description', 'Visibility')
-            if(edit) {
-                await dataHandler.getItem(+query.edit).then(item => {
-                    vals = new RetItemHolder(`${item.id}`, '',  item.source, `${new Date(item.date).toISOString().slice(0, 19)}`, item.tags.join(' '), item.desc, item.pub ? 'Public' : 'Private');
-                    found = true;
-                }, (error:Error) => {
-                    if(errors == undefined) {
-                        errors = [];
+    return new Promise<object>((resolve, reject) => {
+        let typeName: string = '';
+        let page: number = 0;
+        let form: object = {};
+        let labels: object = {};
+        let arrs: object = {};
+        let vals: object = {};
+        let found = false;
+        new Promise<void>((resolve1, reject1) => {
+            switch(dataType) {
+                case('item'):
+                    typeName = 'Item';
+                    page = 5;
+                    (<any>arrs).pub = ['Public', 'Private'];
+                    form = edit ? 
+                        new RetItemHolder('text/dis', 'file', 'url', 'datetime', 'tags', 'text-area', 'radio') :
+                        new ItemHolder('file', 'url', 'datetime', 'tags', 'text-area', 'radio')
+                    labels = edit ? 
+                        new RetItemHolder('Unique ID*', 'Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description', 'Visibility') :
+                        new ItemHolder('Upload', 'Source URL', 'Date and Time*', 'Tags', 'Description', 'Visibility')
+                    if(edit) {
+                        dataHandler.getItem(+query.edit).then(item => {
+                            vals = new RetItemHolder(`${item.id}`, '',  item.source, `${new Date(item.date).toISOString().slice(0, 19)}`, item.tags.join(' '), item.desc, item.pub ? 'Public' : 'Private');
+                            found = true;
+                            resolve1();
+                        }, (error:Error) => {
+                            if(!errors) {
+                                errors = [];
+                            }
+                            errors.push(`Invalid item id: ${query.edit}`);
+                            resolve1();
+                        });
                     }
-                    errors.push(`Invalid item id: ${query.edit}`);
-                });
-            }
-        break;
-        case('tag'):
-            typeName = 'Tag';
-            page = 6;
-            form = new TagHolder(`text${edit ? '/dis' : ''}`, 'select', 'tag');
-            labels = new TagHolder('Name*', 'Type*', 'Parent');
-            await getTagTypes(dataHandler).then(types => {
-                (<any>arrs).type = types;
-            });
-            if(edit) {
-                await dataHandler.getTag(query.edit).then(tag => {
-                    vals = new TagHolder(tag.name, tag.type, tag.parent == null ? '' : tag.parent);
-                    found = true;
-                }, (error:Error) => {
-                    if(errors == undefined) {
-                        errors = [];
+                    break;
+                case('tag'):
+                    typeName = 'Tag';
+                    page = 6;
+                    form = new TagHolder(`text${edit ? '/dis' : ''}`, 'select', 'tag');
+                    labels = new TagHolder('Name*', 'Type*', 'Parent');
+                    getTagTypes(dataHandler).then(types => {
+                        (<any>arrs).type = types;
+                    }).then(() => {
+                        if(edit) {
+                            dataHandler.getTag(query.edit).then(tag => {
+                                vals = new TagHolder(tag.name, tag.type, tag.parent == null ? '' : tag.parent);
+                                found = true;
+                                resolve1();
+                            }, (error:Error) => {
+                                if(errors == undefined) {
+                                    errors = [];
+                                }
+                                errors.push(`Invalid tag name: ${query.edit}`);
+                                resolve1();
+                            });
+                        }
+                    });
+                    break;
+                case('tagType'):
+                    typeName = 'Tag Type';
+                    page = 7;
+                    form = new TagTypeHolder(`text${edit ? '/dis' : ''}`, 'hue', 'number');
+                    labels = new TagTypeHolder('Name*', 'Color*', 'Sort Order');
+                    (<any>arrs).chue = colorNames;
+                    if(edit) {
+                        dataHandler.getTagType(query.edit).then(type => {
+                            vals = new TagTypeHolder(type.name, `${type.color.encoded}`, `${type.order}`);
+                            found = true;
+                            resolve1();
+                        }, (error:Error) => {
+                            if(errors == undefined) {
+                                errors = [];
+                            }
+                            errors.push(`Invalid tag type name: ${query.edit}`);
+                            resolve1();
+                        });
                     }
-                    errors.push(`Invalid tag name: ${query.edit}`);
-                });
-            }
-        break;
-        case('tagType'):
-            typeName = 'Tag Type';
-            page = 7;
-            form = new TagTypeHolder(`text${edit ? '/dis' : ''}`, 'hue', 'number');
-            labels = new TagTypeHolder('Name*', 'Color*', 'Sort Order');
-            (<any>arrs).chue = colorNames;
-            if(edit) {
-                await dataHandler.getTagType(query.edit).then(type => {
-                    vals = new TagTypeHolder(type.name, `${type.color.encoded}`, `${type.order}`);
-                    found = true;
-                }, (error:Error) => {
-                    if(errors == undefined) {
-                        errors = [];
+                    break;
+                case('user'):
+                    typeName = 'User';
+                    page = 8;
+                    form = new UserHolder(`text${edit ? '/dis' : ''}`, 'text', 'select');
+                    labels = new UserHolder('Username*', 'Password*', 'User Role*');
+                    arrs = {role: ['Normal', 'Family', 'Admin']};
+                    if(edit) {
+                        dataHandler.getUser(query.edit).then(user => {
+                            vals = new UserHolder(user.username, '', roleToString(user.role));
+                            found = true;
+                            resolve1();
+                        }, (error:Error) => {
+                            if(errors == undefined) {
+                                errors = [];
+                            }
+                            errors.push(`Invalid username: ${query.edit}`);
+                            resolve1();
+                        });
                     }
-                    errors.push(`Invalid tag type name: ${query.edit}`);
-                });
+                    break;
+                default:
+                    reject(new Error(`Data type "${dataType}" not recognized.`));
             }
-        break;
-        case('user'):
-            typeName = 'User';
-            page = 8;
-            form = new UserHolder(`text${edit ? '/dis' : ''}`, 'text', 'select');
-            labels = new UserHolder('Username*', 'Password*', 'User Role*');
-            arrs = {role: ['Normal', 'Family', 'Admin']};
-            if(edit) {
-                await dataHandler.getUser(query.edit).then(user => {
-                    vals = new UserHolder(user.username, '', roleToString(user.role));
-                    found = true;
-                }, (error:Error) => {
-                    if(errors == undefined) {
-                        errors = [];
-                    }
-                    errors.push(`Invalid username: ${query.edit}`);
-                });
-            }
-        break;
-    }
-    return getArguments(
-        user,
-        config,
-        `${edit && found ? 'Edit': 'New'} ${typeName}`,
-        edit && found ? -1 : page,
-        'Required fields are marked by a *',
-        '',
-        {
-            active: false,
-            pageURL: '',
-            pageCount: 0,
-            pageNumber: 0
-        },
-        edit && found ? {
-            target: `/api/data/${dataType}`,
-            form: form,
-            labels: labels,
-            arrs: arrs,
-            vals: vals,
-            update: edit && found
-        } : {
-            target: `/api/data/${dataType}`,
-            form: form,
-            labels: labels,
-            arrs: arrs,
-            update: false
-        },
-        errors,
-        successes,
-        messages
-    );
+        }).then(() => {
+            resolve(getArguments(
+                user,
+                config,
+                `${edit && found ? 'Edit': 'New'} ${typeName}`,
+                edit && found ? -1 : page,
+                'Required fields are marked by a *',
+                '',
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
+                edit && found ? {
+                    target: `/api/data/${dataType}`,
+                    form: form,
+                    labels: labels,
+                    arrs: arrs,
+                    vals: vals,
+                    update: edit && found
+                } : {
+                    target: `/api/data/${dataType}`,
+                    form: form,
+                    labels: labels,
+                    arrs: arrs,
+                    update: false
+                },
+                errors,
+                successes,
+                messages
+            ));
+        });
+    });
 }
 
 class ItemHolder {

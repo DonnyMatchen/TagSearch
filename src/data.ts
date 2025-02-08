@@ -89,17 +89,15 @@ export class Tag {
     }
 
     async getProximity(dataHandler: DataHandler): Promise<number> {
-        let out: number = 0;
-        if(this.parent == '') {
-            return out;
-        } else {
-            await this.getParent(dataHandler).then(async parent => {
-                await parent.getProximity(dataHandler).then(prox => {
-                    out = prox + 1;
+        return new Promise<number>((resolve, rejct) => {
+            if(this.parent == '') {
+                resolve(0);
+            } else {
+                this.getParent(dataHandler).then(parent => parent.getProximity(dataHandler)).then(prox => {
+                    resolve(prox + 1);
                 });
-            });
-            return out;
-        }
+            }
+        });
     }
 }
 
@@ -504,68 +502,77 @@ export abstract class DataHandler {
      * @returns the list of refs that share all tags in the tag string
      */
     async reduce(input: string): Promise<number[]> {
-        let container: number[][] = [];
-        let allRefs: number[] = [];
-        let reduced: number[] = [];
-        let tags: string[] = this.tagsFromString(input);
-        if(tags.length < 2) {
-            if(tags.length == 1) {
-                let error: Error = null;
-                await this.getTag(tags[0]).then(found => {
-                    reduced = found.refs;
-                }, (error:Error) => {
-                    error = new Error(`Tag "${tags[0]}" not found.`);
-                });
-                if(error != null) {
-                    throw error;
-                }
-            }
-        } else {
-            await this.getTags(tags).then(tags => {
-                for(let i = 0; i < tags.length; i++) {
-                    let found = tags[i];
-                    let refList: number[] = found.refs;
-                    container.push(refList);
-                    refList.forEach(ref => {
-                        if(!allRefs.includes(ref)) {
-                            allRefs.push(ref);
-                        }
+        return new Promise<number[]>((resolve, reject) => {
+            let container: number[][] = [];
+            let allRefs: number[] = [];
+            let reduced: number[] = [];
+            let tags: string[] = this.tagsFromString(input);
+            if(tags.length < 2) {
+                if(tags.length == 1) {
+                    this.getTag(tags[0]).then(found => {
+                        resolve(found.refs);
+                    }, (error:Error) => {
+                        reject(error);
                     });
+                } else {
+                    resolve([]);
                 }
-            });
-            allRefs.forEach(ref => {
-                let include = true;
-                for(let i = 0; i < container.length; i++) {
-                    if(!container[i].includes(ref)) {
-                        include = false;
-                        break;
+            } else {
+                this.getTags(tags).then(tags => {
+                    for(let i = 0; i < tags.length; i++) {
+                        let found = tags[i];
+                        let refList: number[] = found.refs;
+                        container.push(refList);
+                        refList.forEach(ref => {
+                            if(!allRefs.includes(ref)) {
+                                allRefs.push(ref);
+                            }
+                        });
                     }
-                }
-                if (include) {
-                    reduced.push(ref);
-                }
-            });
-        }
-        return reduced;
+                    for(let i = 0; i < allRefs.length; i++) {
+                        let ref = allRefs[i];
+                        let include = true;
+                        for(let j = 0; j < container.length; j++) {
+                            if(!container[j].includes(ref)) {
+                                include = false;
+                                break;
+                            }
+                        }
+                        if (include) {
+                            reduced.push(ref);
+                        }
+                    }
+                    resolve(reduced);
+                }, (error:Error) => reject(error));
+            }
+        });
     }
 
     async ensureAdmin() {
-        let foundAdmin: boolean = false;
-        await this.searchUsers('', -1, 1).then(results => {
-            for(let i = 0; i < results.results.length; i++) {
-                let user = results.results[i];
-                if(user.role == Role.Admin) {
-                    foundAdmin = true;
-                    break;
+        return new Promise<void>((resolve, reject) => {
+            let foundAdmin: boolean = false;
+            this.searchUsers('', -1, 1).then(results => {
+                for(let i = 0; i < results.results.length; i++) {
+                    let user = results.results[i];
+                    if(user.role == Role.Admin) {
+                        foundAdmin = true;
+                        break;
+                    }
                 }
-            }
+            }).then(() => {
+                if(!foundAdmin) {
+                    let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
+                    admin.setPassword('', 'toor').then(() => {
+                        return this.addUser(admin);
+                    }, error => reject(error)).then(() => {
+                        console.log(`[Server:Data] Default admin account created.  Change the password ASAP`);
+                        resolve();
+                    }, error => reject(error));
+                } else {
+                    resolve();
+                }
+            });
         });
-        if(!foundAdmin) {
-            let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
-            admin.setPassword('', 'toor').then(() => {
-                return this.addUser(admin);
-            }).then(() => console.log(`[Server:Data] Default admin account created.  Change the password ASAP`));
-        }
     }
     async ensureDefaultType() {
         return new Promise<void>((resolve, reject) => {
