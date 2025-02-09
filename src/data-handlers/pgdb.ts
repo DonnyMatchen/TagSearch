@@ -326,7 +326,7 @@ export default class PGDB extends DataHandler {
             });
         });
     }
-    async searchItems(search: string, pageSize: number, pageNumber: number, user: User, options?: SearchOptions): Promise<SearchResults<Item>> {
+    async searchItems(search: string, pageSize: number, pageNumber: number, user: User): Promise<SearchResults<Item>> {
         return new Promise((resolve, reject) => {
             let total: number = 0;
             let query: string;
@@ -341,7 +341,7 @@ export default class PGDB extends DataHandler {
                     }
                 } else {
                     this.reduce(search).then(ids => {
-                        if(user.role >= 1) {
+                        if(user && user.role >= 1) {
                             resolve1(` WHERE id IN(${ids.join(',')})`);
                         } else {
                             resolve1(` WHERE pub AND id IN (${ids.join(',')})`);

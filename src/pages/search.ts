@@ -9,7 +9,7 @@ export default function search(dataHandler: DataHandler): Router {
 
     router.get("/", (req, res) => {
         res.setHeader('Content-Type', 'text/html');
-        let search: string = <string>req.query.tags;
+        let search: string = (<string>req.query.tags).trim();
         let page: string = <string>req.query.page;
         if(req.query.tags == null) {
             search = '';
