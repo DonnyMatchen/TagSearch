@@ -192,6 +192,8 @@ async function getArgumentsSimply(
                             errors.push(`Invalid item id: ${query.edit}`);
                             resolve1();
                         });
+                    } else {
+                        resolve1();
                     }
                     break;
                 case('tag'):
@@ -214,6 +216,8 @@ async function getArgumentsSimply(
                                 errors.push(`Invalid tag name: ${query.edit}`);
                                 resolve1();
                             });
+                        } else {
+                            resolve1();
                         }
                     });
                     break;
@@ -235,6 +239,8 @@ async function getArgumentsSimply(
                             errors.push(`Invalid tag type name: ${query.edit}`);
                             resolve1();
                         });
+                    } else {
+                        resolve1();
                     }
                     break;
                 case('user'):
@@ -255,6 +261,8 @@ async function getArgumentsSimply(
                             errors.push(`Invalid username: ${query.edit}`);
                             resolve1();
                         });
+                    } else {
+                        resolve1();
                     }
                     break;
                 default:
