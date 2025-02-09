@@ -751,31 +751,25 @@ export default class PGDB extends DataHandler {
     //other
     async reHost(tempFile: string, type: string, id: number): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
-            fs.readFile(tempFile, (error, data) => {
-                if (error) {
+            let extension = type.split('/')[1];
+            if(extension == 'svg+xml') {
+                extension = 'svg';
+            }
+            let fileName = `${getRandomString(10)}_${id}.${extension}`;
+            let newPath = path.join(__dirname, '..', 'public', 'img', fileName);
+            fs.rename(tempFile, newPath, (error) => {
+                if(error) {
                     reject(error);
                 } else {
-                    let extension = type.split('/')[1];
-                    if(extension == 'svg+xml') {
-                        extension = 'svg';
-                    }
-                    let fileName = `${createHash('sha-256').update(data).digest('hex')}_${id}.${extension}`;
-                    let newPath = path.join(__dirname, '..', 'public', 'img', fileName);
-                    fs.writeFile(newPath, data, (error) => {
+                    fs.rm(tempFile, (error) => {
                         if(error) {
-                            reject(error);
-                        } else {
-                            fs.rm(tempFile, (error) => {
-                                if(error) {
-                                    console.log(`[Server:DB] Cleanup required (${tempFile})`);
-                                }
-                            });
-                            resolve([
-                                `${Arguments.url}/img/${fileName}`,
-                                newPath
-                            ]);
+                            console.log(`[Server:DB] Cleanup required (${tempFile})`);
                         }
                     });
+                    resolve([
+                        `${Arguments.url}/img/${fileName}`,
+                        newPath
+                    ]);
                 }
             });
         });
