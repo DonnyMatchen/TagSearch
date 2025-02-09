@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 
-import { DataHandler, TagType } from '@rt/data';
+import { DataHandler, SearchResults, TagType } from '@rt/data';
 import getArguments, { Arguments } from "@utl/getArguments";
 import partition from "@utl/partition";
 
@@ -9,11 +9,8 @@ export default function search(dataHandler: DataHandler): Router {
 
     router.get("/", (req, res) => {
         res.setHeader('Content-Type', 'text/html');
-        let search: string = (<string>req.query.tags).trim();
+        let search: string = req.query.tags ? (<string>req.query.tags).trim() : '';
         let page: string = <string>req.query.page;
-        if(req.query.tags == null) {
-            search = '';
-        }
         if(page == null) {
             page = '1';
         }
@@ -36,12 +33,13 @@ export default function search(dataHandler: DataHandler): Router {
                 }
             ));
         }, (error:Error) => {
+            let empty = new SearchResults([], 0, 1, 1);
             res.render('search', getArguments(
                 req.session.user,
                 req.session.config,
                 'Search',
                 1,
-                ``,
+                `0 result(s) from search "${search}" because one or more tags were not recognized`,
                 search,
                 {
                     active: true,
@@ -50,7 +48,7 @@ export default function search(dataHandler: DataHandler): Router {
                     pageNumber: 1
                 },
                 {
-                    results: []
+                    results: partition(empty.results, 6)
                 },
                 [error.message]
             ));

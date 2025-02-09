@@ -519,7 +519,19 @@ export abstract class DataHandler {
                     resolve([]);
                 }
             } else {
-                this.getTags(tags).then(tags => {
+                let tagFetch: Promise<Tag>[] = [];
+                tags.forEach(tagName => {
+                    tagFetch.push(new Promise((resolve1, reject1) => {
+                        this.getTag(tagName).then(tag => {
+                            if(tag) {
+                                resolve1(tag);
+                            } else {
+                                reject1(new Error(`Tag "${tagName}" not found.`))
+                            }
+                        })
+                    }));
+                });
+                Promise.all(tagFetch).then(tags => {
                     for(let i = 0; i < tags.length; i++) {
                         let found = tags[i];
                         let refList: number[] = found.refs;

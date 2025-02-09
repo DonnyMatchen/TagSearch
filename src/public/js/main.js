@@ -127,3 +127,13 @@ function delayRedirect(url, delay) {
         }, delay);
     })
 }
+
+function attachSearch() {
+    let searchBar = document.getElementById("main-search");
+    let searchButton = document.getElementById("main-button");
+    searchBar.addEventListener('keydown', function (e) {
+        if (e.code === 'Enter') {
+            searchButton.click();
+        }
+    });
+}

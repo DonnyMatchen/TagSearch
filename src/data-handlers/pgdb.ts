@@ -346,7 +346,7 @@ export default class PGDB extends DataHandler {
                         } else {
                             resolve1(` WHERE pub AND id IN (${ids.join(',')})`);
                         }
-                    });
+                    }, error => {reject(error)});
                 }
             }).then(filter => {
                 query = `SELECT * FROM items
