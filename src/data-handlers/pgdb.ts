@@ -1,10 +1,9 @@
-import {Pool, PoolClient} from 'pg';
-import fs from 'fs';
-import {createHash} from 'crypto';
-import path from "path";
 import { Arguments } from '@utl/getArguments';
+import fs from 'fs';
+import path from "path";
+import { Pool, PoolClient } from 'pg';
 
-import { DataHandler, Item, SearchOptions, SearchResults, Tag, TagType, User, Role, getRandomString } from '@rt/data';
+import { DataHandler, Item, Role, SearchOptions, SearchResults, Tag, TagType, User, getRandomString } from '@rt/data';
 
 export default class PGDB extends DataHandler {
     private pool: Pool;

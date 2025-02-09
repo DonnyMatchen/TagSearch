@@ -1,5 +1,6 @@
-import { PersonalConfig } from '@rt/data';
 import convert from 'color-convert';
+
+import { PersonalConfig } from '@rt/data';
 
 export function getRGB(params: HslColor): number[] {
     return convert.hsl.rgb([params.h, (<any>params).s, params.l]);

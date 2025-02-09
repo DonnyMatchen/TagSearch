@@ -1,8 +1,8 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
 
-import { DataHandler, User, UserState, SearchResults, PersonalConfig, Item, ItemType, Tag, TagType, roleFromString } from "@rt/data";
-import { getCssVars, HslColor, lumFromString } from "@utl/appColor";
+import { DataHandler, Item, ItemType, PersonalConfig, roleFromString, SearchResults, Tag, TagType, User, UserState } from "@rt/data";
+import { HslColor, lumFromString } from "@utl/appColor";
 
 export default function api(dataHandler: DataHandler): Router {
     const router: Router = express.Router();

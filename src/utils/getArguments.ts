@@ -1,5 +1,5 @@
 import { PersonalConfig, User } from "@rt/data";
-import { getCssVars, getRGB, HslColor } from "./appColor";
+import { getCssVars } from "@utl/appColor";
 
 export default function getArguments(
      user: User, config: PersonalConfig,

@@ -1,24 +1,24 @@
-import express, { Express } from "express";
-import dotenv from "dotenv";
-import path from "path";
 import bodyParser from "body-parser";
-import session from 'express-session';
+import dotenv from "dotenv";
+import express, { Express } from "express";
 import fileUpload from 'express-fileupload';
+import session from 'express-session';
+import path from "path";
 
-import Data, { DataHandler, PersonalConfig, User } from "@rt/data";
 import PGDB from "@dh/pgdb";
-import getArguments, { Arguments } from "@utl/getArguments";
+import { DataHandler, PersonalConfig, User } from "@rt/data";
 import { prep } from "@utl/appColor";
+import getArguments, { Arguments } from "@utl/getArguments";
 
-import search from "@pg/search";
-import item from "@pg/item";
-import tag from "@pg/tag";
-import post from "@pg/post";
-import deleter from "@pg/delete";
-import userCenter from "@pg/userCenter";
-import login from "@pg/login";
 import api from "@pg/api";
 import config from "@pg/config";
+import deleter from "@pg/delete";
+import item from "@pg/item";
+import login from "@pg/login";
+import post from "@pg/post";
+import search from "@pg/search";
+import tag from "@pg/tag";
+import userCenter from "@pg/userCenter";
 
 declare module "express-session" {
     interface SessionData {

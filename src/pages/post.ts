@@ -1,9 +1,8 @@
 import express, { Router } from "express";
-import { body, validationResult } from 'express-validator';
 
-import { DataHandler, Item, ItemType, PersonalConfig, Role, Tag, TagType, User, roleToString } from '@rt/data';
-import getArguments from "@utl/getArguments";
+import { DataHandler, PersonalConfig, Role, User, roleToString } from '@rt/data';
 import { colorNames } from "@utl/appColor";
+import getArguments from "@utl/getArguments";
 
 export default function post(dataHandler: DataHandler): Router {
     const router: Router = express.Router();

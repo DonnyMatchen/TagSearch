@@ -1,7 +1,8 @@
 import express, { Router } from "express";
+
 import { DataHandler, TagType } from '@rt/data';
-import partition from "@utl/partition";
 import getArguments, { Arguments } from "@utl/getArguments";
+import partition from "@utl/partition";
 
 export default function search(dataHandler: DataHandler): Router {
     const router: Router = express.Router();

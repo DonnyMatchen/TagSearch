@@ -1,9 +1,8 @@
 import express, { Router } from "express";
-import { body, validationResult } from 'express-validator';
 
-import { DataHandler, PersonalConfig, User, UserState } from "@rt/data";
-import getArguments from "@utl/getArguments";
+import { DataHandler, PersonalConfig, User } from "@rt/data";
 import { HslColor, Lum } from "@utl/appColor";
+import getArguments from "@utl/getArguments";
 
 export default function config(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
