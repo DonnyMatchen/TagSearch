@@ -9,22 +9,22 @@ export default function item(dataHandler: DataHandler): Router {
     router.get("/", function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         let id: string = <string>req.query.id;
-        if(id == undefined) {
+        if (id == undefined) {
             id == '-1'
         }
         let search: string = <string>req.query.tags;
-        if(search == undefined) {
+        if (search == undefined) {
             search = '';
         }
         dataHandler.getItem(+id).then(item => {
-            if(item && (item.pub || (req.session.user != undefined && req.session.user.role >= 1))) {
+            if (item && (item.pub || (req.session.user != undefined && req.session.user.role >= 1))) {
                 let tagCodex: TagsCodex;
                 let types: TagType[] = [];
                 getTagObject(dataHandler, item.tags).then(codex => {
                     tagCodex = codex;
                     return tagCodex.getTagTypes()
                 }).then(foundTypes => {
-                    for(let i = 0; i < foundTypes.length; i++) {
+                    for (let i = 0; i < foundTypes.length; i++) {
                         types.push(foundTypes[i]);
                     }
                     types.sort((a: TagType, b: TagType) => {
@@ -69,7 +69,7 @@ export default function item(dataHandler: DataHandler): Router {
                     ['You do not have access to this item.']
                 ));
             }
-        }, (error:Error) => {
+        }, (error: Error) => {
             res.render('item', getArguments(
                 req.session.user,
                 req.session.config,
@@ -88,7 +88,7 @@ export default function item(dataHandler: DataHandler): Router {
             ));
         });
     });
-    
+
     return router;
 }
 
@@ -101,19 +101,19 @@ async function getTagObject(dataHandler: DataHandler, tags: string[]): Promise<T
         let parents: string[] = [];
         let tagMap: Map<string, Tag> = new Map();
         dataHandler.getTags(tags).then(async foundTags => {
-            for(let i = 0; i < foundTags.length; i++) {
+            for (let i = 0; i < foundTags.length; i++) {
                 let current = foundTags[i];
                 tagMap.set(current.name, current);
-                if(current.parent != '' && !parents.includes(current.parent)) {
+                if (current.parent != '' && !parents.includes(current.parent)) {
                     parents.push(current.parent);
                 }
             }
-            for(let i = 0; i < parents.length; i++) {
+            for (let i = 0; i < parents.length; i++) {
                 tagMap.delete(parents[i]);
             }
             let out = [...tagMap.values()];
             out.sort((a, b) => a.name.localeCompare(b.name));
-            for(let i = 0; i < out.length; i++) {
+            for (let i = 0; i < out.length; i++) {
                 await codex.add(out[i].type, out[i]);
             }
             resolve(codex);
@@ -132,11 +132,11 @@ class TagsCodex {
 
     async add(key: string, tag: Tag) {
         return new Promise<void>((resolve, reject) => {
-            if(!this.codex.has(key)) {
+            if (!this.codex.has(key)) {
                 this.codex.set(key, []);
             }
             new Promise<void>((resolve1, reject1) => {
-                if(tag.parent != '') {
+                if (tag.parent != '') {
                     tag.getParent(this.dataHandler).then(parent => resolve1(this.add(key, parent)));
                 } else {
                     resolve1();
@@ -160,7 +160,7 @@ async function getParents(dataHandler: DataHandler, tag: Tag): Promise<Tag[]> {
     return new Promise<Tag[]>((resolve, reject) => {
         let out: Tag[] = [];
         new Promise<void>((resolve1, reject1) => {
-            if(tag.parent != '') {
+            if (tag.parent != '') {
                 let parent: Tag;
                 tag.getParent(dataHandler).then(async prnt => {
                     parent = prnt;

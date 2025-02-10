@@ -6,7 +6,7 @@ import getArguments from "@utl/getArguments";
 
 export default function config(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
-    
+
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         let config = req.session.user ? req.session.user.config : User.getDefaultConfig();
@@ -100,7 +100,7 @@ class ConfigHolder {
 }
 
 function getLum(lum: Lum): string {
-    switch(lum) {
+    switch (lum) {
         case Lum.dark: return 'Dark';
         case Lum.bright: return 'Bright';
         case Lum.light: return 'Light';

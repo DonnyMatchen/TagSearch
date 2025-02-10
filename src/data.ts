@@ -39,20 +39,20 @@ export class Tag {
     constructor(name: string, type: string, parent?: string, refs?: string[], children?: string[]) {
         this.name = name;
         this.parent = '';
-        if(parent) {
+        if (parent) {
             this.parent = parent;
         }
         this.type = type;
         this.children = [];
-        if(children) {
+        if (children) {
             children.forEach(str => {
                 this.children.push(str);
             });
         }
         this.refs = [];
-        if(refs) {
+        if (refs) {
             refs.forEach(str => {
-                if(str != '') {
+                if (str != '') {
                     this.refs.push(+str);
                 }
             });
@@ -68,30 +68,30 @@ export class Tag {
     }
 
     addRef(ref: number) {
-        if(!this.refs.includes(ref)) {
+        if (!this.refs.includes(ref)) {
             this.refs.push(ref);
         }
     }
     removeRef(ref: number) {
-        if(this.refs.includes(ref)) {
+        if (this.refs.includes(ref)) {
             this.refs.splice(this.refs.indexOf(ref), 1);
         }
     }
 
     addChild(child: string) {
-        if(!this.children.includes(child)) {
+        if (!this.children.includes(child)) {
             this.children.push(child);
         }
     }
     removeChild(child: string) {
-        if(this.children.includes(child)) {
+        if (this.children.includes(child)) {
             this.children.splice(this.children.indexOf(child), 1);
         }
     }
 
     async getProximity(dataHandler: DataHandler): Promise<number> {
         return new Promise<number>((resolve, rejct) => {
-            if(this.parent == '') {
+            if (this.parent == '') {
                 resolve(0);
             } else {
                 this.getParent(dataHandler).then(parent => parent.getProximity(dataHandler)).then(prox => {
@@ -126,7 +126,7 @@ export class Item {
         this.pub = pub;
         this.desc = desc ? desc : '';
         this.filePath = filePath ? filePath : '';
-        if(tags) {
+        if (tags) {
             tags.forEach(tag => {
                 this.tags.push(tag);
             });
@@ -141,17 +141,17 @@ export enum Role {
 }
 
 export function roleToString(role: Role): string {
-    switch(role) {
-        case(Role.Normal): return 'Normal';
-        case(Role.Family): return 'Family';
-        case(Role.Admin): return 'Admin';
+    switch (role) {
+        case (Role.Normal): return 'Normal';
+        case (Role.Family): return 'Family';
+        case (Role.Admin): return 'Admin';
     }
 }
 export function roleFromString(str: string): Role {
-    switch(str) {
-        case('Normal'): return Role.Normal;
-        case('Family'): return Role.Family;
-        case('Admin'): return Role.Admin;
+    switch (str) {
+        case ('Normal'): return Role.Normal;
+        case ('Family'): return Role.Family;
+        case ('Admin'): return Role.Admin;
     }
 }
 
@@ -185,13 +185,13 @@ export class User {
 
     constructor(username: string, role: Role, config: string | PersonalConfig, hash?: string, salt?: string) {
         this.username = username;
-        if(typeof config == 'string') {
+        if (typeof config == 'string') {
             this.config = new PersonalConfig(config);
         } else {
             this.config = config;
         }
         this.role = role;
-        if(hash && salt) {
+        if (hash && salt) {
             this.hash = hash;
             this.salt = salt;
             this.state = UserState.Set;
@@ -208,21 +208,21 @@ export class User {
 
     async setPassword(oldPassword: string, newPassword: string) {
         return new Promise<boolean>((resolve, reject) => {
-            if(this.state != UserState.Set) {
+            if (this.state != UserState.Set) {
                 resolve(true);
             } else {
                 resolve(this.check(oldPassword));
             }
         }).then(change => {
             return new Promise<void>((resolve, reject) => {
-                if(change) {
+                if (change) {
                     let newSalt: string = getRandomString(15);
                     argon2.hash(`${newPassword}${newSalt}`).then(hash => {
                         this.hash = hash;
                         this.state = UserState.Set;
                         this.salt = newSalt;
                         resolve();
-                    }, (error:Error) => {
+                    }, (error: Error) => {
                         this.state = UserState.Error;
                         reject(error);
                     });
@@ -238,10 +238,10 @@ export class User {
     }
 
     stateToString() {
-        switch(this.state) {
-            case(UserState.New): return 'Password Not Set';
-            case(UserState.Set): return 'Password Set'
-            case(UserState.Error): return 'Error Setting Password'
+        switch (this.state) {
+            case (UserState.New): return 'Password Not Set';
+            case (UserState.Set): return 'Password Set'
+            case (UserState.Error): return 'Error Setting Password'
         }
     }
 }
@@ -475,7 +475,7 @@ export abstract class DataHandler {
         let arr: string[] = rawString.split(' ');
         let out: string[] = [];
         arr.forEach(value => {
-            if(!out.includes(value)) {
+            if (!out.includes(value)) {
                 out.push(value);
             }
         });
@@ -508,11 +508,11 @@ export abstract class DataHandler {
             let allRefs: number[] = [];
             let reduced: number[] = [];
             let tags: string[] = this.tagsFromString(input);
-            if(tags.length < 2) {
-                if(tags.length == 1) {
+            if (tags.length < 2) {
+                if (tags.length == 1) {
                     this.getTag(tags[0]).then(found => {
                         resolve(found.refs);
-                    }, (error:Error) => {
+                    }, (error: Error) => {
                         reject(error);
                     });
                 } else {
@@ -523,7 +523,7 @@ export abstract class DataHandler {
                 tags.forEach(tagName => {
                     tagFetch.push(new Promise((resolve1, reject1) => {
                         this.getTag(tagName).then(tag => {
-                            if(tag) {
+                            if (tag) {
                                 resolve1(tag);
                             } else {
                                 reject1(new Error(`Tag "${tagName}" not found.`))
@@ -532,21 +532,21 @@ export abstract class DataHandler {
                     }));
                 });
                 Promise.all(tagFetch).then(tags => {
-                    for(let i = 0; i < tags.length; i++) {
+                    for (let i = 0; i < tags.length; i++) {
                         let found = tags[i];
                         let refList: number[] = found.refs;
                         container.push(refList);
                         refList.forEach(ref => {
-                            if(!allRefs.includes(ref)) {
+                            if (!allRefs.includes(ref)) {
                                 allRefs.push(ref);
                             }
                         });
                     }
-                    for(let i = 0; i < allRefs.length; i++) {
+                    for (let i = 0; i < allRefs.length; i++) {
                         let ref = allRefs[i];
                         let include = true;
-                        for(let j = 0; j < container.length; j++) {
-                            if(!container[j].includes(ref)) {
+                        for (let j = 0; j < container.length; j++) {
+                            if (!container[j].includes(ref)) {
                                 include = false;
                                 break;
                             }
@@ -556,7 +556,7 @@ export abstract class DataHandler {
                         }
                     }
                     resolve(reduced);
-                }, (error:Error) => reject(error));
+                }, (error: Error) => reject(error));
             }
         });
     }
@@ -565,15 +565,15 @@ export abstract class DataHandler {
         return new Promise<void>((resolve, reject) => {
             let foundAdmin: boolean = false;
             this.searchUsers('', -1, 1).then(results => {
-                for(let i = 0; i < results.results.length; i++) {
+                for (let i = 0; i < results.results.length; i++) {
                     let user = results.results[i];
-                    if(user.role == Role.Admin) {
+                    if (user.role == Role.Admin) {
                         foundAdmin = true;
                         break;
                     }
                 }
             }).then(() => {
-                if(!foundAdmin) {
+                if (!foundAdmin) {
                     let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
                     admin.setPassword('', 'toor').then(() => {
                         return this.addUser(admin);
@@ -590,7 +590,7 @@ export abstract class DataHandler {
     async ensureDefaultType() {
         return new Promise<void>((resolve, reject) => {
             this.getTagType('default').then(type => {
-                if(type) {
+                if (type) {
                     resolve();
                 } else {
                     this.addTagType(new TagType('default', 'Grayscale:90', 100)).then(() => {
@@ -610,19 +610,19 @@ export abstract class DataHandler {
     private diffTags(oldList: string[], newList: string[]): Diff {
         let changes: Diff = new Diff();
         oldList.forEach(tag => {
-            if(!newList.includes(tag)) {
+            if (!newList.includes(tag)) {
                 changes.removed.push(tag);
             }
         });
         newList.forEach(newTag => {
             let contains: boolean = false;
             oldList.forEach(oldTag => {
-                if(oldTag == newTag) {
+                if (oldTag == newTag) {
                     contains = true;
                     return;
                 }
             });
-            if(!contains) {
+            if (!contains) {
                 changes.added.push(newTag)
             }
         });
@@ -632,7 +632,7 @@ export abstract class DataHandler {
     private mergeTags(oldList: string[], newList: string[]): string[] {
         let out = [...oldList];
         newList.forEach(tagName => {
-            if(!out.includes(tagName)) {
+            if (!out.includes(tagName)) {
                 out.push(tagName);
             }
         });
@@ -641,7 +641,7 @@ export abstract class DataHandler {
 
     private async addParents(newList: string[], diffAdded: String[], fetched: Map<string, Tag>, tag: Tag): Promise<void> {
         return new Promise((resolve, reject) => {
-            if(tag.parent != '' && !fetched.has(tag.parent)) {
+            if (tag.parent != '' && !fetched.has(tag.parent)) {
                 this.getTag(tag.parent).then(parent => {
                     newList.push(parent.name);
                     diffAdded.push(parent.name);
@@ -662,21 +662,21 @@ export abstract class DataHandler {
      */
     protected async changeTags(oldList: string[], newList: string[], ref: number) {
         let rem: number[] = [];
-        for(let i = 0; i < oldList.length; i++) {
-            if(oldList[i] == '') {
+        for (let i = 0; i < oldList.length; i++) {
+            if (oldList[i] == '') {
                 rem.push(i);
             }
         }
-        for(let i = 0; i < rem.length; i++) {
+        for (let i = 0; i < rem.length; i++) {
             oldList = oldList.splice(rem[i], 1);
         }
         rem = [];
-        for(let i = 0; i < newList.length; i++) {
-            if(newList[i] == '') {
+        for (let i = 0; i < newList.length; i++) {
+            if (newList[i] == '') {
                 rem.push(i);
             }
         }
-        for(let i = 0; i < rem.length; i++) {
+        for (let i = 0; i < rem.length; i++) {
             newList = newList.splice(rem[i], 1);
         }
         //diff
@@ -688,19 +688,19 @@ export abstract class DataHandler {
             let fetched: Map<string, Tag> = new Map();
             this.getTags(merge).then(tags => {
                 let parentFetches: Promise<void>[] = [];
-                for(let i = 0; i < tags.length; i++) {
+                for (let i = 0; i < tags.length; i++) {
                     fetched.set(tags[i].name, tags[i]);
                 }
                 //fetch parents
-                for(let i = 0; i < tags.length; i++) {
+                for (let i = 0; i < tags.length; i++) {
                     parentFetches.push(this.addParents(newList, diff.added, fetched, tags[i]));
                 }
                 return Promise.all(parentFetches);
             }).then(() => {
                 //add new tags
                 let adding: Promise<void>[] = [];
-                for(let i = 0; i < newList.length; i++) {
-                    if(!fetched.has(newList[i])) {
+                for (let i = 0; i < newList.length; i++) {
+                    if (!fetched.has(newList[i])) {
                         let tag = new Tag(newList[i], 'default');
                         fetched.set(tag.name, tag);
                         adding.push(this.addTag(tag));

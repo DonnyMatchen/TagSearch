@@ -11,7 +11,7 @@ export default function search(dataHandler: DataHandler): Router {
         res.setHeader('Content-Type', 'text/html');
         let search: string = req.query.tags ? (<string>req.query.tags).trim() : '';
         let page: string = <string>req.query.page;
-        if(page == null) {
+        if (page == null) {
             page = '1';
         }
         dataHandler.searchItems(search, dataHandler.getPageLimit(), +page, req.session.user).then(results => {
@@ -32,7 +32,7 @@ export default function search(dataHandler: DataHandler): Router {
                     results: partition(results.results, 6)
                 }
             ));
-        }, (error:Error) => {
+        }, (error: Error) => {
             let empty = new SearchResults([], 0, 1, 1);
             res.render('search', getArguments(
                 req.session.user,
@@ -59,27 +59,27 @@ export default function search(dataHandler: DataHandler): Router {
         res.setHeader('Content-Type', 'text/html');
         let search: string = <string>req.query.tags;
         let page: string = <string>req.query.page;
-        if(req.query.tags == null) {
+        if (req.query.tags == null) {
             search = '';
         }
-        if(page == null) {
+        if (page == null) {
             page = '1';
         }
-        let tagSearch: string = <string> req.query.tagMatch;
-        if(req.query.tagMatch == null) {
+        let tagSearch: string = <string>req.query.tagMatch;
+        if (req.query.tagMatch == null) {
             tagSearch = '';
         }
         dataHandler.searchTags(tagSearch, dataHandler.getPageLimit(), +page).then(results => {
             let list: string[] = [];
-            for(let i = 0; i < results.results.length; i++) {
+            for (let i = 0; i < results.results.length; i++) {
                 let tag = results.results[i];
-                if(!list.includes(tag.type)) {
+                if (!list.includes(tag.type)) {
                     list.push(tag.type);
                 }
             }
             let map: Map<string, TagType> = new Map();
             dataHandler.getTagTypes(list).then(types => {
-                for(let i = 0; i < types.length; i++) {
+                for (let i = 0; i < types.length; i++) {
                     map.set(types[i].name, types[i]);
                 }
             }).then(() => {
@@ -110,14 +110,14 @@ export default function search(dataHandler: DataHandler): Router {
         res.setHeader('Content-Type', 'text/html');
         let search: string = <string>req.query.tags;
         let page: string = <string>req.query.page;
-        if(req.query.tags == null) {
+        if (req.query.tags == null) {
             search = '';
         }
-        if(page == null) {
+        if (page == null) {
             page = '1';
         }
-        let tagSearch: string = <string> req.query.tagTypeMatch;
-        if(req.query.tagTypeMatch == null) {
+        let tagSearch: string = <string>req.query.tagTypeMatch;
+        if (req.query.tagTypeMatch == null) {
             tagSearch = '';
         }
         dataHandler.searchTagTypes(tagSearch, dataHandler.getPageLimit(), +page).then(results => {
@@ -141,6 +141,6 @@ export default function search(dataHandler: DataHandler): Router {
             ));
         });
     });
-    
+
     return router;
 }

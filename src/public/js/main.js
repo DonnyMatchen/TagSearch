@@ -14,7 +14,7 @@ function tagSuggest(baseURL, inputID, multiple) {
             listItem.classList.add(`${inputID}-menu-item`);
             link.href = "#";
             link.onclick = (event) => {
-                if(multiple) {
+                if (multiple) {
                     let tags = searchBar.value.trim().split(' ');
                     tags[tags.length - 1] = tag;
                     searchBar.value = `${tags.join(' ')} `;
@@ -51,10 +51,10 @@ function putPostToAPI(baseURL, target, method, handleResults) {
         json.messages.forEach(str => {
             banner.appendChild(makeBanner('ms-color', str));
         });
-        if(handleResults) {
+        if (handleResults) {
             handleResults(json.returned);
         }
-        if(json.returned) {
+        if (json.returned) {
             delayRedirect(`${baseURL}/search`, 1500);
         }
     });
@@ -80,10 +80,10 @@ function getDeleteFromAPI(baseURL, target, method, handleResults) {
         json.messages.forEach(str => {
             banner.appendChild(makeBanner('ms-color', str));
         });
-        if(handleResults) {
+        if (handleResults) {
             handleResults(json.returned);
         }
-        if(json.returned) {
+        if (json.returned) {
             delayRedirect(`${baseURL}/search`, 2500);
         }
     });
@@ -123,7 +123,7 @@ function delayRedirect(url, delay) {
     console.log('redirecting');
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve(window.location.href=url);
+            resolve(window.location.href = url);
         }, delay);
     })
 }

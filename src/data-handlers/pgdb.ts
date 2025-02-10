@@ -26,12 +26,12 @@ export default class PGDB extends DataHandler {
                 this.pool.connect().then(client => {
                     this.client = client;
                     resolve1();
-                }, (error:Error) => {
+                }, (error: Error) => {
                     console.log(`[Server:DB]: Failed to connect: ${error.message}`);
                     reject(error);
                 });
-            }).then(() => this.client.query(`SELECT * FROM items LIMIT 1`)).then(null, (error:Error) => {
-                if(error.message == 'relation "items" does not exist') {
+            }).then(() => this.client.query(`SELECT * FROM items LIMIT 1`)).then(null, (error: Error) => {
+                if (error.message == 'relation "items" does not exist') {
                     this.client.query(`CREATE TABLE items(
                         id INT PRIMARY KEY,
                         src TEXT,
@@ -46,8 +46,8 @@ export default class PGDB extends DataHandler {
                     console.log(`[Server:DB] Failed to query: ${error.message}`);
                     reject(error);
                 }
-            }).then(() => this.client.query(`SELECT * FROM tags LIMIT 1`)).then(null, (error:Error) => {
-                if(error.message == 'relation "tags" does not exist') {
+            }).then(() => this.client.query(`SELECT * FROM tags LIMIT 1`)).then(null, (error: Error) => {
+                if (error.message == 'relation "tags" does not exist') {
                     this.client.query(`CREATE TABLE tags(
                         name TEXT PRIMARY KEY,
                         typ TEXT,
@@ -59,8 +59,8 @@ export default class PGDB extends DataHandler {
                     console.log(`[Server:DB] Failed to query: ${error.message}`);
                     reject(error);
                 }
-            }).then(() => this.client.query(`SELECT * FROM tag_types LIMIT 1`)).then(null, (error:Error) => {
-                if(error.message == 'relation "tag_types" does not exist') {
+            }).then(() => this.client.query(`SELECT * FROM tag_types LIMIT 1`)).then(null, (error: Error) => {
+                if (error.message == 'relation "tag_types" does not exist') {
                     this.client.query(`CREATE TABLE tag_types(
                         name TEXT PRIMARY KEY,
                         clr TEXT,
@@ -70,8 +70,8 @@ export default class PGDB extends DataHandler {
                     console.log(`[Server:DB] Failed to query: ${error.message}`);
                     reject(error);
                 }
-            }).then(() => this.client.query(`SELECT * FROM users LIMIT 1`)).then(() => resolve(), (error:Error) => {
-                if(error.message == 'relation "users" does not exist') {
+            }).then(() => this.client.query(`SELECT * FROM users LIMIT 1`)).then(() => resolve(), (error: Error) => {
+                if (error.message == 'relation "users" does not exist') {
                     this.client.query(`CREATE TABLE users(
                         uname TEXT PRIMARY KEY,
                         state INT,
@@ -92,7 +92,7 @@ export default class PGDB extends DataHandler {
     async nextItemID(): Promise<number> {
         return new Promise((resolve, reject) => {
             this.client.query('SELECT id FROM items ORDER BY id DESC LIMIT 1;').then(result => {
-                if(result.rowCount == 1) {
+                if (result.rowCount == 1) {
                     resolve(result.rows[0].id + 1);
                 } else {
                     resolve(1);
@@ -146,12 +146,12 @@ export default class PGDB extends DataHandler {
     async getTagType(name: string): Promise<TagType> {
         return new Promise<TagType>((resolve, reject) => {
             this.client.query(`SELECT * FROM tag_types WHERE name = '${this.sqlEscape(name)}'`).then(result => {
-                if(result.rows.length >= 1) {
+                if (result.rows.length >= 1) {
                     resolve(this.resolveTagType(result.rows[0]));
                 } else {
                     resolve(undefined);
                 }
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -159,12 +159,12 @@ export default class PGDB extends DataHandler {
     async getTag(name: string): Promise<Tag> {
         return new Promise<Tag>((resolve, reject) => {
             this.client.query(`SELECT * FROM tags WHERE name = '${this.sqlEscape(name)}'`).then(result => {
-                if(result.rows.length >= 1) {
+                if (result.rows.length >= 1) {
                     resolve(this.resolveTag(result.rows[0]));
                 } else {
                     resolve(undefined);
                 }
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -172,12 +172,12 @@ export default class PGDB extends DataHandler {
     async getItem(id: number): Promise<Item> {
         return new Promise<Item>((resolve, reject) => {
             this.client.query(`SELECT * FROM items WHERE id = ${id}`).then(result => {
-                if(result.rows.length >= 1) {
+                if (result.rows.length >= 1) {
                     resolve(this.resolveItem(result.rows[0]));
                 } else {
                     resolve(undefined);
                 }
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -185,12 +185,12 @@ export default class PGDB extends DataHandler {
     async getUser(username: string): Promise<User> {
         return new Promise<User>((resolve, reject) => {
             this.client.query(`SELECT * FROM users WHERE uname = '${this.sqlEscape(username)}'`).then(result => {
-                if(result.rows.length >= 1) {
+                if (result.rows.length >= 1) {
                     resolve(this.resolveUser(result.rows[0]));
                 } else {
                     resolve(undefined);
                 }
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -201,11 +201,11 @@ export default class PGDB extends DataHandler {
         return new Promise<TagType[]>((resolve, reject) => {
             this.client.query(`SELECT * FROM tag_types WHERE name IN ('${this.sqlMultiEscape(names).join("','")}')`).then(result => {
                 let out: TagType[] = [];
-                for(let i = 0; i < result.rowCount; i++) {
+                for (let i = 0; i < result.rowCount; i++) {
                     out.push(this.resolveTagType(result.rows[i]));
                 }
                 resolve(out);
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -215,11 +215,11 @@ export default class PGDB extends DataHandler {
             let query = `SELECT * FROM tags WHERE name IN ('${this.sqlMultiEscape(names).join("','")}')`;
             this.client.query(query).then(result => {
                 let out: Tag[] = [];
-                for(let i = 0; i < result.rowCount; i++) {
+                for (let i = 0; i < result.rowCount; i++) {
                     out.push(this.resolveTag(result.rows[i]));
                 }
                 resolve(out);
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -228,11 +228,11 @@ export default class PGDB extends DataHandler {
         return new Promise<Item[]>((resolve, reject) => {
             this.client.query(`SELECT * FROM items WHERE id IN (${ids.join(',')})`).then(result => {
                 let out: Item[] = [];
-                for(let i = 0; i < result.rowCount; i++) {
+                for (let i = 0; i < result.rowCount; i++) {
                     out.push(this.resolveItem(result.rows[i]));
                 }
                 resolve(out);
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -241,11 +241,11 @@ export default class PGDB extends DataHandler {
         return new Promise<User[]>((resolve, reject) => {
             this.client.query(`SELECT * FROM users WHERE Uname IN ('${this.sqlMultiEscape(usernames).join("','")}')`).then(result => {
                 let out: User[] = [];
-                for(let i = 0; i < result.rowCount; i++) {
+                for (let i = 0; i < result.rowCount; i++) {
                     out.push(this.resolveUser(result.rows[i]));
                 }
                 resolve(out);
-            }, (error:Error) => {
+            }, (error: Error) => {
                 reject(error);
             });
         });
@@ -258,7 +258,7 @@ export default class PGDB extends DataHandler {
             let query = `SELECT * FROM tag_types
                 ${search == '' ? '' : ` WHERE name LIKE '%${this.sqlEscape(search)}%'`}
                 ORDER BY ordr ASC
-                ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber-1)*pageSize}`}`;
+                ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber - 1) * pageSize}`}`;
             let count = `SELECT COUNT(*) FROM tag_types${search == '' ? '' : ` WHERE name LIKE '%${this.sqlEscape(search)}%'`}`;
             this.client.query(count).then(count => {
                 total = count.rows[0].count;
@@ -266,12 +266,12 @@ export default class PGDB extends DataHandler {
             }, error => {
                 reject(error);
             }).then(results => {
-                if(results) {
+                if (results) {
                     let out: TagType[] = [];
-                    for(let i = 0; i < results.rows.length; i++) {
+                    for (let i = 0; i < results.rows.length; i++) {
                         out.push(this.resolveTagType(results.rows[i]));
                     }
-                    if(pageSize <= 0) {
+                    if (pageSize <= 0) {
                         resolve(new SearchResults(out, out.length, 1, 1));
                     } else {
                         resolve(new SearchResults(
@@ -295,7 +295,7 @@ export default class PGDB extends DataHandler {
             let query = `SELECT * FROM tags
                 ${search == '' ? '' : ` WHERE name LIKE '%${this.sqlEscape(search)}%'`}
                 ORDER BY name ASC
-                ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber-1)*pageSize}`}`;
+                ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber - 1) * pageSize}`}`;
             let count = `SELECT COUNT(*) FROM tags${search == '' ? '' : ` WHERE name LIKE '%${this.sqlEscape(search)}%'`}`;
             this.client.query(count).then(count => {
                 total = count.rows[0].count;
@@ -303,12 +303,12 @@ export default class PGDB extends DataHandler {
             }, error => {
                 reject(error);
             }).then(results => {
-                if(results) {
+                if (results) {
                     let out: Tag[] = [];
-                    for(let i = 0; i < results.rows.length; i++) {
+                    for (let i = 0; i < results.rows.length; i++) {
                         out.push(this.resolveTag(results.rows[i]));
                     }
-                    if(pageSize <= 0) {
+                    if (pageSize <= 0) {
                         resolve(new SearchResults(out, out.length, 1, 1));
                     } else {
                         resolve(new SearchResults(
@@ -333,26 +333,26 @@ export default class PGDB extends DataHandler {
             let count: string;
             new Promise<string>((resolve1, reject1) => {
                 let str = ``;
-                if(search == '') {
-                    if(user && user.role >= 1) {
+                if (search == '') {
+                    if (user && user.role >= 1) {
                         resolve1('');
                     } else {
                         resolve1(` WHERE pub`)
                     }
                 } else {
                     this.reduce(search).then(ids => {
-                        if(user && user.role >= 1) {
+                        if (user && user.role >= 1) {
                             resolve1(` WHERE id IN(${ids.join(',')})`);
                         } else {
                             resolve1(` WHERE pub AND id IN (${ids.join(',')})`);
                         }
-                    }, error => {reject(error)});
+                    }, error => { reject(error) });
                 }
             }).then(filter => {
                 query = `SELECT * FROM items
                     ${filter}
                     ORDER BY id DESC
-                    ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber-1)*pageSize}`}`;
+                    ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber - 1) * pageSize}`}`;
                 count = `SELECT COUNT(*) FROM items${filter}`;
                 return this.client.query(count)
             }).then(count => {
@@ -361,12 +361,12 @@ export default class PGDB extends DataHandler {
             }, error => {
                 reject(error);
             }).then(results => {
-                if(results) {
+                if (results) {
                     let out: Item[] = [];
-                    for(let i = 0; i < results.rows.length; i++) {
+                    for (let i = 0; i < results.rows.length; i++) {
                         out.push(this.resolveItem(results.rows[i]));
                     }
-                    if(pageSize <= 0) {
+                    if (pageSize <= 0) {
                         resolve(new SearchResults(out, out.length, 1, 1));
                     } else {
                         resolve(new SearchResults(
@@ -390,7 +390,7 @@ export default class PGDB extends DataHandler {
             let query = `SELECT * FROM users
                 ${search == '' ? '' : ` WHERE uname LIKE '%${this.sqlEscape(search)}%'`}
                 ORDER BY role DESC, uname ASC
-                ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber-1)*pageSize}`}`;
+                ${pageSize <= 0 ? '' : ` LIMIT ${pageSize} OFFSET ${(pageNumber - 1) * pageSize}`}`;
             let count = `SELECT COUNT(*) FROM users${search == '' ? '' : ` WHERE uname LIKE '%${this.sqlEscape(search)}%'`}`;
             this.client.query(count).then(count => {
                 total = count.rows[0].count;
@@ -398,12 +398,12 @@ export default class PGDB extends DataHandler {
             }, error => {
                 reject(error);
             }).then(results => {
-                if(results) {
+                if (results) {
                     let out: User[] = [];
-                    for(let i = 0; i < results.rows.length; i++) {
+                    for (let i = 0; i < results.rows.length; i++) {
                         out.push(this.resolveUser(results.rows[i]));
                     }
-                    if(pageSize <= 0) {
+                    if (pageSize <= 0) {
                         resolve(new SearchResults(out, out.length, 1, 1));
                     } else {
                         resolve(new SearchResults(
@@ -427,20 +427,20 @@ export default class PGDB extends DataHandler {
         return new Promise<void>((resolve, reject) => {
             this.client.query(`INSERT INTO tag_types (name, clr, ordr)
                 VALUES ('${this.sqlEscape(type.name)}', '${type.color.encoded}', ${type.order})`)
-            .then(result => {
-                resolve();
-            }, error => {
-                reject(error);
-            });
+                .then(result => {
+                    resolve();
+                }, error => {
+                    reject(error);
+                });
         });
     }
     async addTag(tag: Tag) {
         return new Promise<void>((resolve, reject) => {
             let parent: Tag;
             new Promise<void>((resolve1, reject1) => {
-                if(tag.parent != '') {
+                if (tag.parent != '') {
                     this.getTag(tag.parent).then(prnt => {
-                        if(prnt) {
+                        if (prnt) {
                             parent = prnt;
                             prnt.addChild(tag.name);
                             resolve1(this.updateTag(prnt));
@@ -468,17 +468,17 @@ export default class PGDB extends DataHandler {
                     ${item.id},
                     '${this.sqlEscape(item.source)}',
                     ${item.date},
-                    '${this.sqlEscape(item.tags.sort((a, b) => {return a.localeCompare(b)}).join(' '))}',
+                    '${this.sqlEscape(item.tags.sort((a, b) => { return a.localeCompare(b) }).join(' '))}',
                     '${this.sqlEscape(item.desc)}',
                     ${item.type},
                     ${item.pub},
                     '${this.sqlEscape(item.filePath)}')`;
                 this.client.query(query)
-                .then(result => {
-                    resolve();
-                }, error => {
-                    reject(error);
-                });
+                    .then(result => {
+                        resolve();
+                    }, error => {
+                        reject(error);
+                    });
             });
         });
     }
@@ -493,11 +493,11 @@ export default class PGDB extends DataHandler {
                 ${user.role},
                 '${this.sqlEscape(JSON.stringify(user.config))}'
                 )`)
-            .then(result => {
-                resolve();
-            }, error => {
-                reject(error);
-            });
+                .then(result => {
+                    resolve();
+                }, error => {
+                    reject(error);
+                });
         });
     }
 
@@ -505,14 +505,14 @@ export default class PGDB extends DataHandler {
     async updateTagType(type: TagType) {
         new Promise<void>((resolve, reject) => {
             this.getTagType(type.name).then(typ => {
-                if(typ) {
+                if (typ) {
                     let query: string = `UPDATE tag_types SET
                         clr = '${type.color.encoded}',
                         ordr = ${type.order}
                     WHERE name = '${this.sqlEscape(type.name)}'`;
                     this.client.query(query).then(result => {
                         resolve();
-                    }, (error:Error) => {
+                    }, (error: Error) => {
                         reject(error);
                     });
                 } else {
@@ -524,11 +524,11 @@ export default class PGDB extends DataHandler {
     async updateTag(tag: Tag) {
         return new Promise<void>((resolve, reject) => {
             this.getTag(tag.name).then(old => {
-                if(!old) {
+                if (!old) {
                     resolve(this.addTag(tag));
                 } else {
                     new Promise<void>((resolve1, reject1) => {
-                        if(old.parent != tag.parent && old.parent != '') {
+                        if (old.parent != tag.parent && old.parent != '') {
                             this.getTag(old.parent).then(oldParent => {
                                 oldParent.removeChild(old.name);
                                 resolve1(this.updateTag(oldParent));
@@ -538,7 +538,7 @@ export default class PGDB extends DataHandler {
                         }
                     }).then(() => {
                         return new Promise<void>((resolve1, reject1) => {
-                            if(old.parent != tag.parent && tag.parent != '') {
+                            if (old.parent != tag.parent && tag.parent != '') {
                                 this.getTag(tag.parent).then(newParent => {
                                     newParent.addChild(tag.name);
                                     resolve1(this.updateTag(newParent));
@@ -549,9 +549,9 @@ export default class PGDB extends DataHandler {
                         });
                     }).then(() => {
                         return new Promise<void[]>((resolve1, reject1) => {
-                            if(tag.type != old.type && tag.children.length > 0) {
+                            if (tag.type != old.type && tag.children.length > 0) {
                                 let children: Promise<void>[] = [];
-                                for(let i = 0; i < tag.children.length; i++) {
+                                for (let i = 0; i < tag.children.length; i++) {
                                     this.getTag(tag.children[i]).then(child => {
                                         child.type = tag.type;
                                         children.push(this.updateTag(child));
@@ -571,7 +571,7 @@ export default class PGDB extends DataHandler {
                             WHERE name = '${this.sqlEscape(tag.name)}'`;
                         this.client.query(query).then(result => {
                             resolve();
-                        }, (error:Error) => {
+                        }, (error: Error) => {
                             reject(error);
                         });
                     });
@@ -582,12 +582,12 @@ export default class PGDB extends DataHandler {
     async updateItem(item: Item) {
         new Promise<void>((resolve, reject) => {
             this.getItem(item.id).then(old => {
-                if(old) {
+                if (old) {
                     this.changeTags(old.tags, item.tags, item.id).then(() => {
                         return new Promise<void>((resolve1, reject1) => {
-                            if(old.filePath != item.filePath && old.filePath != '') {
+                            if (old.filePath != item.filePath && old.filePath != '') {
                                 fs.rm(old.filePath, (error) => {
-                                    if(error) {
+                                    if (error) {
                                         console.log(`[Server:DB] Cleanup required (${old.filePath})`);
                                         reject(error);
                                     } else {
@@ -602,7 +602,7 @@ export default class PGDB extends DataHandler {
                         let query: string = `UPDATE items SET
                             src = '${this.sqlEscape(item.source)}',
                             dt = ${item.date},
-                            tags = '${this.sqlEscape(item.tags.sort((a, b) => {return a.localeCompare(b)}).join(' '))}',
+                            tags = '${this.sqlEscape(item.tags.sort((a, b) => { return a.localeCompare(b) }).join(' '))}',
                             des = '${this.sqlEscape(item.desc)}',
                             typ = ${item.type},
                             pub = ${item.pub},
@@ -610,7 +610,7 @@ export default class PGDB extends DataHandler {
                             WHERE id = ${item.id}`;
                         this.client.query(query).then(result => {
                             resolve();
-                        }, (error:Error) => {
+                        }, (error: Error) => {
                             reject(error);
                         });
                     });
@@ -623,7 +623,7 @@ export default class PGDB extends DataHandler {
     async updateUser(user: User) {
         new Promise<void>((resolve, reject) => {
             this.getUser(user.username).then(usr => {
-                if(usr) {
+                if (usr) {
                     let query: string = `UPDATE users SET
                         state = ${user.state},
                         hash = '${this.sqlEscape(user.hash)}',
@@ -633,7 +633,7 @@ export default class PGDB extends DataHandler {
                         WHERE uname = '${this.sqlEscape(user.username)}'`;
                     this.client.query(query).then(result => {
                         resolve();
-                    }, (error:Error) => {
+                    }, (error: Error) => {
                         reject(error);
                     });
                 } else {
@@ -646,14 +646,14 @@ export default class PGDB extends DataHandler {
     //delete
     async deleteTagType(type: TagType) {
         return new Promise<void>((resolve, reject) => {
-            if(type.name == 'default') {
+            if (type.name == 'default') {
                 reject(new Error('You cannot delete the default tag type.'));
             } else {
                 this.searchTags('', -1, 1).then(result => {
                     let altering: Promise<void>[] = [];
-                    for(let i = 0; i < result.results.length; i++) {
+                    for (let i = 0; i < result.results.length; i++) {
                         let tag = result.results[i];
-                        if(tag.type == type.name) {
+                        if (tag.type == type.name) {
                             tag.type = 'default';
                             altering.push(this.updateTag(tag));
                         }
@@ -670,10 +670,10 @@ export default class PGDB extends DataHandler {
     async deleteTag(tag: Tag) {
         return new Promise<void>((resolve, reject) => {
             new Promise<void[]>((resolve1, reject1) => {
-                if(tag.children.length > 0) {
+                if (tag.children.length > 0) {
                     return this.getTags(tag.children).then(children => {
                         let deleted: Promise<void>[] = [];
-                        for(let i = 0; i < children.length; i++) {
+                        for (let i = 0; i < children.length; i++) {
                             deleted.push(this.deleteTag(children[i]));
                         }
                         resolve1(Promise.all(deleted));
@@ -690,9 +690,9 @@ export default class PGDB extends DataHandler {
                 return this.getItems(tag.refs);
             }).then(refs => {
                 let refRemovals: Promise<void>[] = [];
-                for(let i = 0; i < refs.length; i++) {
+                for (let i = 0; i < refs.length; i++) {
                     let item = refs[i];
-                    if(item.tags.includes(tag.name)) {
+                    if (item.tags.includes(tag.name)) {
                         item.tags.splice(item.tags.indexOf(tag.name), 1);
                         refRemovals.push(this.updateItem(item));
                     }
@@ -706,9 +706,9 @@ export default class PGDB extends DataHandler {
     async deleteItem(item: Item) {
         return new Promise<void>((resolve, reject) => {
             new Promise<void>((resolve1, reject1) => {
-                if(item.filePath != '') {
+                if (item.filePath != '') {
                     fs.rm(item.filePath, (error) => {
-                        if(error) {
+                        if (error) {
                             console.log(`[Server:DB] Cleanup required (${item.filePath})`);
                             reject(error);
                         } else {
@@ -728,10 +728,10 @@ export default class PGDB extends DataHandler {
     async deleteUser(user: User) {
         return new Promise<void>((resolve, reject) => {
             new Promise<void>((resolve1, reject1) => {
-                if(user.role == Role.Admin) {
+                if (user.role == Role.Admin) {
                     this.client.query(`SELECT COUNT(*) FROM users WHERE role = 2`).then(result => {
                         let count: number = +(<string>result.rows[0].count);
-                        if(count <= 1) {
+                        if (count <= 1) {
                             reject(new Error('There must be at least 1 admin account.'));
                         } else {
                             resolve1();
@@ -744,24 +744,24 @@ export default class PGDB extends DataHandler {
                 return this.client.query(`DELETE FROM users WHERE uname = '${this.sqlEscape(user.username)}'`);
             }).then(result => resolve(), error => reject(error));
         });
-        
+
     }
 
     //other
     async reHost(tempFile: string, type: string, id: number): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
             let extension = type.split('/')[1];
-            if(extension == 'svg+xml') {
+            if (extension == 'svg+xml') {
                 extension = 'svg';
             }
             let fileName = `${getRandomString(10)}_${id}.${extension}`;
             let newPath = path.join(__dirname, '..', 'public', 'img', fileName);
             fs.rename(tempFile, newPath, (error) => {
-                if(error) {
+                if (error) {
                     reject(error);
                 } else {
                     fs.rm(tempFile, (error) => {
-                        if(error) {
+                        if (error) {
                             console.log(`[Server:DB] Cleanup required (${tempFile})`);
                         }
                     });
@@ -776,7 +776,7 @@ export default class PGDB extends DataHandler {
     async ensureAdmin() {
         return new Promise<void>((resolve, reject) => {
             this.client.query(`SELECT COUNT(*) FROM users WHERE role = 2`).then(result => {
-                if(+(<string>result.rows[0].count) > 0) {
+                if (+(<string>result.rows[0].count) > 0) {
                     resolve();
                 } else {
                     let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
@@ -792,7 +792,7 @@ export default class PGDB extends DataHandler {
     }
 
     private sqlEscape(unsafe: string): string {
-        if(unsafe.includes("'")) {
+        if (unsafe.includes("'")) {
             return unsafe.replace("'", '\u0006');
         } else {
             return unsafe;
@@ -806,7 +806,7 @@ export default class PGDB extends DataHandler {
         return safe;
     }
     private sqlUnEscape(safe: string): string {
-        if(safe.includes('\u0006')) {
+        if (safe.includes('\u0006')) {
             return safe.replace('\u0006', "'");
         } else {
             return safe;

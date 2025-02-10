@@ -9,11 +9,11 @@ export default function tag(dataHandler: DataHandler): Router {
     router.get("/", function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         let name: string = <string>req.query.name;
-        if(name == undefined) {
+        if (name == undefined) {
             name = '';
         }
         let search: string = <string>req.query.tags;
-        if(search == undefined) {
+        if (search == undefined) {
             search = '';
         }
         dataHandler.getTag(name).then(tag => {
@@ -38,7 +38,7 @@ export default function tag(dataHandler: DataHandler): Router {
                     }
                 ));
             });
-        }, (error:Error) => {
+        }, (error: Error) => {
             res.render('tag', getArguments(
                 req.session.user,
                 req.session.config,
@@ -57,7 +57,7 @@ export default function tag(dataHandler: DataHandler): Router {
             ));
         });
     });
-    
+
     return router;
 }
 
@@ -74,11 +74,11 @@ class CodexSet {
         return this.dataHandler.getTagType(tag.type).then(type => {
             this.type = type;
         }).then(() => {
-            if(tag.parent != '') {
+            if (tag.parent != '') {
                 this.dataHandler.getTag(tag.parent).then(parent => {
-                    for(let i = 0; i < parent.children.length; i++) {
+                    for (let i = 0; i < parent.children.length; i++) {
                         let tagName = parent.children[i];
-                        if(tagName != tag.name) {
+                        if (tagName != tag.name) {
                             this.siblings.push(tagName);
                         }
                     }

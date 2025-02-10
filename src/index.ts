@@ -43,10 +43,10 @@ app.use(bodyParser.json());
 app.use(fileUpload({
     // Configure file uploads with maximum file size 10MB
     limits: { fileSize: 20 * 1024 * 1024 },
-  
+
     // Temporarily store uploaded files to disk, rather than buffering in memory
-    useTempFiles : true,
-    tempFileDir : '/tmp/tag-search/'
+    useTempFiles: true,
+    tempFileDir: '/tmp/tag-search/'
 }));
 
 //HERE IS THE DATA HANDLER!
@@ -60,11 +60,11 @@ dataHandler.init().then(() => {
         secret: secret,
         resave: false,
         saveUninitialized: true,
-        genid: function(req) {
+        genid: function (req) {
             return dataHandler.generateSessionID();
         }
     }));
-    
+
     app.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         res.render('index', getArguments(
@@ -83,12 +83,12 @@ dataHandler.init().then(() => {
             {}
         ))
     });
-    
+
     app.get('/logout', (req, res) => {
         req.session.user = undefined;
         res.redirect('/search');
     });
-    
+
     app.get('/test', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         res.sendFile(path.join(__dirname, 'test.html'));
@@ -100,9 +100,9 @@ dataHandler.init().then(() => {
             'files': req.files,
         });
     });
-    
+
     app.use(express.static(path.join(__dirname, "public")));
-    
+
     app.use("/search", search(dataHandler));
     app.use("/item", item(dataHandler));
     app.use("/tag", tag(dataHandler));
@@ -112,7 +112,7 @@ dataHandler.init().then(() => {
     app.use('/login', login(dataHandler));
     app.use('/api', api(dataHandler));
     app.use('/config', config(dataHandler));
-    
+
     app.listen(port, () => {
         console.log(`[Server:Main] Server is running at http://localhost:${port}`);
     });

@@ -1,6 +1,5 @@
 :root {
     --border: hsl(var(--foreground)), thin, solid;
-    
 
     --bs-body-color: hsl(var(--foreground));
     --bs-body-bg: hsl(var(--bacground));
@@ -15,27 +14,35 @@
 .ct-color {
     background-color: hsl(var(--content));
 }
+
 .ct-color:hover {
     background-color: hsl(var(--content-h));
 }
+
 .gd-color {
     background-color: hsl(var(--success));
 }
+
 .gd-color:hover {
     background-color: hsl(var(--success-h));
 }
+
 .er-color {
     background-color: hsl(var(--error));
 }
+
 .er-color:hover {
     background-color: hsl(var(--error-h));
 }
+
 .ms-color {
     background-color: hsl(var(--message));
 }
+
 .ms-color:hover {
     background-color: hsl(var(--message-h));
 }
+
 .field {
     --bs-body-bg: hsl(var(--content));
     --bs-tertiary-bg: hsl(var(--content));

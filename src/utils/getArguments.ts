@@ -2,10 +2,10 @@ import { PersonalConfig, User } from "@rt/data";
 import { getCssVars } from "@utl/appColor";
 
 export default function getArguments(
-     user: User, config: PersonalConfig,
-     title: string, webPage: number, legend: string,
-     search: string, pages: Pages, args: object,
-     errors?: string[], successes?: string[], messages?: string[]
+    user: User, config: PersonalConfig,
+    title: string, webPage: number, legend: string,
+    search: string, pages: Pages, args: object,
+    errors?: string[], successes?: string[], messages?: string[]
 ): object {
     return new Arguments(user, config, title, webPage, legend, search, pages, args, errors, successes, messages);
 }
@@ -27,10 +27,10 @@ export class Arguments {
     config: PersonalConfig;
 
     constructor(
-         user: User, config: PersonalConfig,
-         title: string, webPage: number, legend: string,
-         search: string, pages: Pages, args: object,
-         errors?: string[], successes?: string[], messages?: string[]
+        user: User, config: PersonalConfig,
+        title: string, webPage: number, legend: string,
+        search: string, pages: Pages, args: object,
+        errors?: string[], successes?: string[], messages?: string[]
     ) {
         this.user = user;
         this.title = title;
@@ -41,13 +41,13 @@ export class Arguments {
         this.config = (user) ? user.config : config ? config : User.getDefaultConfig();
         this.themeSheet = getCssVars(this.config);
         this.args = args;
-        if(errors == undefined) {
+        if (errors == undefined) {
             errors = [];
         }
-        if(successes == undefined) {
+        if (successes == undefined) {
             successes = [];
         }
-        if(messages == undefined) {
+        if (messages == undefined) {
             messages = [];
         }
         this.errors = errors;

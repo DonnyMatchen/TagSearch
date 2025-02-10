@@ -26,19 +26,19 @@ export enum Lum {
     light = 75
 }
 
-export class HslColor{
+export class HslColor {
     static getHover(color: HslColor): HslColor {
-        if(color.l > 5) {
-            return new HslColor(color.h, color.s, color.l * 3/4);
+        if (color.l > 5) {
+            return new HslColor(color.h, color.s, color.l * 3 / 4);
         } else {
-            return new HslColor(color.h, color.s, color.l * 5/4);
+            return new HslColor(color.h, color.s, color.l * 5 / 4);
         }
     }
     static toString(color: HslColor): string {
         return `${color.h}, ${color.s}%, ${color.l}%`;
     }
     static data(color: HslColor): string {
-        if(color.s == 0) {
+        if (color.s == 0) {
             return `Grayscale::${color.l}`;
         } else {
             return `Color:${color.h}:${color.l}`
@@ -53,13 +53,13 @@ export class HslColor{
     constructor(h: number, s: number, l: number);
 
     constructor(hOrStr: any, s?: number, l?: number) {
-        if(s != undefined && l != undefined) {
+        if (s != undefined && l != undefined) {
             this.h = hOrStr;
             this.s = s;
             this.l = l;
         } else {
             let parts = (<string>hOrStr).split(':');
-            if(parts[0] == 'Color') {
+            if (parts[0] == 'Color') {
                 this.h = +parts[1];
                 this.s = 80;
                 this.l = +parts[2];
@@ -84,10 +84,10 @@ export class ColorConv {
         if (parts[0] == 'Color') {
             return new HslColor(+parts[1], 80, lum);
         } else {
-            switch(lum) {
-                case Lum.dark: return new HslColor(0,0,+parts[1] < 50 ? +parts[1] : 100-+parts[1]);
+            switch (lum) {
+                case Lum.dark: return new HslColor(0, 0, +parts[1] < 50 ? +parts[1] : 100 - +parts[1]);
                 case Lum.light:
-                case Lum.bright: return new HslColor(0,0,+parts[1] > 50 ? +parts[1] : 100-+parts[1]);
+                case Lum.bright: return new HslColor(0, 0, +parts[1] > 50 ? +parts[1] : 100 - +parts[1]);
             }
         }
     }
@@ -165,7 +165,7 @@ export const colorNames: string[] = [
 export const colorCodex: Map<string, number> = new Map();
 
 export function prep() {
-    colorCodex.clear();    colorCodex.set('red', 0);
+    colorCodex.clear(); colorCodex.set('red', 0);
     colorCodex.set('orange', 30);
     colorCodex.set('yellow', 60);
     colorCodex.set('lime', 90);
@@ -187,37 +187,24 @@ export function getCssVars(config: PersonalConfig): string {
     let header = getRGB(config.header);
     let link = getRGB(config.fg);
     let linkH = getRGB(HslColor.getHover(config.fg));
-    return `:root {--bacground: ${
-        HslColor.toString(config.bg)
-    };--foreground: ${
-        HslColor.toString(config.fg)
-    };--content: ${
-        HslColor.toString(config.theme)
-    };--content-h: ${
-        HslColor.toString(themeH)
-    };--error: ${
-        HslColor.toString(config.bad)
-    };--error-h: ${
-        HslColor.toString(badH)
-    };--success: ${
-        HslColor.toString(config.good)
-    };--success-h: ${
-        HslColor.toString(goodH)
-    };--message: ${
-        HslColor.toString(config.msg)
-    };--message-h: ${
-        HslColor.toString(msgH)
-    };--header: ${
-        header[0]}, ${header[1]}, ${header[2]
-    };--link: ${
-        link[0]}, ${link[1]}, ${link[2]
-    };--link-h: ${
-        linkH[0]}, ${linkH[1]}, ${linkH[2]
-    };}`;
+    return `:root {--bacground: ${HslColor.toString(config.bg)
+        };--foreground: ${HslColor.toString(config.fg)
+        };--content: ${HslColor.toString(config.theme)
+        };--content-h: ${HslColor.toString(themeH)
+        };--error: ${HslColor.toString(config.bad)
+        };--error-h: ${HslColor.toString(badH)
+        };--success: ${HslColor.toString(config.good)
+        };--success-h: ${HslColor.toString(goodH)
+        };--message: ${HslColor.toString(config.msg)
+        };--message-h: ${HslColor.toString(msgH)
+        };--header: ${header[0]}, ${header[1]}, ${header[2]
+        };--link: ${link[0]}, ${link[1]}, ${link[2]
+        };--link-h: ${linkH[0]}, ${linkH[1]}, ${linkH[2]
+        };}`;
 }
 
 export function lumFromString(str: string): Lum {
-    switch(str) {
+    switch (str) {
         case 'Dark': return Lum.dark;
         case 'Bright': return Lum.bright;
         case 'Light': return Lum.light;

@@ -5,13 +5,13 @@ import getArguments from "@utl/getArguments";
 export default function deleter(): Router {
     const router: Router = express.Router();
 
-    router.get('/', function(req, res) {
+    router.get('/', function (req, res) {
         res.redirect("/");
     });
 
-    router.get('/item', function(req, res) {
+    router.get('/item', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
-        if(req.session.user == undefined || req.session.user.role < 1) {
+        if (req.session.user == undefined || req.session.user.role < 1) {
             res.render('delete', getArguments(
                 req.session.user,
                 req.session.config,
@@ -52,9 +52,9 @@ export default function deleter(): Router {
         }
     });
 
-    router.get('/tag', function(req, res) {
+    router.get('/tag', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
-        if(req.session.user == undefined || req.session.user.role < 1) {
+        if (req.session.user == undefined || req.session.user.role < 1) {
             res.render('delete', getArguments(
                 req.session.user,
                 req.session.config,
@@ -95,9 +95,9 @@ export default function deleter(): Router {
         }
     });
 
-    router.get('/tagType', function(req, res) {
+    router.get('/tagType', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
-        if(req.session.user == undefined || req.session.user.role <= 1) {
+        if (req.session.user == undefined || req.session.user.role <= 1) {
             res.render('layout', getArguments(
                 req.session.user,
                 req.session.config,
@@ -116,7 +116,7 @@ export default function deleter(): Router {
             ));
         } else {
             let name: string = <string>req.query.name;
-            if(name == 'default') {
+            if (name == 'default') {
                 res.render('layout', getArguments(
                     req.session.user,
                     req.session.config,
@@ -157,9 +157,9 @@ export default function deleter(): Router {
         }
     });
 
-    router.get('/user', function(req, res) {
+    router.get('/user', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
-        if(req.session.user == undefined || req.session.user.role <= 1) {
+        if (req.session.user == undefined || req.session.user.role <= 1) {
             res.render('layout', getArguments(
                 req.session.user,
                 req.session.config,
