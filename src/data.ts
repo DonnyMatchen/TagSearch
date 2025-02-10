@@ -862,11 +862,21 @@ export default class Data {
 }
 
 /**
- * a byte array of size `size * 5` is generated, then encoded into base64
+ * a byte array of size `size * 5` is generated, then encoded into base64.  
  * this results in an output string of length `size * 8`
  * @param size the size of the string in increments of 8 characters
  * @returns a base64 encoded byte array, ensuring that random string is alphanumeric.
  */
 export function getRandomString(size: number): string {
     return Buffer.from(Array.from(randomBytes(size * 5))).toString('base64');
+}
+
+/**
+ * a byte array of size `size` is generated, then encoded into hex.  
+ * this results in an output string of length `size * 2`
+ * @param size the size of the string in increments of 2 characters
+ * @returns a hex encoded byte array, ensuring that random string is file-path friendly.
+ */
+export function getRandomHexString(size: number): string {
+    return randomBytes(size).toString('hex');
 }

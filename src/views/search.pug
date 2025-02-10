@@ -12,7 +12,7 @@ block layout-content
                                 - if(item != undefined)
                                     a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
                                         -if(item.type == 0)
-                                            img.width-snug(title=item.tags.join(" "), src=item.source)
+                                            img.width-snug(title=item.tags.join(" "), src=`${item.source.replace('$BASE_URL', baseURL)}`)
                                         -else
                                             img.width-snug(title=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
                     div.row.mb-4

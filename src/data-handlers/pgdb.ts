@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from "path";
 import { Pool, PoolClient } from 'pg';
 
-import { DataHandler, Item, Role, SearchOptions, SearchResults, Tag, TagType, User, getRandomString } from '@rt/data';
+import { DataHandler, Item, Role, SearchOptions, SearchResults, Tag, TagType, User, getRandomHexString, getRandomString } from '@rt/data';
 
 export default class PGDB extends DataHandler {
     private pool: Pool;
@@ -754,19 +754,14 @@ export default class PGDB extends DataHandler {
             if (extension == 'svg+xml') {
                 extension = 'svg';
             }
-            let fileName = `${getRandomString(10)}_${id}.${extension}`;
+            let fileName = `${getRandomHexString(25)}_${id}.${extension}`;
             let newPath = path.join(__dirname, '..', 'public', 'img', fileName);
             fs.rename(tempFile, newPath, (error) => {
                 if (error) {
                     reject(error);
                 } else {
-                    fs.rm(tempFile, (error) => {
-                        if (error) {
-                            console.log(`[Server:DB] Cleanup required (${tempFile})`);
-                        }
-                    });
                     resolve([
-                        `${Arguments.url}/img/${fileName}`,
+                        `$BASE_URL/img/${fileName}`,
                         newPath
                     ]);
                 }
@@ -783,7 +778,7 @@ export default class PGDB extends DataHandler {
                     admin.setPassword('', 'toor').then(() => {
                         return this.addUser(admin);
                     }, error => reject(error)).then(() => {
-                        console.log(`[Server:Data] Default admin account created.  Change the password ASAP`)
+                        console.log(`[Server:DB] Default admin account created.  Change the password ASAP`)
                         resolve();
                     }, error => reject(error));
                 }

@@ -3,7 +3,7 @@ extends layout
 block layout-content
     - itm = args.item
     -if(itm != null)
-        - url = args.item.source
+        - url = args.item.source.replace('$BASE_URL', baseURL)
         div.container-fluid
             div.row
                 div.col-sm-1

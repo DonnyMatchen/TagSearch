@@ -97,10 +97,12 @@ dataHandler.init().then(() => {
     });
     app.post('/test', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
-        res.send({
+        let o = {
             'body': req.body,
             'files': req.files,
-        });
+        };
+        console.log(JSON.stringify(o));
+        res.send(o);
     });
 
     app.use(express.static(path.join(__dirname, "public")));
