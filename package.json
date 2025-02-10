@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist/",
-    "copy-files": "copyfiles -u 1 src/**/*.mini.css src/**/*.mini.js src/**/*.pug src/**/*.ico src/**/*.svg dist/",
+    "copy-files": "copyfiles -u 1 src/**/*.css src/**/*.js src/**/*.pug src/**/*.ico src/**/*.svg dist/",
     "build": "npm run clean && tsc --project tsconfig.json && tsc-alias -p tsconfig.json && npm run copy-files",
     "start": "node dist/index.js",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts"
@@ -20,6 +20,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-fileupload": "^1.5.1",
+    "express-minify": "^1.0.0",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.0",
     "form-data": "^4.0.1",
@@ -31,6 +32,7 @@
     "@types/color-convert": "^2.0.4",
     "@types/express": "^5.0.0",
     "@types/express-fileupload": "^1.5.1",
+    "@types/express-minify": "^0.1.38",
     "@types/express-session": "^1.18.1",
     "@types/node": "^22.10.2",
     "@types/pg": "^8.11.11",
