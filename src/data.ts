@@ -668,7 +668,7 @@ export abstract class DataHandler {
             }
         }
         for (let i = 0; i < rem.length; i++) {
-            oldList = oldList.splice(rem[i], 1);
+            oldList.splice(rem[i], 1);
         }
         rem = [];
         for (let i = 0; i < newList.length; i++) {
@@ -677,7 +677,7 @@ export abstract class DataHandler {
             }
         }
         for (let i = 0; i < rem.length; i++) {
-            newList = newList.splice(rem[i], 1);
+            newList.splice(rem[i], 1);
         }
         //diff
         let diff = this.diffTags(oldList, newList);

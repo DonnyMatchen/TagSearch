@@ -288,8 +288,20 @@ function data(dataHandler: DataHandler): Router {
                         }
                     }).then(id => {
                         newID = id;
-                        if (req.files == null) {
-                            return [<string>req.body.src, ''];
+                        if (!req.files) {
+                            return new Promise<string[]>((resolve1, reject1) => {
+                                if (req.body.state == 'new') {
+                                    resolve1([<string>req.body.src, '']);
+                                } else {
+                                    dataHandler.getItem(id).then(old => {
+                                        if (old.source == req.body.src) {
+                                            resolve1([old.source, old.filePath]);
+                                        } else {
+                                            resolve1([<string>req.body.src, '']);
+                                        }
+                                    });
+                                }
+                            });
                         } else {
                             return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype, id);
                         }
@@ -301,7 +313,8 @@ function data(dataHandler: DataHandler): Router {
                             ItemType.Image,
                             req.body.pub == 'Public',
                             req.body.desc,
-                            req.body.tags.split(' ')
+                            req.body.tags.trim().split(' '),
+                            src[1]
                         );
                         item.filePath = src[1];
                         if (req.body.state == 'new') {
