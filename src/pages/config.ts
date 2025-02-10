@@ -10,7 +10,7 @@ export default function config(dataHandler: DataHandler): Router {
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         let config = req.session.user ? req.session.user.config : User.getDefaultConfig();
-        res.render('create-edit', getArgumentsSimply(req.session.user, config));
+        res.render('settings', getArgumentsSimply(req.session.user, config));
     });
 
     return router;
@@ -55,7 +55,7 @@ function getArgumentsSimply(user: User, config: PersonalConfig, errors?: string[
         config,
         `Settings`,
         103,
-        'Color settings can be saved without an account.',
+        'Color settings will update temporarily when you click away, but must be saved to be permanent',
         '',
         {
             active: false,

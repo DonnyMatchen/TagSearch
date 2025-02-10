@@ -32,7 +32,7 @@ function tagSuggest(baseURL, inputID, multiple) {
     });
 }
 
-function putPostToAPI(baseURL, target, method, handleResults) {
+function putPostToAPI(baseURL, target, method, redirect, handleResults) {
     const formData = new FormData(document.getElementById('script-target'));
     const banner = document.getElementById('banners');
     clearBanners();
@@ -54,13 +54,13 @@ function putPostToAPI(baseURL, target, method, handleResults) {
         if (handleResults) {
             handleResults(json.returned);
         }
-        if (json.returned) {
+        if (json.returned && redirect) {
             delayRedirect(`${baseURL}/search`, 1500);
         }
     });
 }
 
-function getDeleteFromAPI(baseURL, target, method, handleResults) {
+function getDeleteFromAPI(baseURL, target, method, redirect, handleResults) {
     const formData = new FormData(document.getElementById('script-target'));
     const banner = document.getElementById('banners');
     clearBanners();
@@ -83,7 +83,7 @@ function getDeleteFromAPI(baseURL, target, method, handleResults) {
         if (handleResults) {
             handleResults(json.returned);
         }
-        if (json.returned) {
+        if (json.returned && redirect) {
             delayRedirect(`${baseURL}/search`, 2500);
         }
     });
@@ -136,4 +136,15 @@ function attachSearch() {
             searchButton.click();
         }
     });
+}
+
+function attachContUpdate(baseURL) {
+    let inputs = document.getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].onchange = function () {
+            putPostToAPI(baseURL, '/api/color', 'POST', false, (returned) => {
+                document.getElementById('theme').innerHTML = returned;
+            });
+        };
+    }
 }

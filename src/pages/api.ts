@@ -2,7 +2,7 @@ import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
 
 import { DataHandler, Item, ItemType, PersonalConfig, roleFromString, SearchResults, Tag, TagType, User, UserState } from "@rt/data";
-import { HslColor, lumFromString } from "@utl/appColor";
+import { getCssVars, HslColor, lumFromString } from "@utl/appColor";
 
 export default function api(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
@@ -39,7 +39,6 @@ export default function api(dataHandler: DataHandler): Router {
     });
 
     router.put('/color', (req, res) => {
-        console.log(`[Server:Test] Check`);
         res.setHeader('Content-Type', 'application/json');
         let loggedIn = true;
         if (!req.session.user) {
@@ -56,7 +55,6 @@ export default function api(dataHandler: DataHandler): Router {
             good: new HslColor(`${req.body.gdA}:${req.body.gdB}:${req.body.gdC}`),
         };
         new Promise<void>((resolve, reject) => {
-            console.log(`[Server:Test] A`);
             if (loggedIn) {
                 dataHandler.getUser(req.session.user.username).then(user => {
                     user.config = config;
@@ -65,14 +63,33 @@ export default function api(dataHandler: DataHandler): Router {
                     resolve(dataHandler.updateUser(user));
                 });
             } else {
-                console.log(`[Server:Test] B`);
                 req.session.config = config;
                 resolve();
             }
         }).then(() => {
             res.status(200);
-            res.send(new Response(statuses.get(200), [], ['Settings Updated, reload the page to see yoru changes.'], [], null));
+            res.send(new Response(statuses.get(200), [], ['Settings saved.'], [], null));
         });
+    });
+
+    router.post('/color', (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        let loggedIn = true;
+        if (!req.session.user) {
+            loggedIn = false;
+        }
+        let config: PersonalConfig = {
+            tagLum: lumFromString(req.body.tagl),
+            bg: new HslColor(`${req.body.bgA}:${req.body.bgB}:${req.body.bgC}`),
+            fg: new HslColor(`${req.body.fgA}:${req.body.fgB}:${req.body.fgC}`),
+            header: new HslColor(`${req.body.hdA}:${req.body.hdB}:${req.body.hdC}`),
+            msg: new HslColor(`${req.body.msgA}:${req.body.msgB}:${req.body.msgC}`),
+            theme: new HslColor(`${req.body.thmA}:${req.body.thmB}:${req.body.thmC}`),
+            bad: new HslColor(`${req.body.bdA}:${req.body.bdB}:${req.body.bdC}`),
+            good: new HslColor(`${req.body.gdA}:${req.body.gdB}:${req.body.gdC}`),
+        };
+        res.status(200);
+        res.send(new Response(statuses.get(200), [], [], [], getCssVars(config)));
     });
 
     router.use('/data', data(dataHandler));

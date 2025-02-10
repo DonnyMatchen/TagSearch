@@ -22,5 +22,5 @@ block form-content
             div.col-sm-8.row
                 div.col-sm-5
                 div.col-sm-7
-                    button.btn.gd-color(onclick=`putPostToAPI('${baseURL}', '/api/admin/${args.set ? 'activate' : 'passChange'}', 'PUT')`)= args.set ? 'Set Password' : 'Change Password'
+                    button.btn.gd-color(onclick=`putPostToAPI('${baseURL}', '/api/admin/${args.set ? 'activate' : 'passChange'}', 'PUT', true)`)= args.set ? 'Set Password' : 'Change Password'
             div.col-sm-2
