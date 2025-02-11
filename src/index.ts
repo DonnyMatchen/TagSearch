@@ -2,7 +2,6 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import fileUpload from 'express-fileupload';
-import minify from 'express-minify';
 import session from 'express-session';
 import path from 'path';
 
@@ -38,10 +37,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(minify({
-    js_match: /js/,
-    css_match: /css/
-}));
 
 app.use(fileUpload({
     limits: { fileSize: 200 * 1024 * 1024 },
@@ -64,6 +59,9 @@ dataHandler.init().then(() => {
             return dataHandler.generateSessionID();
         }
     }));
+    if (secret == 'You should set a session secret.') {
+        console.log(`[Server:Main] ${secret}`);
+    }
 
     app.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
