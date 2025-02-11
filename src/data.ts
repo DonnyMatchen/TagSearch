@@ -46,7 +46,9 @@ export class Tag {
         this.children = [];
         if (children) {
             children.forEach(str => {
-                this.children.push(str);
+                if (str != '') {
+                    this.children.push(str);
+                }
             });
         }
         this.refs = [];
@@ -128,7 +130,9 @@ export class Item {
         this.filePath = filePath ? filePath : '';
         if (tags) {
             tags.forEach(tag => {
-                this.tags.push(tag);
+                if (tag != '') {
+                    this.tags.push(tag);
+                }
             });
         }
     }
