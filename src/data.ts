@@ -805,7 +805,7 @@ export default class Data {
                     1733066171000,
                     ItemType.Image,
                     false,
-                    'climb the stairs, you\'ve coem this far',
+                    'climb the stairs, you\'ve come this far',
                     ['x', 'yy']
                 ));
             });

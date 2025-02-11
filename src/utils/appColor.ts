@@ -12,7 +12,7 @@ export enum Hue {
     yellow = 60,
     lime = 90,
     green = 120,
-    puse = 150,
+    chartreuse = 150,
     cyan = 180,
     teal = 210,
     blue = 240,
@@ -113,9 +113,9 @@ export const prefabs = {
     green_dark: new HslColor(Hue.green, 80, Lum.dark),
     green: new HslColor(Hue.green, 80, Lum.bright),
     green_light: new HslColor(Hue.green, 80, Lum.light),
-    puse_dark: new HslColor(Hue.puse, 80, Lum.dark),
-    puse: new HslColor(Hue.puse, 80, Lum.bright),
-    puse_light: new HslColor(Hue.puse, 80, Lum.light),
+    chartreuse_dark: new HslColor(Hue.chartreuse, 80, Lum.dark),
+    chartreuse: new HslColor(Hue.chartreuse, 80, Lum.bright),
+    chartreuse_light: new HslColor(Hue.chartreuse, 80, Lum.light),
     cyan_dark: new HslColor(Hue.cyan, 80, Lum.dark),
     cyan: new HslColor(Hue.cyan, 80, Lum.bright),
     cyan_light: new HslColor(Hue.cyan, 80, Lum.light),
@@ -153,7 +153,7 @@ export const colorNames: string[] = [
     "yellow",
     "lime",
     "green",
-    "puse",
+    "chartreuse",
     "cyan",
     "teal",
     "blue",
@@ -170,7 +170,7 @@ export function prep() {
     colorCodex.set('yellow', 60);
     colorCodex.set('lime', 90);
     colorCodex.set('green', 120);
-    colorCodex.set('puse', 150);
+    colorCodex.set('chartreuse', 150);
     colorCodex.set('cyan', 180);
     colorCodex.set('teal', 210);
     colorCodex.set('blue', 240);
