@@ -309,6 +309,8 @@ export abstract class DataHandler {
      */
     abstract init(): Promise<void>;
 
+    abstract getAdminCount(): Promise<number>;
+
     /**
      * 
      * @returns the next avaiable item ID
@@ -576,28 +578,19 @@ export abstract class DataHandler {
 
     async ensureAdmin() {
         return new Promise<void>((resolve, reject) => {
-            let foundAdmin: boolean = false;
-            this.searchUsers('', -1, 1).then(results => {
-                for (let i = 0; i < results.results.length; i++) {
-                    let user = results.results[i];
-                    if (user.role == Role.Admin) {
-                        foundAdmin = true;
-                        break;
-                    }
-                }
-            }).then(() => {
-                if (!foundAdmin) {
+            this.getAdminCount().then(count => {
+                if (count > 0) {
+                    resolve();
+                } else {
                     let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
                     admin.setPassword('', 'toor').then(() => {
                         return this.addUser(admin);
                     }, error => reject(error)).then(() => {
-                        console.log(`[Server:Data] Default admin account created.  Change the password ASAP`);
+                        console.log(`[Server:DB] Default admin account created.  Change the password ASAP`)
                         resolve();
                     }, error => reject(error));
-                } else {
-                    resolve();
                 }
-            });
+            }, error => reject(error));
         });
     }
     async ensureDefaultType() {

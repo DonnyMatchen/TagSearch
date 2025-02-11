@@ -768,20 +768,10 @@ export default class PGDB extends DataHandler {
             });
         });
     }
-    async ensureAdmin() {
-        return new Promise<void>((resolve, reject) => {
-            this.client.query(`SELECT COUNT(*) FROM users WHERE role = 2`).then(result => {
-                if (+(<string>result.rows[0].count) > 0) {
-                    resolve();
-                } else {
-                    let admin: User = new User('admin', Role.Admin, User.getDefaultConfig());
-                    admin.setPassword('', 'toor').then(() => {
-                        return this.addUser(admin);
-                    }, error => reject(error)).then(() => {
-                        console.log(`[Server:DB] Default admin account created.  Change the password ASAP`)
-                        resolve();
-                    }, error => reject(error));
-                }
+    async getAdminCount(): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            this.client.query(`SELECT COUNT(*) FROM users WHERE role = ${Role.Admin}`).then(result => {
+                resolve(+(<string>result.rows[0].count));
             }, error => reject(error));
         });
     }
