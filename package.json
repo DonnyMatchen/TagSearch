@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist/",
-    "copy-files": "copyfiles -u 1 src/**/*.css src/**/*.js src/**/*.pug src/**/*.ico src/**/*.svg dist/",
+    "copy-files": "copyfiles -u 1 src/**/*.css src/**/*.js src/**/*.pug src/**/*.bmp src/**/*.gif src/**/*.ico src/**/*.jpg src/**/*.jpeg src/**/*.png src/**/*.svg src/**/*.webp src/**/*.avi src/**/*.mp4 src/**/*.mpeg src/**/*.ogv src/**/*.webm src/**/*.aac src/**/*.mid src/**/*.midi src/**/*.mp3 src/**/*.oga src/**/*.wav src/**/*.weba src/**/*.pdf src/**/*.rtf src/**/*.txt src/**/*.odt src/**/*.ods src/**/*.odp src/**/*.doc src/**/*.docx src/**/*.ppt src/**/*.pptx src/**/*.xls src/**/*.xlsx dist/",
     "build": "npm run clean && tsc --project tsconfig.json && tsc-alias -p tsconfig.json && npm run copy-files",
     "start": "node dist/index.js",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts"

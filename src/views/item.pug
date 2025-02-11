@@ -11,8 +11,14 @@ block layout-content
                     -if(itm.type == 0)
                         a(href=url)
                             img.width-snug(title=itm.tags.join(" "), src=url)
-                    -else
+                    -else if(itm.type == 1)
                         embed.width-snug.tall-embed(src=url)
+                    -else if(itm.type == 2)
+                        video.width-snug(title=itm.tags.join(" "), src=url, controls)
+                    -else if(itm.type == 3)
+                        audio.width-snug(title=itm.tags.join(" "), src=url, controls)
+                    -else
+                        a(href=url)= url
                 div.col-sm-4.box.ps-3.pe-3.pb-3
                     -if(user != undefined && user.role >= 2)
                         h3.mt-3 Options

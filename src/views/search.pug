@@ -12,9 +12,15 @@ block layout-content
                                 - if(item != undefined)
                                     a.item(href=`${baseURL}/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
                                         -if(item.type == 0)
-                                            img.width-snug(title=item.tags.join(" "), src=`${item.source.replace('$BASE_URL', baseURL)}`)
+                                            img.width-snug(title=item.tags.join(" "), src=`${item.source}`)
+                                        -else if(item.type == 1)
+                                            img.width-snug(title=item.tags.join(" "), src=`/assets/doc.svg`)
+                                        -else if(item.type == 2)
+                                            img.width-snug(title=item.tags.join(" "), src=`/assets/video.svg`)
+                                        -else if(item.type == 3)
+                                            img.width-snug(title=item.tags.join(" "), src=`/assets/audio.svg`)
                                         -else
-                                            img.width-snug(title=item.tags.join(" "), src=`${baseURL}/assets/text70.svg`)
+                                            img.width-snug(title=item.tags.join(" "), src=`/assets/unk.svg`)
                     div.row.mb-4
                         each item in rw
                             div.text-center.mt-2.col-sm-2

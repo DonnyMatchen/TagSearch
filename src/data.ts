@@ -106,7 +106,10 @@ export class Tag {
 
 export enum ItemType {
     Image = 0,
-    Document = 1
+    Document = 1,
+    Video = 2,
+    Audio = 3,
+    Unknown = 10
 }
 
 export class Item {
@@ -885,4 +888,60 @@ export function getRandomString(size: number): string {
  */
 export function getRandomHexString(size: number): string {
     return randomBytes(size).toString('hex');
+}
+
+export function getItemType(src: string): ItemType {
+    let img = [
+        '.bmp',
+        '.gif',
+        '.ico',
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.svg',
+        '.webp'
+    ];
+    let vid = [
+        '.avi',
+        '.mp4',
+        '.mpeg',
+        '.ogv',
+        '.webm'
+    ];
+    let aud = [
+        '.aac',
+        '.mid',
+        '.midi',
+        '.mp3',
+        '.oga',
+        '.wav',
+        '.weba'
+    ];
+    let doc = [
+        '.pdf',
+        '.rtf',
+        '.txt'
+    ];
+
+    for (let i = 0; i < img.length; i++) {
+        if (src.includes(img[i])) {
+            return ItemType.Image;
+        }
+    }
+    for (let i = 0; i < vid.length; i++) {
+        if (src.includes(vid[i])) {
+            return ItemType.Video;
+        }
+    }
+    for (let i = 0; i < aud.length; i++) {
+        if (src.includes(aud[i])) {
+            return ItemType.Audio;
+        }
+    }
+    for (let i = 0; i < doc.length; i++) {
+        if (src.includes(doc[i])) {
+            return ItemType.Document;
+        }
+    }
+    return ItemType.Unknown;
 }

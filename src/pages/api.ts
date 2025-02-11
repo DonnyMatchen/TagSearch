@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
 
-import { DataHandler, Item, ItemType, PersonalConfig, roleFromString, SearchResults, Tag, TagType, User, UserState } from "@rt/data";
+import { DataHandler, getItemType, Item, ItemType, PersonalConfig, roleFromString, SearchResults, Tag, TagType, User, UserState } from "@rt/data";
 import { getCssVars, HslColor, lumFromString } from "@utl/appColor";
 
 export default function api(dataHandler: DataHandler): Router {
@@ -310,7 +310,7 @@ function data(dataHandler: DataHandler): Router {
                             newID,
                             src[0],
                             new Date(req.body.date).valueOf(),
-                            ItemType.Image,
+                            getItemType(src[0]),
                             req.body.pub == 'Public',
                             req.body.desc,
                             req.body.tags.trim().split(' '),

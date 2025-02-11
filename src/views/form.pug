@@ -49,9 +49,9 @@ block layout-content
 
     mixin fileInput(inputName, dis)
         -if(dis)
-            input.form-control.field(type="file", name=inputName, accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf", readonly)
+            input.form-control.field(type="file", name=inputName, readonly)
         -else
-            input.form-control.field(type="file", name=inputName, accept="image/jpeg, image/png, image/bmp, image/svg+xml, image/webp, application/pdf")
+            input.form-control.field(type="file", name=inputName)
 
     mixin radioInput(inputName, inputValue, arr, dis)
         each str in arr
