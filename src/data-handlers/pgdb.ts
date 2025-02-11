@@ -748,41 +748,8 @@ export default class PGDB extends DataHandler {
     }
 
     //other
-    async reHost(tempFile: string, type: string, id: number): Promise<string[]> {
+    async reHost(tempFile: string, type: string, extension: string, id: number): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
-            let repl = [
-                ['image/vnd.microsoft.icon', '.ico'],
-                ['image/svg+xml', '.svg'],
-
-                ['video/x-msvideo', '.avi'],
-                ['video/ogg', '.ogv'],
-
-                ['audio/x-midi', '.midi'],
-                ['audio/mpeg', '.mp3'],
-                ['audio/ogg', '.oga'],
-                ['audio/webm', '.weba'],
-
-                ['text/plain', '.txt'],
-                ['application/vnd.oasis.opendocument.text', '.odt'],
-                ['application/vnd.oasis.opendocument.spreadsheet', '.ods'],
-                ['application/vnd.oasis.opendocument.presentation', '.odp'],
-                ['application/msword', '.doc'],
-                ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.docx'],
-                ['application/vnd.ms-powerpoint', '.ppt'],
-                ['application/vnd.openxmlformats-officedocument.presentationml.presentation', '.pptx'],
-                ['application/vnd.ms-excel', '.xls'],
-                ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.xlsx']
-            ];
-            let extension: string;
-            for (let i = 0; i < repl.length; i++) {
-                if (type == repl[i][0]) {
-                    extension = repl[i][1];
-                    break;
-                }
-            }
-            if (!extension) {
-                extension = `.${type.split('/')[1]}`;
-            }
             let fileName = `${getRandomHexString(25)}_${id}${extension}`;
             let newPath = path.join(__dirname, '..', 'public', 'items', fileName);
             fs.rename(tempFile, newPath, (error) => {

@@ -744,7 +744,7 @@ export abstract class DataHandler {
      * @param type the mime type of the file
      * @returns the permanent file path after rehosting
      */
-    abstract reHost(tempFile: string, type: string, id: number): Promise<string[]>;
+    abstract reHost(tempFile: string, type: string, extension: string, id: number): Promise<string[]>;
 }
 
 export default class Data {
@@ -919,8 +919,15 @@ export function getItemType(src: string): ItemType {
     ];
     let doc = [
         '.pdf',
-        '.rtf',
-        '.txt'
+        '.txt',
+        '.css',
+        '.csv',
+        '.html',
+        '.htm',
+        '.js',
+        '.mjs',
+        '.json',
+        '.xml'
     ];
 
     for (let i = 0; i < img.length; i++) {

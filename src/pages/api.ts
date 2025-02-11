@@ -303,7 +303,8 @@ function data(dataHandler: DataHandler): Router {
                                 }
                             });
                         } else {
-                            return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype, id);
+                            let fileNameParts = (<string>(<any>req.files['file']).name).split('.');
+                            return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype, `.${fileNameParts[fileNameParts.length - 1]}`, id);
                         }
                     }).then(src => {
                         let item = new Item(
