@@ -38,8 +38,8 @@ export class Arguments {
         this.legend = legend;
         this.search = search;
         this.pages = pages;
-        this.config = (user) ? user.config : config ? config : User.getDefaultConfig();
-        this.themeSheet = getCssVars(this.config);
+        this.config = user ? user.config : config ? config : User.getDefaultConfig();
+        this.themeSheet = getCssVars(new PersonalConfig(this.config));
         this.args = args;
         if (errors == undefined) {
             errors = [];

@@ -9,8 +9,8 @@ export default function config(dataHandler: DataHandler): Router {
 
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
-        let config = req.session.user ? req.session.user.config : User.getDefaultConfig();
-        res.render('settings', getArgumentsSimply(req.session.user, config));
+        let config = req.session.user ? req.session.user.config : req.session.config ? req.session.config : User.getDefaultConfig();
+        res.render('settings', getArgumentsSimply(req.session.user, new PersonalConfig(config)));
     });
 
     return router;
@@ -42,13 +42,13 @@ function getArgumentsSimply(user: User, config: PersonalConfig, errors?: string[
     };
     let vals = new ConfigHolder(
         `${getLum(config.tagLum)}`,
-        `${HslColor.data(config.bg)}`,
-        `${HslColor.data(config.fg)}`,
-        `${HslColor.data(config.header)}`,
-        `${HslColor.data(config.msg)}`,
-        `${HslColor.data(config.theme)}`,
-        `${HslColor.data(config.bad)}`,
-        `${HslColor.data(config.good)}`
+        `${config.bg.data()}`,
+        `${config.fg.data()}`,
+        `${config.header.data()}`,
+        `${config.msg.data()}`,
+        `${config.theme.data()}`,
+        `${config.bad.data()}`,
+        `${config.good.data()}`
     );
     return getArguments(
         user,

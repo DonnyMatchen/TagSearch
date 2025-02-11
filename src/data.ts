@@ -277,16 +277,25 @@ export class PersonalConfig {
     bad: HslColor;
     good: HslColor;
 
-    constructor(raw: string) {
-        let rawObj: any = JSON.parse(raw);
+    constructor(stripped: PersonalConfig);
+    constructor(rawStr: string);
+
+    constructor(input: string | PersonalConfig) {
+        let rawObj: any;
+        if (typeof input == 'string') {
+            rawObj = JSON.parse(input);
+        } else {
+            rawObj = input;
+        }
+
         this.tagLum = rawObj.tagLum;
-        this.bg = new HslColor(rawObj.bg.h, rawObj.bg.s, rawObj.bg.l);
-        this.fg = new HslColor(rawObj.fg.h, rawObj.fg.s, rawObj.fg.l);
-        this.header = new HslColor(rawObj.header.h, rawObj.header.s, rawObj.header.l);
-        this.msg = new HslColor(rawObj.msg.h, rawObj.msg.s, rawObj.msg.l);
-        this.theme = new HslColor(rawObj.theme.h, rawObj.theme.s, rawObj.theme.l);
-        this.bad = new HslColor(rawObj.bad.h, rawObj.bad.s, rawObj.bad.l);
-        this.good = new HslColor(rawObj.good.h, rawObj.good.s, rawObj.good.l);
+        this.bg = new HslColor(rawObj.bg);
+        this.fg = new HslColor(rawObj.fg);
+        this.header = new HslColor(rawObj.header);
+        this.msg = new HslColor(rawObj.msg);
+        this.theme = new HslColor(rawObj.theme);
+        this.bad = new HslColor(rawObj.bad);
+        this.good = new HslColor(rawObj.good);
     }
 }
 
