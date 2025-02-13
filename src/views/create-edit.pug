@@ -16,7 +16,7 @@ block form-content
                     div.row.mb-2
                         div.col-sm-5
                         div.col-sm-6.p-0
-                            button.btn.gd-color(onclick=`putPostToAPI('${baseURL}', '${args.target}', 'PUT', true)`)= args.update ? 'Update' : 'Add'
+                            button.btn.gd-color(onclick=`putPostToAPI('${args.target}', 'PUT', true)`)= args.update ? 'Update' : 'Add'
                         div.col-sm-1
                 div.col-sm-3
                     -if(huePresent)

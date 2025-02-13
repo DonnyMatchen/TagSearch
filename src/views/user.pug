@@ -10,7 +10,7 @@ block layout-content
                 div.col-sm-6
                     input#small-search.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
                 div.col-sm-3
-                    button.btn.ct-color(onclick=`window.location.href='${baseURL}/userCenter?username='+document.getElementById('small-search').value;`) Go
+                    button.btn.ct-color(onclick=`window.location.href='/userCenter?username='+document.getElementById('small-search').value;`) Go
             div.col-sm-3
         div.row.mt-3
             div.col-sm-1
@@ -33,7 +33,7 @@ block layout-content
                         div.col-sm-2= user.roleToString()
                         div.col-sm-2= user.stateToString()
                         div.col-sm-2
-                            a.btn.ms-2.me-2.gd-color(title='Edit' href=`${baseURL}/post/user?edit=${user.username}`) E
-                            a.btn.ms-2.me-2.er-color(title='Delete' href=`${baseURL}/delete/user?username=${user.username}`) X
+                            a.btn.ms-2.me-2.gd-color(title='Edit' href=`/post/user?edit=${user.username}`) E
+                            a.btn.ms-2.me-2.er-color(title='Delete' href=`/delete/user?username=${user.username}`) X
                         div.col-sm-2
             div.col-sm-1

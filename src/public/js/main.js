@@ -1,10 +1,10 @@
-function tagSuggest(baseURL, inputID, multiple) {
+function tagSuggest(inputID, multiple) {
     const searchBar = document.querySelector(`#${inputID}-search`);
     let split = searchBar.value.trim().split(' ');
     const search = split[split.length - 1];
     const parentElement = document.querySelector(`#${inputID}-menu`);
     clearDropDown(inputID);
-    fetch(`${baseURL}/api/tags?match=${search}`).then(res => res.json()).then(json => {
+    fetch(`/api/tags?match=${search}`).then(res => res.json()).then(json => {
         let array = json.returned.results;
         array.sort((a, b) => a.indexOf(search) - b.indexOf(search));
         array.forEach(tag => {
@@ -32,11 +32,11 @@ function tagSuggest(baseURL, inputID, multiple) {
     });
 }
 
-function putPostToAPI(baseURL, target, method, redirect, handleResults) {
+function putPostToAPI(target, method, redirect, handleResults) {
     const formData = new FormData(document.getElementById('script-target'));
     const banner = document.getElementById('banners');
     clearBanners();
-    fetch(`${baseURL}${target}`, {
+    fetch(`${target}`, {
         method: method,
         body: formData
     }).then(response => {
@@ -55,17 +55,17 @@ function putPostToAPI(baseURL, target, method, redirect, handleResults) {
             handleResults(json.returned);
         }
         if (json.returned && redirect) {
-            delayRedirect(`${baseURL}/search`, 1500);
+            delayRedirect(`/search`, 1500);
         }
     });
 }
 
-function getDeleteFromAPI(baseURL, target, method, redirect, handleResults) {
+function getDeleteFromAPI(target, method, redirect, handleResults) {
     const formData = new FormData(document.getElementById('script-target'));
     const banner = document.getElementById('banners');
     clearBanners();
     let params = new URLSearchParams(formData).toString();
-    fetch(`${baseURL}${target}?${params}`, {
+    fetch(`${target}?${params}`, {
         method: method,
         body: formData
     }).then(response => {
@@ -84,7 +84,7 @@ function getDeleteFromAPI(baseURL, target, method, redirect, handleResults) {
             handleResults(json.returned);
         }
         if (json.returned && redirect) {
-            delayRedirect(`${baseURL}/search`, 2500);
+            delayRedirect(`/search`, 2500);
         }
     });
 }
@@ -138,11 +138,11 @@ function attachSearch() {
     });
 }
 
-function attachContUpdate(baseURL) {
+function attachContUpdate() {
     let inputs = document.getElementsByTagName('input');
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].onchange = function () {
-            putPostToAPI(baseURL, '/api/color', 'POST', false, (returned) => {
+            putPostToAPI('/api/color', 'POST', false, (returned) => {
                 document.getElementById('theme').innerHTML = returned;
             });
         };

@@ -10,7 +10,7 @@ block layout-content
                 div.col-sm-6
                     input#small-search.width-full.form-control.field(type='text' name="tagSearch", value=args.tagSearch)
                 div.col-sm-3
-                    button.btn.gd-color(onclick=`window.location.href='${baseURL}/search/tags?tagMatch='+document.getElementById('small-search').value;`) Go
+                    button.btn.gd-color(onclick=`window.location.href='/search/tags?tagMatch='+document.getElementById('small-search').value;`) Go
             div.col-sm-3
         div.row.mt-3
             div.col-sm-1
@@ -28,9 +28,9 @@ block layout-content
                     div.row.mb-1.text-center
                         div.col-sm-3
                         div.col-sm-2
-                            a(href=`${baseURL}/tag?name=${tag.name}`)= tag.name
+                            a(href=`/tag?name=${tag.name}`)= tag.name
                         div.col-sm-2
-                            a(style=`color: ${args.types.get(tag.type).getColorString(config.tagLum)};`, href=`${baseURL}/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
+                            a(style=`color: ${args.types.get(tag.type).getColorString(config.tagLum)};`, href=`/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
                         div.col-sm-2= tag.refs.length
                         div.col-sm-3
             div.col-sm-1

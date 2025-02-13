@@ -24,7 +24,7 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 {
                     active: true,
-                    pageURL: `${Arguments.url}/search?tags=${search}&page=`,
+                    pageURL: `/search?tags=${search}&page=`,
                     pageCount: results.pageCount,
                     pageNumber: +page
                 },
@@ -43,7 +43,7 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 {
                     active: true,
-                    pageURL: `${Arguments.url}/search?tags=${search}&`,
+                    pageURL: `/search?tags=${search}&`,
                     pageCount: 1,
                     pageNumber: 1
                 },
@@ -92,7 +92,7 @@ export default function search(dataHandler: DataHandler): Router {
                     search,
                     {
                         active: true,
-                        pageURL: `${Arguments.url}/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
+                        pageURL: `/search/tags?tagMatch=${tagSearch}&tags=${search}&page=`,
                         pageCount: results.pageCount,
                         pageNumber: +page
                     },
@@ -130,7 +130,7 @@ export default function search(dataHandler: DataHandler): Router {
                 search,
                 {
                     active: true,
-                    pageURL: `${Arguments.url}/search/tagTypes?tagTypeMatch=${tagSearch}&tags=${search}&page=`,
+                    pageURL: `/search/tagTypes?tagTypeMatch=${tagSearch}&tags=${search}&page=`,
                     pageCount: results.pageCount,
                     pageNumber: +page
                 },

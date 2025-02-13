@@ -11,8 +11,6 @@ export default function getArguments(
 }
 
 export class Arguments {
-    static url: string;
-    baseURL: string = Arguments.url;
     title: string;
     webPage: number;
     legend: string;

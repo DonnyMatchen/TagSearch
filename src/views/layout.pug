@@ -40,9 +40,9 @@ html
                         button#main-dropdown.btn.box.ct-color.dropdown-toggle.ms-2(type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
                         ul#main-menu.ct-color.box.dropdown-menu.pt-0(aria-labelledby='main')
                     div.col-sm-6.p-0
-                        input#main-search.width-full.field.form-control(type='text' name='search' value=search oninput=`tagSuggest('${baseURL}', 'main', true)`)
+                        input#main-search.width-full.field.form-control(type='text' name='search' value=search oninput=`tagSuggest('main', true)`)
                     div.col-sm-3
-                        button#main-button.btn.gd-color(onclick=`window.location.href='${baseURL}/search?tags='+document.getElementById('main-search').value.replace(' ', '+');`) Go
+                        button#main-button.btn.gd-color(onclick=`window.location.href='/search?tags='+document.getElementById('main-search').value.replace(' ', '+');`) Go
                 div.col-sm-2
             nav.row
                 div.col-sm-8
@@ -51,7 +51,7 @@ html
                             each triad, index in group
                                 -if(index != webPage)
                                     -if(+triad[2] <= +level)
-                                        a.btn.m-1.ct-color(href=`${baseURL}${triad[1]}`)= triad[0]
+                                        a.btn.m-1.ct-color(href=`${triad[1]}`)= triad[0]
                                 -else
                                     -if(+triad[2] <= +level)
                                         span.btn.m-1.bg-item= triad[0]
@@ -60,22 +60,22 @@ html
                         -if(webPage == 103)
                             span.btn.m-1.bg-item Settings
                         -else
-                            a.btn.m-1.ct-color(href=`${baseURL}/config`) Settings
+                            a.btn.m-1.ct-color(href=`/config`) Settings
                         -if(webPage == 101)
                             span.btn.m-1.bg-item Login
                         -else
-                            a.btn.m-1.gd-color(href=`${baseURL}/login`) Log In
+                            a.btn.m-1.gd-color(href=`/login`) Log In
                     -else
                         b.btn.box.m-1.bg-item= user.username
                         -if(webPage == 102)
                             span.btn.m-1.bg-item Change Password
                         -else
-                            a.btn.m-1.ct-color(href=`${baseURL}/login/change`) Change Password
+                            a.btn.m-1.ct-color(href=`/login/change`) Change Password
                         -if(webPage == 103)
                             span.btn.m-1.bg-item Settings
                         -else
-                            a.btn.m-1.ct-color(href=`${baseURL}/config`) Settings
-                        a.btn.m-1.er-color(href=`${baseURL}/logout`) Log Out
+                            a.btn.m-1.ct-color(href=`/config`) Settings
+                        a.btn.m-1.er-color(href=`/logout`) Log Out
         div#banners.bg-item
             each error in errors
                 div.banner.er-color.p-3.mb-2.text-center= error
@@ -85,7 +85,7 @@ html
                 div.banner.ms-color.p-3.mb-2.text-center= message
         h3.text-center.mb-3= legend
         block layout-content
-        script= `tagSuggest('${baseURL}', 'main', true)`
+        script= `tagSuggest('main', true)`
         script= 'attachSearch();'
         -if(pages.active)
             -if(pages.pageNumber <= 0)

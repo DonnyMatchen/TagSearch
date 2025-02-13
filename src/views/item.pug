@@ -3,7 +3,7 @@ extends layout
 block layout-content
     - itm = args.item
     -if(itm != null)
-        - url = args.item.source.replace('$BASE_URL', baseURL)
+        - url = args.item.source
         div.container-fluid
             div.row
                 div.col-sm-1
@@ -23,21 +23,21 @@ block layout-content
                     -if(user != undefined && user.role >= 2)
                         h3.mt-3 Options
                         div#options
-                            a.btn.gd-color.me-3(href=`${baseURL}/post/item?edit=${itm.id}`) Edit
-                            a.btn.er-color.me-3(href=`${baseURL}/delete/item?id=${itm.id}`) Delete
+                            a.btn.gd-color.me-3(href=`/post/item?edit=${itm.id}`) Edit
+                            a.btn.er-color.me-3(href=`/delete/item?id=${itm.id}`) Delete
                     h3.mt-3 Tags
                     each type in args.types
                         b= type.name
                         ul
                             each tag in args.tags.get(type.name)
                                 li(style=`padding-left: ${args.indents.get(tag.name) * 17}px;color:${type.getColorString(config.tagLum)}`)
-                                    a(style=`color:${type.getColorString(config.tagLum)}`, href=`${baseURL}/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
+                                    a(style=`color:${type.getColorString(config.tagLum)}`, href=`/search?tags=${tag.name}`)= `${tag.name} (${tag.refs.length})`
                     h3.mt-3 Timestamp
                     div= `${new Date(itm.date).toLocaleDateString()} ${new Date(itm.date).toLocaleTimeString()}`
                     h3.mt-3 Description
                     p= itm.desc
                     h3.mt-3 Link
-                    a(href=`${baseURL}/item?id=${itm.id}`) #{`${baseURL}/item?id=${itm.id}`}
+                    a(href=`/item?id=${itm.id}`)= `/item?id=${itm.id}`
                 div.col-sm-1
     -else
         h2.text-center The specified item could not be loaded or does not exist

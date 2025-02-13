@@ -18,7 +18,7 @@ export default function userCenter(dataHandler: DataHandler): Router {
                 '',
                 {
                     active: true,
-                    pageURL: `${Arguments.url}/userCenter?username=&page=`,
+                    pageURL: `/userCenter?username=&page=`,
                     pageCount: 0,
                     pageNumber: 0
                 },
@@ -44,7 +44,7 @@ export default function userCenter(dataHandler: DataHandler): Router {
                     '',
                     {
                         active: true,
-                        pageURL: `${Arguments.url}/userCenter?username=${search}&page=`,
+                        pageURL: `/userCenter?username=${search}&page=`,
                         pageCount: results.pageCount,
                         pageNumber: +page
                     },

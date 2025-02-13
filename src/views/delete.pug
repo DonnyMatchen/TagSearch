@@ -5,5 +5,5 @@ block layout-content
         form#script-target
             input(type='hidden', name='del', value=args.delete)
         div.text-center
-            a.btn.ct-color.ms-2.me-2(href=`${baseURL}${args.cancel}`) Cancel
-            button.btn.er-color.ms-2.me-2(onclick=`getDeleteFromAPI('${baseURL}', '${args.target}', 'DELETE', true)`) Delete
+            a.btn.ct-color.ms-2.me-2(href=`${args.cancel}`) Cancel
+            button.btn.er-color.ms-2.me-2(onclick=`getDeleteFromAPI('${args.target}', 'DELETE', true)`) Delete

@@ -39,13 +39,13 @@ block layout-content
         -if(dis)
             textArea.form-control.field(id=`${inputName}-search`, name=inputName, rows=5, readonly)= inputValue
         -else
-            textArea.form-control.field(id=`${inputName}-search`, name=inputName, rows=5, oninput=`tagSuggest('${baseURL}', '${inputName}', true)`)= inputValue
+            textArea.form-control.field(id=`${inputName}-search`, name=inputName, rows=5, oninput=`tagSuggest('${inputName}', true)`)= inputValue
 
     mixin tagInput(inputName, inputValue, dis)
         -if(dis)
             input.form-control.field(id=`${inputName}-search`, type='text', name=inputName, value=inputValue, readonly)
         -else
-            input.form-control.field(id=`${inputName}-search`, type='text', name=inputName, value=inputValue, oninput=`tagSuggest('${baseURL}', '${inputName}', false)`)
+            input.form-control.field(id=`${inputName}-search`, type='text', name=inputName, value=inputValue, oninput=`tagSuggest('${inputName}', false)`)
 
     mixin fileInput(inputName, dis)
         -if(dis)
@@ -157,7 +157,7 @@ block layout-content
                 -if(!dis && (inputType == 'tag' || inputType == 'tags'))
                     button.btn.box.ct-color.dropdown-toggle.ms-2(id=`${inputName}-dropdown`, type='button' data-bs-toggle='dropdown' data-bs-auto-close='false' aria-expanded='false')
                     ul.ct-color.box.dropdown-menu.pt-0(id=`${inputName}-menu`, aria-labelledby='item-dropdown')
-                    script= `tagSuggest('${baseURL}', '${inputName}', ${inputType=='tags'})`
+                    script= `tagSuggest('${inputName}', ${inputType=='tags'})`
 
     mixin hueBox()
         div.box.p-2.row.bg-item
