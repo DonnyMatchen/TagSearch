@@ -148,3 +148,12 @@ function attachContUpdate() {
         };
     }
 }
+
+function applyDisplayClass() {
+    let img = document.getElementById('display-image');
+    if (0.5 * visualViewport.width * img.height / img.width > 0.6 * visualViewport.height) {
+        img.classList.add('tall-embed');
+    } else {
+        img.classList.add('width-snug');
+    }
+}

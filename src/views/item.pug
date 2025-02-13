@@ -10,11 +10,12 @@ block layout-content
                 div.col-sm-6.text-center
                     -if(itm.type == 0)
                         a(href=url)
-                            img.width-snug(title=itm.tags.join(" "), src=url)
+                            img#display-image(title=itm.tags.join(" "), src=url)
+                        script= `applyDisplayClass();`
                     -else if(itm.type == 1)
                         embed.width-snug.tall-embed(src=url)
                     -else if(itm.type == 2)
-                        video.width-snug(title=itm.tags.join(" "), src=url, controls)
+                        video.width-snug.tall-embed(title=itm.tags.join(" "), src=url, controls)
                     -else if(itm.type == 3)
                         audio.width-snug(title=itm.tags.join(" "), src=url, controls)
                     -else
