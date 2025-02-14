@@ -1,7 +1,8 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
 
-import { DataHandler, User, UserState } from "@rt/data";
+import { User, UserState } from "@da/user";
+import DataHandler from "@dh/dataHandler";
 import getArguments from "@utl/getArguments";
 
 export default function login(dataHandler: DataHandler): Router {

@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 
-import { DataHandler, Tag, TagType } from '@rt/data';
+import { Tag, TagType } from "@da/tag";
+import DataHandler from "@dh/dataHandler";
 import getArguments from "@utl/getArguments";
 
 export default function item(dataHandler: DataHandler): Router {

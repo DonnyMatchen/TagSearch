@@ -1,7 +1,9 @@
 import express, { Router } from "express";
 
-import { DataHandler, PersonalConfig, Role, User, roleToString } from '@rt/data';
-import { colorNames } from "@utl/appColor";
+import { colorNames } from "@da/color";
+import { Role, roleToString } from '@da/user';
+import { PersonalConfig, User } from "@da/user";
+import DataHandler from "@dh/dataHandler";
 import getArguments from "@utl/getArguments";
 
 export default function post(dataHandler: DataHandler): Router {

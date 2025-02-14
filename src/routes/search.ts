@@ -1,7 +1,9 @@
 import express, { Router } from "express";
 
-import { DataHandler, SearchResults, TagType } from '@rt/data';
-import getArguments, { Arguments } from "@utl/getArguments";
+import { SearchResults } from "@da/search";
+import { TagType } from "@da/tag";
+import DataHandler from "@dh/dataHandler";
+import getArguments from "@utl/getArguments";
 import partition from "@utl/partition";
 
 export default function search(dataHandler: DataHandler): Router {

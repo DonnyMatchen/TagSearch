@@ -1,7 +1,8 @@
 import express, { Router } from "express";
 
-import { DataHandler, PersonalConfig, User } from "@rt/data";
-import { HslColor, Lum } from "@utl/appColor";
+import { Lum } from "@da/color";
+import { PersonalConfig, User } from "@da/user";
+import DataHandler from "@dh/dataHandler";
 import getArguments from "@utl/getArguments";
 
 export default function config(dataHandler: DataHandler): Router {

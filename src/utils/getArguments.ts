@@ -1,5 +1,5 @@
-import { PersonalConfig, User } from "@rt/data";
-import { getCssVars } from "@utl/appColor";
+import { getCssVars } from "@da/color";
+import { PersonalConfig, User } from "@da/user";
 
 export default function getArguments(
     user: User, config: PersonalConfig,

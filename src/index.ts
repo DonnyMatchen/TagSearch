@@ -1,5 +1,4 @@
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import fileUpload from 'express-fileupload';
 import session from 'express-session';
@@ -8,19 +7,20 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
-import PGDB from "@dh/pgdb";
-import { DataHandler, PersonalConfig, User } from "@rt/data";
+import { PersonalConfig, User } from "@da/user";
+import DataHandler from "@dh/dataHandler";
+import PGDB, { DBConfig } from "@dh/pgdb";
 import getArguments from "@utl/getArguments";
 
-import api from "@pg/api";
-import config from "@pg/config";
-import deleter from "@pg/delete";
-import item from "@pg/item";
-import login from "@pg/login";
-import post from "@pg/post";
-import search from "@pg/search";
-import tag from "@pg/tag";
-import userCenter from "@pg/userCenter";
+import api from "@rt/api";
+import config from "@rt/config";
+import deleter from "@rt/delete";
+import item from "@rt/item";
+import login from "@rt/login";
+import post from "@rt/post";
+import search from "@rt/search";
+import tag from "@rt/tag";
+import userCenter from "@rt/userCenter";
 
 declare module "express-session" {
     interface SessionData {
@@ -29,16 +29,7 @@ declare module "express-session" {
     }
 }
 
-dotenv.config();
-
 const app: Express = express();
-const httpPort = process.env.HTTP_PORT || 80;
-const httpsPort = process.env.HTTPS_PORT || 443;
-const tlsKey = process.env.TLS_KEY || 'server.key';
-const tlsCert = process.env.TLS_CERT || 'server.pem';
-const httpDisable = process.env.HTTP_DISABLED || 'false';
-const httpsDisable = process.env.HTTPS_DISABLED || 'false';
-const secret = process.env.SESSION_SECRET || 'You should set a session secret.';
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -51,9 +42,50 @@ app.use(fileUpload({
     tempFileDir: '/tmp/tag-search/'
 }));
 
-//HERE IS THE DATA HANDLER!
-let dataHandler: DataHandler = new PGDB(process.env.PG_USER, process.env.PG_PASS, process.env.PG_HOST, +process.env.PG_PORT, process.env.PG_DB);
-dataHandler.init().then(() => {
+let httpEnabled: boolean = true;
+let httpsEnabled: boolean = true;
+let httpPort: number = 80;
+let httpsPort: number = 443;
+let tlsKey: string = 'server.key';
+let tlsCert: string = 'server.pem';
+let secret: string = 'CHANGE ME!';
+
+let dataHandler: DataHandler;
+
+new Promise<any>((resolve, reject) => {
+    fs.readFile(path.join(__dirname, '..', 'config', 'main.json'), 'utf-8', (error, data) => {
+        if (error) {
+            reject(error);
+        } else {
+            resolve(JSON.parse(data));
+        }
+    });
+}).then(cfg => {
+    httpEnabled = cfg.http.enabled;;
+    if (httpEnabled) {
+        httpPort = cfg.http.port;
+    }
+    httpsEnabled = cfg.https.enabled;;
+    if (httpsEnabled) {
+        httpsPort = cfg.https.port;
+        tlsKey = cfg.https.tls.key;
+        tlsCert = cfg.https.tls.cert;
+    }
+    secret = cfg.session.secret;
+}).then(() => {
+    return new Promise<DBConfig>((resolve, reject) => {
+        fs.readFile(path.join(__dirname, '..', 'config', 'db.json'), 'utf-8', (error, data) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(JSON.parse(data));
+            }
+        });
+    });
+}).then(cfg => {
+    dataHandler = new PGDB(cfg);
+    return dataHandler.init();
+}).then(() => {
     return dataHandler.ensureAdmin();;
 }).then(() => {
     return dataHandler.ensureDefaultType();
@@ -120,14 +152,14 @@ dataHandler.init().then(() => {
     app.use('/api', api(dataHandler));
     app.use('/config', config(dataHandler));
 
-    if (httpDisable.toLowerCase() != 'true' && httpDisable.toLowerCase() != 't') {
+    if (httpEnabled) {
         let httpServ = http.createServer(app);
         httpServ.listen(httpPort, () => {
             console.log(`[Server:Main] HTTP Server is running at http://localhost:${httpPort}`);
         });
     }
 
-    if (httpsDisable.toLowerCase() != 'true' && httpsDisable.toLowerCase() != 't') {
+    if (httpsEnabled) {
         let cred = { key: '', cert: '' };
         new Promise<string>((resolve, reject) => {
             fs.readFile(path.join(__dirname, 'tlsCert', tlsKey), 'utf8', (error, data) => {

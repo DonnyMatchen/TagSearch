@@ -1,22 +1,26 @@
-import { Arguments } from '@utl/getArguments';
 import fs from 'fs';
 import path from "path";
 import { Pool, PoolClient } from 'pg';
 
-import { DataHandler, Item, Role, SearchOptions, SearchResults, Tag, TagType, User, getRandomHexString, getRandomString } from '@rt/data';
+import { getRandomHexString, getRandomString } from '@da/data';
+import DataHandler from '@dh/dataHandler';
+import { Item } from '@da/item';
+import { SearchResults } from '@da/search';
+import { Tag, TagType } from '@da/tag';
+import { Role, User } from '@da/user';
 
 export default class PGDB extends DataHandler {
     private pool: Pool;
     public client: PoolClient;
 
-    constructor(username: string, password: string, host: string, port: number, database: string) {
+    constructor(config: DBConfig) {
         super();
         this.pool = new Pool({
-            user: username,
-            password: password,
-            host: host,
-            port: port,
-            database: database
+            user: config.username,
+            password: config.password,
+            host: config.host,
+            port: config.port,
+            database: config.database
         });
     }
 
@@ -793,4 +797,12 @@ export default class PGDB extends DataHandler {
             return safe;
         }
     }
+}
+
+export class DBConfig {
+    username: string;
+    password: string;
+    host: string;
+    port: number;
+    database: string;
 }

@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 
-import { DataHandler } from "@rt/data";
-import getArguments, { Arguments } from "@utl/getArguments";
+import DataHandler from "@dh/dataHandler";
+import getArguments from "@utl/getArguments";
 
 export default function userCenter(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
