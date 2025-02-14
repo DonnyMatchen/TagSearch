@@ -3,11 +3,14 @@ import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import fileUpload from 'express-fileupload';
 import session from 'express-session';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
 import path from 'path';
 
 import PGDB from "@dh/pgdb";
 import { DataHandler, PersonalConfig, User } from "@rt/data";
-import getArguments, { Arguments } from "@utl/getArguments";
+import getArguments from "@utl/getArguments";
 
 import api from "@pg/api";
 import config from "@pg/config";
@@ -29,7 +32,12 @@ declare module "express-session" {
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const httpPort = process.env.HTTP_PORT || 80;
+const httpsPort = process.env.HTTPS_PORT || 443;
+const tlsKey = process.env.TLS_KEY || 'server.key';
+const tlsCert = process.env.TLS_CERT || 'server.pem';
+const httpDisable = process.env.HTTP_DISABLED || 'false';
+const httpsDisable = process.env.HTTPS_DISABLED || 'false';
 const secret = process.env.SESSION_SECRET || 'You should set a session secret.';
 
 app.set('views', path.join(__dirname, 'views'));
@@ -112,7 +120,48 @@ dataHandler.init().then(() => {
     app.use('/api', api(dataHandler));
     app.use('/config', config(dataHandler));
 
-    app.listen(port, () => {
-        console.log(`[Server:Main] Server is running at http://localhost:${port}`);
-    });
+    if (httpDisable.toLowerCase() != 'true' && httpDisable.toLowerCase() != 't') {
+        let httpServ = http.createServer(app);
+        httpServ.listen(httpPort, () => {
+            console.log(`[Server:Main] HTTP Server is running at http://localhost:${httpPort}`);
+        });
+    }
+
+    if (httpsDisable.toLowerCase() != 'true' && httpsDisable.toLowerCase() != 't') {
+        let cred = { key: '', cert: '' };
+        new Promise<string>((resolve, reject) => {
+            fs.readFile(path.join(__dirname, 'tlsCert', tlsKey), 'utf8', (error, data) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(data);
+                }
+            });
+        }).then(key => {
+            cred.key = key;
+            return new Promise<string>((resolve, reject) => {
+                fs.readFile(path.join(__dirname, 'tlsCert', tlsCert), 'utf8', (error, data) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(data);
+                    }
+                });
+            });
+        }, (error: Error) => {
+            console.log(`[Server:Main] Unable to load TLS key because: ${error.message}`);
+        }).then(cert => {
+            if (cert) {
+                cred.cert = cert;
+                if (cred.key && cred.cert) {
+                    let httpsServ = https.createServer(cred, app);
+                    httpsServ.listen(httpsPort, () => {
+                        console.log(`[Server:Main] HTTPS Server is running at https://localhost:${httpsPort}`);
+                    });
+                }
+            }
+        }, (error: Error) => {
+            console.log(`[Server:Main] Unable to load TLS cert because: ${error.message}`);
+        });
+    }
 });
