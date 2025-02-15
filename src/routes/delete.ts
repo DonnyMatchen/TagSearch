@@ -12,12 +12,12 @@ export default function deleter(): Router {
     router.get('/item', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.render('delete', getArguments(
+            res.status(401).render('delete', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete Item',
                 -1,
-                `Access denied`,
+                `Access Denied`,
                 '',
                 {
                     active: false,
@@ -30,7 +30,7 @@ export default function deleter(): Router {
             ));
         } else {
             let itemID: number = +<string>req.query.id;
-            res.render('delete', getArguments(
+            res.status(200).render('delete', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete Item',
@@ -55,7 +55,7 @@ export default function deleter(): Router {
     router.get('/tag', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.render('delete', getArguments(
+            res.status(401).render('delete', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete Tag',
@@ -73,7 +73,7 @@ export default function deleter(): Router {
             ));
         } else {
             let name: string = <string>req.query.name;
-            res.render('delete', getArguments(
+            res.status(200).render('delete', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete Tag',
@@ -98,7 +98,7 @@ export default function deleter(): Router {
     router.get('/tagType', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role <= 1) {
-            res.render('layout', getArguments(
+            res.status(401).render('layout', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete Tag Type',
@@ -117,7 +117,7 @@ export default function deleter(): Router {
         } else {
             let name: string = <string>req.query.name;
             if (name == 'default') {
-                res.render('layout', getArguments(
+                res.status(200).render('layout', getArguments(
                     req.session.user,
                     req.session.config,
                     'Delete Tag Type',
@@ -134,7 +134,7 @@ export default function deleter(): Router {
                     ['You cannot delete the default tag type']
                 ));
             } else {
-                res.render('delete', getArguments(
+                res.status(200).render('delete', getArguments(
                     req.session.user,
                     req.session.config,
                     'Delete Tag Type',
@@ -160,7 +160,7 @@ export default function deleter(): Router {
     router.get('/user', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role <= 1) {
-            res.render('layout', getArguments(
+            res.status(401).render('layout', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete User',
@@ -178,7 +178,7 @@ export default function deleter(): Router {
             ));
         } else {
             let username: string = <string>req.query.username;
-            res.render('delete', getArguments(
+            res.status(200).render('delete', getArguments(
                 req.session.user,
                 req.session.config,
                 'Delete User',

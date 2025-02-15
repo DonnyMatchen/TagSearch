@@ -17,7 +17,7 @@ export default function search(dataHandler: DataHandler): Router {
             page = '1';
         }
         dataHandler.searchItems(search, dataHandler.getPageLimit(), +page, req.session.user).then(results => {
-            res.render('search', getArguments(
+            res.status(200).render('search', getArguments(
                 req.session.user,
                 req.session.config,
                 'Search Results',
@@ -36,7 +36,7 @@ export default function search(dataHandler: DataHandler): Router {
             ));
         }, (error: Error) => {
             let empty = new SearchResults([], 0, 1, 1);
-            res.render('search', getArguments(
+            res.status(200).render('search', getArguments(
                 req.session.user,
                 req.session.config,
                 'Search',
@@ -85,7 +85,7 @@ export default function search(dataHandler: DataHandler): Router {
                     map.set(types[i].name, types[i]);
                 }
             }).then(() => {
-                res.render('tagSearch', getArguments(
+                res.status(200).render('tagSearch', getArguments(
                     req.session.user,
                     req.session.config,
                     'Search Results',
@@ -123,7 +123,7 @@ export default function search(dataHandler: DataHandler): Router {
             tagSearch = '';
         }
         dataHandler.searchTagTypes(tagSearch, dataHandler.getPageLimit(), +page).then(results => {
-            res.render('tagType', getArguments(
+            res.status(200).render('tagType', getArguments(
                 req.session.user,
                 req.session.config,
                 'Search Results',

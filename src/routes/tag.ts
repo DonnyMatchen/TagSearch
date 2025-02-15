@@ -20,7 +20,7 @@ export default function tag(dataHandler: DataHandler): Router {
         dataHandler.getTag(name).then(tag => {
             let codex: CodexSet = new CodexSet(dataHandler);
             codex.setup(tag).then(() => {
-                res.render('tag', getArguments(
+                res.status(200).render('tag', getArguments(
                     req.session.user,
                     req.session.config,
                     'Tag',
@@ -40,7 +40,7 @@ export default function tag(dataHandler: DataHandler): Router {
                 ));
             });
         }, (error: Error) => {
-            res.render('tag', getArguments(
+            res.status(200).render('tag', getArguments(
                 req.session.user,
                 req.session.config,
                 'Tag',

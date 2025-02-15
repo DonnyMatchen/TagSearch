@@ -10,7 +10,7 @@ export default function login(dataHandler: DataHandler): Router {
 
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
-        res.render('login', getArguments(
+        res.status(200).render('login', getArguments(
             req.session.user,
             req.session.config,
             'Sign In',
@@ -81,7 +81,7 @@ export default function login(dataHandler: DataHandler): Router {
                 }
             }).finally(() => {
                 if (failure) {
-                    res.render('login', getArguments(
+                    res.status(200).render('login', getArguments(
                         req.session.user,
                         req.session.config,
                         'Sign In',
@@ -107,7 +107,7 @@ export default function login(dataHandler: DataHandler): Router {
     router.get('/change', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         if (!req.session.user) {
-            res.render("create-edit", getArguments(
+            res.status(401).render("create-edit", getArguments(
                 req.session.user,
                 req.session.config,
                 'Change Password',
@@ -124,7 +124,7 @@ export default function login(dataHandler: DataHandler): Router {
                 ['You are not logged in.']
             ));
         } else {
-            res.render('pass-change', getArguments(
+            res.status(200).render('pass-change', getArguments(
                 req.session.user,
                 req.session.config,
                 'Change Password',
@@ -142,12 +142,11 @@ export default function login(dataHandler: DataHandler): Router {
                 },
             ));
         }
-
     });
 
     router.get('/set', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
-        res.render('pass-change', getArguments(
+        res.status(200).render('pass-change', getArguments(
             req.session.user,
             req.session.config,
             'Set Password',

@@ -13,8 +13,7 @@ export default function api(dataHandler: DataHandler): Router {
 
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
-        res.status(200);
-        res.send(new Response(statuses.get(200), [], ['Server is up'], [], null));
+        res.status(200).send(new Response(statuses.get(200), [], ['Server is up'], [], null));
     });
 
     router.get('/tags', (req, res) => {
@@ -22,8 +21,7 @@ export default function api(dataHandler: DataHandler): Router {
         let search: string = <string>req.query.match;
         let page: string = <string>req.query.page;
         if (search == undefined) {
-            res.status(400);
-            res.send(new Response(statuses.get(400), [], ['invalid querry'], [], new SearchResults([], 0, 1, 1)));
+            res.status(400).send(new Response(statuses.get(400), [], ['invalid querry'], [], new SearchResults([], 0, 1, 1)));
         } else {
             if (page == undefined || Number.isNaN(+page)) {
                 page = '1';
@@ -33,11 +31,9 @@ export default function api(dataHandler: DataHandler): Router {
                 for (let i = 0; i < tags.results.length; i++) {
                     tagNames.push(tags.results[i].name);
                 }
-                res.status(200);
-                res.send(new Response(statuses.get(200), [], [], [], new SearchResults(tagNames, tags.total, +page, tags.pageCount)));
+                res.status(200).send(new Response(statuses.get(200), [], [], [], new SearchResults(tagNames, tags.total, +page, tags.pageCount)));
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], new SearchResults([], 0, 1, 1)));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], new SearchResults([], 0, 1, 1)));
             });
         }
     });
@@ -71,8 +67,7 @@ export default function api(dataHandler: DataHandler): Router {
                 resolve();
             }
         }).then(() => {
-            res.status(200);
-            res.send(new Response(statuses.get(200), [], ['Settings saved.'], [], null));
+            res.status(200).send(new Response(statuses.get(200), [], ['Settings saved.'], [], null));
         });
     });
 
@@ -92,12 +87,15 @@ export default function api(dataHandler: DataHandler): Router {
             bad: new HslColor(`${req.body.bdA}:${req.body.bdB}:${req.body.bdC}`),
             good: new HslColor(`${req.body.gdA}:${req.body.gdB}:${req.body.gdC}`),
         };
-        res.status(200);
-        res.send(new Response(statuses.get(200), [], [], [], getCssVars(config)));
+        res.status(200).send(new Response(statuses.get(200), [], [], [], getCssVars(config)));
     });
 
     router.use('/data', data(dataHandler));
     router.use('/admin', admin(dataHandler));
+
+    router.all('*', (req, res) => {
+        res.status(404).send(new Response(statuses.get(404), [], [], [], null));
+    });
 
     return router;
 }
@@ -117,8 +115,7 @@ function admin(dataHandler: DataHandler): Router {
         (req, res) => {
             res.setHeader('Content-Type', 'application/json');
             if (!req.session.user) {
-                res.status(400);
-                res.send(new Response(statuses.get(400), ['You are not logged in.'], [], [], null));
+                res.status(400).send(new Response(statuses.get(400), ['You are not logged in.'], [], [], null));
             } else {
                 let errorList = validationResult(req);
                 let errors: string[] = [];
@@ -150,8 +147,7 @@ function admin(dataHandler: DataHandler): Router {
                     errors.push(error.message);
                 }).then(message => {
                     if (message) {
-                        res.status(200);
-                        res.send(new Response(statuses.get(200), [], [message], [], true));
+                        res.status(200).send(new Response(statuses.get(200), [], [message], [], true));
                     }
                 }).finally(() => {
                     if (!errorList.isEmpty() || errors.length > 0) {
@@ -174,8 +170,7 @@ function admin(dataHandler: DataHandler): Router {
                                 }
                             }
                         });
-                        res.status(500);
-                        res.send(new Response(statuses.get(500), errors, [], [], null));
+                        res.status(500).send(new Response(statuses.get(500), errors, [], [], null));
                     }
                 });;
             }
@@ -229,8 +224,7 @@ function admin(dataHandler: DataHandler): Router {
                 errors.push(error.message);
             }).then(message => {
                 if (message) {
-                    res.status(200);
-                    res.send(new Response(statuses.get(200), [], [message], [], true));
+                    res.status(200).send(new Response(statuses.get(200), [], [message], [], true));
                 }
             }).finally(() => {
                 if (!errorList.isEmpty() || errors.length > 0) {
@@ -253,8 +247,7 @@ function admin(dataHandler: DataHandler): Router {
                             }
                         }
                     });
-                    res.status(500);
-                    res.send(new Response(statuses.get(500), errors, [], [], null));
+                    res.status(500).send(new Response(statuses.get(500), errors, [], [], null));
                 }
             });;
         });
@@ -271,8 +264,7 @@ function data(dataHandler: DataHandler): Router {
         async function (req, res) {
             res.setHeader('Content-Type', 'application/json');
             if (req.session.user == undefined || req.session.user.role == 0) {
-                res.status(401)
-                res.send(new Response(statuses.get(401), ['You are not permitted to create or edit items.'], [], [], null));
+                res.status(401).send(new Response(statuses.get(401), ['You are not permitted to create or edit items.'], [], [], null));
             } else {
                 let errorList = validationResult(req);
                 let errors: string[] = [];
@@ -331,8 +323,7 @@ function data(dataHandler: DataHandler): Router {
                         errors.push(error.message);
                     }).then(() => {
                         if (errors.length == 0) {
-                            res.status(200);
-                            res.send(new Response(statuses.get(200), [], [`Item ${word} successfully.`], [], true));
+                            res.status(200).send(new Response(statuses.get(200), [], [`Item ${word} successfully.`], [], true));
                         }
                     }, (error: Error) => {
                         errors.push(error.message);
@@ -345,8 +336,7 @@ function data(dataHandler: DataHandler): Router {
                                     }
                                 }
                             });
-                            res.status(500);
-                            res.send(new Response(statuses.get(500), errors, [], [], null));
+                            res.status(500).send(new Response(statuses.get(500), errors, [], [], null));
                         }
                     });
                 }
@@ -356,8 +346,7 @@ function data(dataHandler: DataHandler): Router {
     router.delete('/item', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.status(401)
-            res.send(new Response(statuses.get(401), ['You are not permitted to delete items.'], [], [], null));
+            res.status(401).send(new Response(statuses.get(401), ['You are not permitted to delete items.'], [], [], null));
         } else {
             let id: number = +<string>req.query.del;
             let failed = false;
@@ -365,16 +354,13 @@ function data(dataHandler: DataHandler): Router {
                 return dataHandler.deleteItem(item);
             }, (error: Error) => {
                 failed = true;
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             }).then(() => {
                 if (!failed) {
-                    res.status(200);
-                    res.send(new Response(statuses.get(200), [], ['Item deleted successfully'], [], true));
+                    res.status(200).send(new Response(statuses.get(200), [], ['Item deleted successfully'], [], true));
                 }
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             });;
         }
     });
@@ -385,8 +371,7 @@ function data(dataHandler: DataHandler): Router {
         function (req, res) {
             res.setHeader('Content-Type', 'application/json');
             if (req.session.user == undefined || req.session.user.role < 1) {
-                res.status(401)
-                res.send(new Response(statuses.get(401), ['You are not permitted to create or edit tags.'], [], [], null));
+                res.status(401).send(new Response(statuses.get(401), ['You are not permitted to create or edit tags.'], [], [], null));
             } else {
                 let errorList = validationResult(req);
                 let errors: string[] = [];
@@ -417,8 +402,7 @@ function data(dataHandler: DataHandler): Router {
                     errors.push(error.message);
                 }).then(() => {
                     if (errorList.isEmpty() && errors.length == 0) {
-                        res.status(200);
-                        res.send(new Response(statuses.get(200), [], [`Tag ${word} successfully.`], [], true));
+                        res.status(200).send(new Response(statuses.get(200), [], [`Tag ${word} successfully.`], [], true));
                     }
                 }, (error: Error) => {
                     errors.push(error.message);
@@ -431,8 +415,7 @@ function data(dataHandler: DataHandler): Router {
                                 }
                             }
                         });
-                        res.status(500);
-                        res.send(new Response(statuses.get(500), errors, [], [], null));
+                        res.status(500).send(new Response(statuses.get(500), errors, [], [], null));
                     }
                 });
             }
@@ -441,21 +424,17 @@ function data(dataHandler: DataHandler): Router {
     router.delete('/tag', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.status(401)
-            res.send(new Response(statuses.get(401), ['You are not permitted to delete tags.'], [], [], null));
+            res.status(401).send(new Response(statuses.get(401), ['You are not permitted to delete tags.'], [], [], null));
         } else {
             let name: string = <string>req.query.del;
             dataHandler.getTag(name).then(tag => {
                 return dataHandler.deleteTag(tag);
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             }).then(() => {
-                res.status(200);
-                res.send(new Response(statuses.get(200), [], ['Tag deleted successfully'], [], true));
+                res.status(200).send(new Response(statuses.get(200), [], ['Tag deleted successfully'], [], true));
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             });;
         }
     });
@@ -469,8 +448,7 @@ function data(dataHandler: DataHandler): Router {
         function (req, res) {
             res.setHeader('Content-Type', 'application/json');
             if (req.session.user == undefined || req.session.user.role < 2) {
-                res.status(401)
-                res.send(new Response(statuses.get(401), ['You are not permitted to create or edit tag types.'], [], [], null));
+                res.status(401).send(new Response(statuses.get(401), ['You are not permitted to create or edit tag types.'], [], [], null));
             } else {
                 let errorList = validationResult(req);
                 let errors: string[] = [];
@@ -494,8 +472,7 @@ function data(dataHandler: DataHandler): Router {
                         }
                     }
                 }).then(() => {
-                    res.status(200);
-                    res.send(new Response(statuses.get(200), [], [`Tag Type ${word} successfully.`], [], true));
+                    res.status(200).send(new Response(statuses.get(200), [], [`Tag Type ${word} successfully.`], [], true));
                 }, (error: Error) => {
                     errors.push(error.message);
                 }).finally(() => {
@@ -513,8 +490,7 @@ function data(dataHandler: DataHandler): Router {
                                 }
                             }
                         });
-                        res.status(500);
-                        res.send(new Response(statuses.get(500), errors, [], [], null));
+                        res.status(500).send(new Response(statuses.get(500), errors, [], [], null));
                     }
                 });
             }
@@ -523,21 +499,17 @@ function data(dataHandler: DataHandler): Router {
     router.delete('/tagType', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         if (req.session.user == undefined || req.session.user.role < 2) {
-            res.status(401)
-            res.send(new Response(statuses.get(401), ['You are not permitted to delete tag types.'], [], [], null));
+            res.status(401).send(new Response(statuses.get(401), ['You are not permitted to delete tag types.'], [], [], null));
         } else {
             let name: string = <string>req.query.del;
             dataHandler.getTagType(name).then(type => {
                 return dataHandler.deleteTagType(type);
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             }).then(() => {
-                res.status(200);
-                res.send(new Response(statuses.get(200), [], ['Tag type deleted successfully'], [], true));
+                res.status(200).send(new Response(statuses.get(200), [], ['Tag type deleted successfully'], [], true));
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             });;
         }
     });
@@ -549,8 +521,7 @@ function data(dataHandler: DataHandler): Router {
         function (req, res) {
             res.setHeader('Content-Type', 'application/json');
             if (!req.session.user || req.session.user.role < 2) {
-                res.status(401)
-                res.send(new Response(statuses.get(401), ['You are not permitted to create or edit users.'], [], [], null));
+                res.status(401).send(new Response(statuses.get(401), ['You are not permitted to create or edit users.'], [], [], null));
             } else {
                 let errorList = validationResult(req);
                 let errors: string[] = [];
@@ -590,8 +561,7 @@ function data(dataHandler: DataHandler): Router {
                     });
                 }, (error: Error) => errors.push(error.message)).then(() => {
                     if (errorList.isEmpty() && errors.length == 0) {
-                        res.status(200);
-                        res.send(new Response(statuses.get(200), [], [`User ${word} successfully.`], [], true));
+                        res.status(200).send(new Response(statuses.get(200), [], [`User ${word} successfully.`], [], true));
                     }
                 }, (error: Error) => {
                     errors.push(error.message);
@@ -606,8 +576,7 @@ function data(dataHandler: DataHandler): Router {
                                 }
                             }
                         });
-                        res.status(500);
-                        res.send(new Response(statuses.get(500), errors, [], [], null));
+                        res.status(500).send(new Response(statuses.get(500), errors, [], [], null));
                     }
                 });
             }
@@ -616,21 +585,17 @@ function data(dataHandler: DataHandler): Router {
     router.delete('/user', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         if (req.session.user == undefined || req.session.user.role < 2) {
-            res.status(401)
-            res.send(new Response(statuses.get(401), ['You are not permitted to delete users.'], [], [], null));
+            res.status(401).send(new Response(statuses.get(401), ['You are not permitted to delete users.'], [], [], null));
         } else {
             let username: string = <string>req.query.del;
             dataHandler.getUser(username).then(user => {
                 return dataHandler.deleteUser(user);
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             }).then(() => {
-                res.status(200);
-                res.send(new Response(statuses.get(200), [], ['User deleted successfully'], [], true));
+                res.status(200).send(new Response(statuses.get(200), [], ['User deleted successfully'], [], true));
             }, (error: Error) => {
-                res.status(500);
-                res.send(new Response(statuses.get(500), [error.message], [], [], null));
+                res.status(500).send(new Response(statuses.get(500), [error.message], [], [], null));
             });;
         }
     });
@@ -668,4 +633,5 @@ const statuses: Map<number, Status> = new Map();
 statuses.set(200, new Status(200, 'OK'));
 statuses.set(400, new Status(400, 'Bad Request'));
 statuses.set(401, new Status(401, 'Unauthorized'));
+statuses.set(404, new Status(404, 'Not Found'));
 statuses.set(500, new Status(500, 'Internal Server Error'));

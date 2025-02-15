@@ -14,12 +14,12 @@ import PGDB from "@dh/pgdb";
 import getArguments from "@utl/getArguments";
 
 import api from "@rt/api";
-import config from "@rt/config";
 import deleter from "@rt/delete";
 import item from "@rt/item";
 import login from "@rt/login";
 import post from "@rt/post";
 import search from "@rt/search";
+import settings from "@rt/settings";
 import tag from "@rt/tag";
 import userCenter from "@rt/userCenter";
 
@@ -164,7 +164,7 @@ new Promise<MainConfig>((resolve, reject) => {
 
         app.get('/', (req, res) => {
             res.setHeader('Content-Type', 'text/html');
-            res.render('index', getArguments(
+            res.status(200).render('index', getArguments(
                 req.session.user,
                 req.session.config,
                 'Home',
@@ -210,7 +210,26 @@ new Promise<MainConfig>((resolve, reject) => {
         app.use('/userCenter', userCenter(dataHandler));
         app.use('/login', login(dataHandler));
         app.use('/api', api(dataHandler));
-        app.use('/config', config(dataHandler));
+        app.use('/settings', settings(dataHandler));
+
+        app.all('*', (req, res) => {
+            res.setHeader('Content-Type', 'text/html');
+            res.status(404).render('index', getArguments(
+                req.session.user,
+                req.session.config,
+                'Home',
+                0,
+                `The page you're looking for may not exit.`,
+                '',
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
+                {}
+            ))
+        });
 
         if (httpEnabled) {
             let httpServ = http.createServer(app);

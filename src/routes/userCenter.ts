@@ -9,7 +9,7 @@ export default function userCenter(dataHandler: DataHandler): Router {
     router.get('/', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.render('layout', getArguments(
+            res.status(401).render('layout', getArguments(
                 req.session.user,
                 req.session.config,
                 'User Center',
@@ -35,10 +35,10 @@ export default function userCenter(dataHandler: DataHandler): Router {
                 page = '1';
             }
             dataHandler.searchUsers(search, dataHandler.getPageLimit(), +page).then(results => {
-                res.render('user', getArguments(
+                res.status(200).render('user', getArguments(
                     req.session.user,
                     req.session.config,
-                    'Manage Center',
+                    'User Center',
                     4,
                     `${results.total} result(s) matching "${search}"`,
                     '',

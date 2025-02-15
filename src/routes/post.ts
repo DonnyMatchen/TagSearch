@@ -16,7 +16,7 @@ export default function post(dataHandler: DataHandler): Router {
     router.get("/item", function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.render("create-edit", getArguments(
+            res.status(401).render("create-edit", getArguments(
                 req.session.user,
                 req.session.config,
                 'New Item',
@@ -36,11 +36,11 @@ export default function post(dataHandler: DataHandler): Router {
             if (req.query.edit == null) {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'item', false
-                ).then(args => res.render("create-edit", args));
+                ).then(args => res.status(200).render("create-edit", args));
             } else {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'item', true
-                ).then(args => res.render("create-edit", args));
+                ).then(args => res.status(200).render("create-edit", args));
             }
         }
     });
@@ -48,7 +48,7 @@ export default function post(dataHandler: DataHandler): Router {
     router.get('/tag', function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role < 1) {
-            res.render('create-edit', getArguments(
+            res.status(401).render('create-edit', getArguments(
                 req.session.user,
                 req.session.config,
                 'New Tag',
@@ -68,11 +68,11 @@ export default function post(dataHandler: DataHandler): Router {
             if (req.query.edit == null) {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'tag', false
-                ).then(args => res.render("create-edit", args));
+                ).then(args => res.status(200).render("create-edit", args));
             } else {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'tag', true
-                ).then(args => res.render("create-edit", args));
+                ).then(args => res.status(200).render("create-edit", args));
             }
         }
     });
@@ -80,7 +80,7 @@ export default function post(dataHandler: DataHandler): Router {
     router.get("/tagType", function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role == 0) {
-            res.render('create-edit', getArguments(
+            res.status(401).render('create-edit', getArguments(
                 req.session.user,
                 req.session.config,
                 'New Tag',
@@ -100,11 +100,11 @@ export default function post(dataHandler: DataHandler): Router {
             if (req.query.edit == null) {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'tagType', false
-                ).then(args => res.render('create-edit', args));
+                ).then(args => res.status(200).render('create-edit', args));
             } else {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'tagType', true
-                ).then(args => res.render('create-edit', args));
+                ).then(args => res.status(200).render('create-edit', args));
             }
         }
     });
@@ -112,7 +112,7 @@ export default function post(dataHandler: DataHandler): Router {
     router.get("/user", function (req, res) {
         res.setHeader('Content-Type', 'text/html');
         if (req.session.user == undefined || req.session.user.role < Role.Admin) {
-            res.render("create-edit", getArguments(
+            res.status(401).render("create-edit", getArguments(
                 req.session.user,
                 req.session.config,
                 'New User',
@@ -132,11 +132,11 @@ export default function post(dataHandler: DataHandler): Router {
             if (req.query.edit == null) {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'user', false
-                ).then(args => res.render('create-edit', args));
+                ).then(args => res.status(200).render('create-edit', args));
             } else {
                 getArgumentsSimply(
                     dataHandler, req.session.user, req.session.config, req.query, req.body, 'user', true
-                ).then(args => res.render('create-edit', args));
+                ).then(args => res.status(200).render('create-edit', args));
             }
         }
     });

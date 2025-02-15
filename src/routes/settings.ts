@@ -5,13 +5,13 @@ import { PersonalConfig, User } from "@da/user";
 import DataHandler from "@dh/dataHandler";
 import getArguments from "@utl/getArguments";
 
-export default function config(dataHandler: DataHandler): Router {
+export default function settings(dataHandler: DataHandler): Router {
     const router: Router = express.Router();
 
     router.get('/', (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         let config = req.session.user ? req.session.user.config : req.session.config ? req.session.config : User.getDefaultConfig();
-        res.render('settings', getArgumentsSimply(req.session.user, new PersonalConfig(config)));
+        res.status(200).render('settings', getArgumentsSimply(req.session.user, new PersonalConfig(config)));
     });
 
     return router;

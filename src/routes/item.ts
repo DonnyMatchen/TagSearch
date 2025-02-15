@@ -31,7 +31,7 @@ export default function item(dataHandler: DataHandler): Router {
                     types.sort((a: TagType, b: TagType) => {
                         return a.order - b.order;
                     });
-                    res.render('item', getArguments(
+                    res.status(200).render('item', getArguments(
                         req.session.user,
                         req.session.config,
                         'Item',
@@ -53,7 +53,7 @@ export default function item(dataHandler: DataHandler): Router {
                     ));
                 });
             } else {
-                res.render('item', getArguments(
+                res.status(401).render('item', getArguments(
                     req.session.user,
                     req.session.config,
                     'Item',
@@ -71,7 +71,7 @@ export default function item(dataHandler: DataHandler): Router {
                 ));
             }
         }, (error: Error) => {
-            res.render('item', getArguments(
+            res.status(200).render('item', getArguments(
                 req.session.user,
                 req.session.config,
                 'Item',
