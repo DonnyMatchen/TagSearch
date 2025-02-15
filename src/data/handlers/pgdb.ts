@@ -2,12 +2,13 @@ import fs from 'fs';
 import path from "path";
 import { Pool, PoolClient } from 'pg';
 
+import { DBConfig } from '@da/config';
 import { getRandomHexString, getRandomString } from '@da/data';
-import DataHandler from '@dh/dataHandler';
 import { Item } from '@da/item';
 import { SearchResults } from '@da/search';
 import { Tag, TagType } from '@da/tag';
 import { Role, User } from '@da/user';
+import DataHandler from '@dh/dataHandler';
 
 export default class PGDB extends DataHandler {
     private pool: Pool;
@@ -797,12 +798,4 @@ export default class PGDB extends DataHandler {
             return safe;
         }
     }
-}
-
-export class DBConfig {
-    username: string;
-    password: string;
-    host: string;
-    port: number;
-    database: string;
 }

@@ -7,9 +7,10 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
+import { DBConfig, MainConfig } from "@da/config";
 import { PersonalConfig, User } from "@da/user";
 import DataHandler from "@dh/dataHandler";
-import PGDB, { DBConfig } from "@dh/pgdb";
+import PGDB from "@dh/pgdb";
 import getArguments from "@utl/getArguments";
 
 import api from "@rt/api";
@@ -42,41 +43,81 @@ app.use(fileUpload({
     tempFileDir: '/tmp/tag-search/'
 }));
 
-let httpEnabled: boolean = true;
-let httpsEnabled: boolean = true;
-let httpPort: number = 80;
-let httpsPort: number = 443;
-let tlsKey: string = 'server.key';
-let tlsCert: string = 'server.pem';
-let secret: string = 'CHANGE ME!';
-
+//variables that are used in multiple sections of the .then chain
+let httpEnabled: boolean;
+let httpsEnabled: boolean;
+let httpPort: number;
+let httpsPort: number;
+let tlsKey: string;
+let tlsCert: string;
+let secret: string;
 let dataHandler: DataHandler;
 
-new Promise<any>((resolve, reject) => {
+let def = MainConfig.getDefaultConfig();
+let db = DBConfig.getDefaultConfig();
+
+new Promise<MainConfig>((resolve, reject) => {
     fs.readFile(path.join(__dirname, '..', 'config', 'main.json'), 'utf-8', (error, data) => {
         if (error) {
-            reject(error);
+            if (error.message.includes('no such file or directory')) {
+                fs.writeFile(path.join(__dirname, '..', 'config', 'main.json'), JSON.stringify(def), (error) => {
+                    resolve(def);
+                });
+            } else {
+                reject(error);
+            }
         } else {
             resolve(JSON.parse(data));
         }
     });
 }).then(cfg => {
-    httpEnabled = cfg.http.enabled;;
-    if (httpEnabled) {
-        httpPort = cfg.http.port;
+    if (cfg.http) {
+        httpEnabled = cfg.http.enabled;;
+        if (httpEnabled) {
+            httpPort = cfg.http.port;
+        }
+    } else {
+        httpEnabled = def.http.enabled;;
+        if (httpEnabled) {
+            httpPort = def.http.port;
+        }
     }
-    httpsEnabled = cfg.https.enabled;;
-    if (httpsEnabled) {
-        httpsPort = cfg.https.port;
-        tlsKey = cfg.https.tls.key;
-        tlsCert = cfg.https.tls.cert;
+
+    if (cfg.https) {
+        httpsEnabled = cfg.https.enabled;;
+        if (httpsEnabled) {
+            httpsPort = cfg.https.port;
+            tlsKey = cfg.https.tls.key;
+            tlsCert = cfg.https.tls.cert;
+        }
+    } else {
+        httpsEnabled = def.https.enabled;;
+        if (httpsEnabled) {
+            httpsPort = def.https.port;
+            tlsKey = def.https.tls.key;
+            tlsCert = def.https.tls.cert;
+        }
     }
-    secret = cfg.session.secret;
+
+    if (cfg.session) {
+        secret = cfg.session.secret;
+    } else {
+        secret = def.session.secret;
+    }
+    if (secret == 'CHANGE THIS ASAP!') {
+        console.log(`[Server:Main] You need to change your session secret asap.`);
+    }
 }).then(() => {
     return new Promise<DBConfig>((resolve, reject) => {
         fs.readFile(path.join(__dirname, '..', 'config', 'db.json'), 'utf-8', (error, data) => {
             if (error) {
-                reject(error);
+                if (error.message.includes('no such file or directory')) {
+                    fs.writeFile(path.join(__dirname, '..', 'config', 'db.json'), JSON.stringify(db), (error) => {
+                        resolve(db);
+                    });
+                } else {
+                    reject(error);
+                }
             } else {
                 resolve(JSON.parse(data));
             }
