@@ -52,6 +52,7 @@ let tlsKey: string;
 let tlsCert: string;
 let secret: string;
 let dataHandler: DataHandler;
+let initialized: boolean = false;
 
 let def = MainConfig.getDefaultConfig();
 let db = DBConfig.getDefaultConfig();
@@ -61,10 +62,16 @@ new Promise<MainConfig>((resolve, reject) => {
         if (error) {
             if (error.message.includes('no such file or directory')) {
                 fs.writeFile(path.join(__dirname, '..', 'config', 'main.json'), JSON.stringify(def), (error) => {
-                    resolve(def);
+                    if (error) {
+                        console.log(`[Server:Main] Failed to save default main config because: ${error.message}`);
+                    } else {
+                        console.log(`[Server:Main] The default main config was written to ${path.join(__dirname, '..', 'config', 'main.json')}`);
+                    }
                 });
+                resolve(def);
             } else {
-                reject(error);
+                console.log(`[Server:Main] Using default main config because the config file could not be loaded, because: ${error.message}`);
+                resolve(def);
             }
         } else {
             resolve(JSON.parse(data));
@@ -113,10 +120,16 @@ new Promise<MainConfig>((resolve, reject) => {
             if (error) {
                 if (error.message.includes('no such file or directory')) {
                     fs.writeFile(path.join(__dirname, '..', 'config', 'db.json'), JSON.stringify(db), (error) => {
-                        resolve(db);
+                        if (error) {
+                            console.log(`[Server:Main] Failed to save default db config because: ${error.message}`);
+                        } else {
+                            console.log(`[Server:Main] The default db config was written to ${path.join(__dirname, '..', 'config', 'db.json')}`);
+                        }
                     });
+                    resolve(db);
                 } else {
-                    reject(error);
+                    console.log(`[Server:Main] Using default db config because the config file could not be loaded, because: ${error.message}`);
+                    resolve(db);
                 }
             } else {
                 resolve(JSON.parse(data));
@@ -127,114 +140,123 @@ new Promise<MainConfig>((resolve, reject) => {
     dataHandler = new PGDB(cfg);
     return dataHandler.init();
 }).then(() => {
+    initialized = true;
     return dataHandler.ensureAdmin();;
+}, (error: Error) => {
+    console.log(`[Server:Main] Unable to initialize the PGDB link because: ${error.message}`);
 }).then(() => {
-    return dataHandler.ensureDefaultType();
+    if (initialized) {
+        return dataHandler.ensureDefaultType();
+    }
 }).then(() => {
-    app.use(session({
-        secret: secret,
-        resave: false,
-        saveUninitialized: true,
-        genid: function (req) {
-            return dataHandler.generateSessionID();
+    if (initialized) {
+        app.use(session({
+            secret: secret,
+            resave: false,
+            saveUninitialized: true,
+            genid: function (req) {
+                return dataHandler.generateSessionID();
+            }
+        }));
+        if (secret == 'You should set a session secret.') {
+            console.log(`[Server:Main] ${secret}`);
         }
-    }));
-    if (secret == 'You should set a session secret.') {
-        console.log(`[Server:Main] ${secret}`);
-    }
 
-    app.get('/', (req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        res.render('index', getArguments(
-            req.session.user,
-            req.session.config,
-            'Home',
-            0,
-            'Yes, the site is working.',
-            '',
-            {
-                active: false,
-                pageURL: '',
-                pageCount: 0,
-                pageNumber: 0
-            },
-            {}
-        ))
-    });
-
-    app.get('/logout', (req, res) => {
-        req.session.user = undefined;
-        res.redirect('/search');
-    });
-
-    app.get('/test', (req, res) => {
-        res.setHeader('Content-Type', 'text/html');
-        res.sendFile(path.join(__dirname, 'test.html'));
-    });
-    app.post('/test', (req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        let o = {
-            'body': req.body,
-            'files': req.files,
-        };
-        console.log(JSON.stringify(o));
-        res.send(o);
-    });
-
-    app.use(express.static(path.join(__dirname, "public")));
-
-    app.use("/search", search(dataHandler));
-    app.use("/item", item(dataHandler));
-    app.use("/tag", tag(dataHandler));
-    app.use("/post", post(dataHandler));
-    app.use("/delete", deleter());
-    app.use('/userCenter', userCenter(dataHandler));
-    app.use('/login', login(dataHandler));
-    app.use('/api', api(dataHandler));
-    app.use('/config', config(dataHandler));
-
-    if (httpEnabled) {
-        let httpServ = http.createServer(app);
-        httpServ.listen(httpPort, () => {
-            console.log(`[Server:Main] HTTP Server is running at http://localhost:${httpPort}`);
+        app.get('/', (req, res) => {
+            res.setHeader('Content-Type', 'text/html');
+            res.render('index', getArguments(
+                req.session.user,
+                req.session.config,
+                'Home',
+                0,
+                'Yes, the site is working.',
+                '',
+                {
+                    active: false,
+                    pageURL: '',
+                    pageCount: 0,
+                    pageNumber: 0
+                },
+                {}
+            ))
         });
-    }
 
-    if (httpsEnabled) {
-        let cred = { key: '', cert: '' };
-        new Promise<string>((resolve, reject) => {
-            fs.readFile(path.join(__dirname, 'tlsCert', tlsKey), 'utf8', (error, data) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(data);
-                }
+        app.get('/logout', (req, res) => {
+            req.session.user = undefined;
+            res.redirect('/search');
+        });
+
+        app.get('/test', (req, res) => {
+            res.setHeader('Content-Type', 'text/html');
+            res.sendFile(path.join(__dirname, 'test.html'));
+        });
+        app.post('/test', (req, res) => {
+            res.setHeader('Content-Type', 'application/json');
+            let o = {
+                'body': req.body,
+                'files': req.files,
+            };
+            console.log(JSON.stringify(o));
+            res.send(o);
+        });
+
+        app.use(express.static(path.join(__dirname, "public")));
+
+        app.use("/search", search(dataHandler));
+        app.use("/item", item(dataHandler));
+        app.use("/tag", tag(dataHandler));
+        app.use("/post", post(dataHandler));
+        app.use("/delete", deleter());
+        app.use('/userCenter', userCenter(dataHandler));
+        app.use('/login', login(dataHandler));
+        app.use('/api', api(dataHandler));
+        app.use('/config', config(dataHandler));
+
+        if (httpEnabled) {
+            let httpServ = http.createServer(app);
+            httpServ.listen(httpPort, () => {
+                console.log(`[Server:Main] HTTP Server is running at http://localhost:${httpPort}`);
             });
-        }).then(key => {
-            cred.key = key;
-            return new Promise<string>((resolve, reject) => {
-                fs.readFile(path.join(__dirname, 'tlsCert', tlsCert), 'utf8', (error, data) => {
+        }
+
+        if (httpsEnabled) {
+            let cred = { key: '', cert: '' };
+            new Promise<string>((resolve, reject) => {
+                fs.readFile(path.join(__dirname, 'tlsCert', tlsKey), 'utf8', (error, data) => {
                     if (error) {
                         reject(error);
                     } else {
                         resolve(data);
                     }
                 });
-            });
-        }, (error: Error) => {
-            console.log(`[Server:Main] Unable to load TLS key because: ${error.message}`);
-        }).then(cert => {
-            if (cert) {
-                cred.cert = cert;
-                if (cred.key && cred.cert) {
-                    let httpsServ = https.createServer(cred, app);
-                    httpsServ.listen(httpsPort, () => {
-                        console.log(`[Server:Main] HTTPS Server is running at https://localhost:${httpsPort}`);
+            }).then(key => {
+                cred.key = key;
+                return new Promise<string>((resolve, reject) => {
+                    fs.readFile(path.join(__dirname, 'tlsCert', tlsCert), 'utf8', (error, data) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(data);
+                        }
                     });
+                });
+            }, (error: Error) => {
+                console.log(`[Server:Main] Unable to load TLS key because: ${error.message}`);
+            }).then(cert => {
+                if (cert) {
+                    cred.cert = cert;
+                    if (cred.key && cred.cert) {
+                        let httpsServ = https.createServer(cred, app);
+                        httpsServ.listen(httpsPort, () => {
+                            console.log(`[Server:Main] HTTPS Server is running at https://localhost:${httpsPort}`);
+                        });
+                    }
                 }
-            }
-        }, (error: Error) => {
-            console.log(`[Server:Main] Unable to load TLS cert because: ${error.message}`);
-        });
+            }, (error: Error) => {
+                console.log(`[Server:Main] Unable to load TLS cert because: ${error.message}`);
+            });
+        }
+    } else {
+        console.log(`[Server:Main] The server could not start because the data handler was not initialized.`);
     }
 });

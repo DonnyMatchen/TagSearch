@@ -1,6 +1,6 @@
 {
   "name": "tag-search",
-  "version": "0.2.71L",
+  "version": "0.2.72L",
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist/",
