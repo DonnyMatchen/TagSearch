@@ -2,6 +2,8 @@ import { Item } from "@da/item";
 import { SearchResults } from "@da/search";
 import { Tag, TagType } from "@da/tag";
 import { Role, User } from "@da/user";
+import { LogMetaData } from "@utl/logHandler";
+import { Logger } from "winston";
 
 class Diff {
     added: string[] = [];
@@ -9,6 +11,12 @@ class Diff {
 }
 
 export default abstract class DataHandler {
+    logHandler: Logger;
+
+    constructor(logHandler: Logger) {
+        this.logHandler = logHandler;
+    }
+
     /**
      * This is for initializing data connections
      */
@@ -291,7 +299,7 @@ export default abstract class DataHandler {
                     admin.setPassword('', 'toor').then(() => {
                         return this.addUser(admin);
                     }, error => reject(error)).then(() => {
-                        console.log(`[Server:DB] Default admin account created.  Change the password ASAP`)
+                        this.logHandler.warn('Default admin account created.  Change the password ASAP', new LogMetaData('db'));
                         resolve();
                     }, error => reject(error));
                 }

@@ -12,11 +12,15 @@ export class HTTPSConfig extends HTTPConfig {
 export class SessionConfig {
     secret: string;
 }
+export class LogConfig {
+    level: string;
+}
 
 export class MainConfig {
     http: HTTPConfig;
     https: HTTPSConfig;
     session: SessionConfig;
+    logging: LogConfig;
 
     static getDefaultConfig(): MainConfig {
         return {
@@ -34,6 +38,9 @@ export class MainConfig {
             },
             session: {
                 secret: 'CHANGE THIS ASAP!'
+            },
+            logging: {
+                level: 'info'
             }
         };
     }

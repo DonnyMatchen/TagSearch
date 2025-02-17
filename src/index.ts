@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import fileUpload from 'express-fileupload';
 import session from 'express-session';
@@ -12,6 +13,7 @@ import { PersonalConfig, User } from "@da/user";
 import DataHandler from "@dh/dataHandler";
 import PGDB from "@dh/pgdb";
 import getArguments from "@utl/getArguments";
+import logHandler, { getLogConfig, LogMetaData } from '@utl/logHandler';
 
 import api from "@rt/api";
 import deleter from "@rt/delete";
@@ -29,6 +31,8 @@ declare module "express-session" {
         config: PersonalConfig;
     }
 }
+
+dotenv.config();
 
 const app: Express = express();
 
@@ -63,14 +67,14 @@ new Promise<MainConfig>((resolve, reject) => {
             if (error.message.includes('no such file or directory')) {
                 fs.writeFile(path.join(__dirname, '..', 'config', 'main.json'), JSON.stringify(def), (error) => {
                     if (error) {
-                        console.log(`[Server:Main] Failed to save default main config because: ${error.message}`);
+                        logHandler.error('Failed to save default main config', new LogMetaData('main', error));
                     } else {
-                        console.log(`[Server:Main] The default main config was written to ${path.join(__dirname, '..', 'config', 'main.json')}`);
+                        logHandler.info(`The default main config was written to ${path.join(__dirname, '..', 'config', 'main.json')}`, new LogMetaData('main'));
                     }
                 });
                 resolve(def);
             } else {
-                console.log(`[Server:Main] Using default main config because the config file could not be loaded, because: ${error.message}`);
+                logHandler.error(`Using default main config because the config file could not be loaded`, new LogMetaData('main', error));
                 resolve(def);
             }
         } else {
@@ -112,7 +116,13 @@ new Promise<MainConfig>((resolve, reject) => {
         secret = def.session.secret;
     }
     if (secret == 'CHANGE THIS ASAP!') {
-        console.log(`[Server:Main] You need to change your session secret asap.`);
+        logHandler.warn(`You need to change your session secret.`, new LogMetaData('main'));
+    }
+
+    if (cfg.logging) {
+        logHandler.configure(getLogConfig(cfg.logging.level));
+    } else {
+        logHandler.configure(getLogConfig(def.logging.level));
     }
 }).then(() => {
     return new Promise<DBConfig>((resolve, reject) => {
@@ -121,14 +131,14 @@ new Promise<MainConfig>((resolve, reject) => {
                 if (error.message.includes('no such file or directory')) {
                     fs.writeFile(path.join(__dirname, '..', 'config', 'db.json'), JSON.stringify(db), (error) => {
                         if (error) {
-                            console.log(`[Server:Main] Failed to save default db config because: ${error.message}`);
+                            logHandler.error('Failed to save default db config', new LogMetaData('main', error));
                         } else {
-                            console.log(`[Server:Main] The default db config was written to ${path.join(__dirname, '..', 'config', 'db.json')}`);
+                            logHandler.info(`The default db config was written to ${path.join(__dirname, '..', 'config', 'db.json')}`, new LogMetaData('main'));
                         }
                     });
                     resolve(db);
                 } else {
-                    console.log(`[Server:Main] Using default db config because the config file could not be loaded, because: ${error.message}`);
+                    logHandler.error(`Using default db config because the config file could not be loaded`, new LogMetaData('main', error));
                     resolve(db);
                 }
             } else {
@@ -137,13 +147,13 @@ new Promise<MainConfig>((resolve, reject) => {
         });
     });
 }).then(cfg => {
-    dataHandler = new PGDB(cfg);
+    dataHandler = new PGDB(logHandler, cfg);
     return dataHandler.init();
 }).then(() => {
     initialized = true;
     return dataHandler.ensureAdmin();;
 }, (error: Error) => {
-    console.log(`[Server:Main] Unable to initialize the PGDB link because: ${error.message}`);
+    logHandler.error(`Unable to initialize the PGDB link`, new LogMetaData('main', error));
 }).then(() => {
     if (initialized) {
         return dataHandler.ensureDefaultType();
@@ -158,13 +168,9 @@ new Promise<MainConfig>((resolve, reject) => {
                 return dataHandler.generateSessionID();
             }
         }));
-        if (secret == 'You should set a session secret.') {
-            console.log(`[Server:Main] ${secret}`);
-        }
 
         app.get('/', (req, res) => {
-            res.setHeader('Content-Type', 'text/html');
-            res.status(200).render('index', getArguments(
+            res.setHeader('Content-Type', 'text/html').status(200).render('index', getArguments(
                 req.session.user,
                 req.session.config,
                 'Home',
@@ -178,7 +184,7 @@ new Promise<MainConfig>((resolve, reject) => {
                     pageNumber: 0
                 },
                 {}
-            ))
+            ));
         });
 
         app.get('/logout', (req, res) => {
@@ -187,17 +193,15 @@ new Promise<MainConfig>((resolve, reject) => {
         });
 
         app.get('/test', (req, res) => {
-            res.setHeader('Content-Type', 'text/html');
-            res.sendFile(path.join(__dirname, 'test.html'));
+            res.setHeader('Content-Type', 'text/html').status(200).sendFile(path.join(__dirname, 'test.html'));
         });
         app.post('/test', (req, res) => {
-            res.setHeader('Content-Type', 'application/json');
             let o = {
                 'body': req.body,
                 'files': req.files,
             };
-            console.log(JSON.stringify(o));
-            res.send(o);
+            logHandler.verbose(JSON.stringify(o), new LogMetaData('main'));
+            res.setHeader('Content-Type', 'application/json').status(200).send(o);
         });
 
         app.use(express.static(path.join(__dirname, "public")));
@@ -208,13 +212,12 @@ new Promise<MainConfig>((resolve, reject) => {
         app.use("/post", post(dataHandler));
         app.use("/delete", deleter());
         app.use('/userCenter', userCenter(dataHandler));
-        app.use('/login', login(dataHandler));
-        app.use('/api', api(dataHandler));
+        app.use('/login', login(dataHandler, logHandler));
+        app.use('/api', api(dataHandler, logHandler));
         app.use('/settings', settings(dataHandler));
 
         app.all('*', (req, res) => {
-            res.setHeader('Content-Type', 'text/html');
-            res.status(404).render('index', getArguments(
+            res.setHeader('Content-Type', 'text/html').status(404).render('index', getArguments(
                 req.session.user,
                 req.session.config,
                 'Home',
@@ -234,14 +237,14 @@ new Promise<MainConfig>((resolve, reject) => {
         if (httpEnabled) {
             let httpServ = http.createServer(app);
             httpServ.listen(httpPort, () => {
-                console.log(`[Server:Main] HTTP Server is running at http://localhost:${httpPort}`);
+                logHandler.info(`HTTP Server is running at http://localhost:${httpPort}`, new LogMetaData('main'));
             });
         }
 
         if (httpsEnabled) {
             let cred = { key: '', cert: '' };
             new Promise<string>((resolve, reject) => {
-                fs.readFile(path.join(__dirname, 'tlsCert', tlsKey), 'utf8', (error, data) => {
+                fs.readFile(path.join(__dirname, '..', 'tlsCert', tlsKey), 'utf8', (error, data) => {
                     if (error) {
                         reject(error);
                     } else {
@@ -251,7 +254,7 @@ new Promise<MainConfig>((resolve, reject) => {
             }).then(key => {
                 cred.key = key;
                 return new Promise<string>((resolve, reject) => {
-                    fs.readFile(path.join(__dirname, 'tlsCert', tlsCert), 'utf8', (error, data) => {
+                    fs.readFile(path.join(__dirname, '..', 'tlsCert', tlsCert), 'utf8', (error, data) => {
                         if (error) {
                             reject(error);
                         } else {
@@ -260,22 +263,22 @@ new Promise<MainConfig>((resolve, reject) => {
                     });
                 });
             }, (error: Error) => {
-                console.log(`[Server:Main] Unable to load TLS key because: ${error.message}`);
+                logHandler.error(`Unable to load TLS key`, new LogMetaData('main', error));
             }).then(cert => {
                 if (cert) {
                     cred.cert = cert;
                     if (cred.key && cred.cert) {
                         let httpsServ = https.createServer(cred, app);
                         httpsServ.listen(httpsPort, () => {
-                            console.log(`[Server:Main] HTTPS Server is running at https://localhost:${httpsPort}`);
+                            logHandler.info(`HTTPS server is running at https://localhost:${httpsPort}`, new LogMetaData('main'));
                         });
                     }
                 }
             }, (error: Error) => {
-                console.log(`[Server:Main] Unable to load TLS cert because: ${error.message}`);
+                logHandler.error(`Unable to load TLS cert`, new LogMetaData('main', error));
             });
         }
     } else {
-        console.log(`[Server:Main] The server could not start because the data handler was not initialized.`);
+        logHandler.error(`The server could not start because the data handler was not initialized`, new LogMetaData('main'));
     }
 });

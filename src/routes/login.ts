@@ -1,11 +1,13 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
+import { Logger } from "winston";
 
 import { User, UserState } from "@da/user";
 import DataHandler from "@dh/dataHandler";
 import getArguments from "@utl/getArguments";
+import { LogMetaData } from "@utl/logHandler";
 
-export default function login(dataHandler: DataHandler): Router {
+export default function login(dataHandler: DataHandler, logHandler: Logger): Router {
     const router: Router = express.Router();
 
     router.get('/', (req, res) => {
@@ -69,6 +71,7 @@ export default function login(dataHandler: DataHandler): Router {
                 return false;
             }).then(check => {
                 if (check) {
+                    logHandler.info(`Login for ${user.username} from host ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}`, new LogMetaData('login'));
                     req.session.user = user;
                     req.session.config = user.config;
                     if (user.state == UserState.Set) {
@@ -99,9 +102,6 @@ export default function login(dataHandler: DataHandler): Router {
                     ));
                 }
             });
-
-
-
         });
 
     router.get('/change', (req, res) => {

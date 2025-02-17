@@ -1,7 +1,11 @@
 /.env
-/config
-/dist
-/node_modules
+
+/config/*
+/dist/
+/logs/*
+/node_modules/
+/tlsCert/*
+
 /src/test.html
-/src/public/items
-/src/tlsCert
+
+/src/public/items/*

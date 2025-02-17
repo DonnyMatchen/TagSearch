@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import { body, validationResult } from 'express-validator';
+import { Logger } from "winston";
 
 import { getCssVars, HslColor, lumFromString } from "@da/color";
 import { getItemType, Item } from "@da/item";
@@ -7,13 +8,13 @@ import { SearchResults } from "@da/search";
 import { Tag, TagType } from "@da/tag";
 import { PersonalConfig, roleFromString, User, UserState } from "@da/user";
 import DataHandler from "@dh/dataHandler";
+import { LogMetaData } from "@utl/logHandler";
 
-export default function api(dataHandler: DataHandler): Router {
+export default function api(dataHandler: DataHandler, logHandler: Logger): Router {
     const router: Router = express.Router();
 
     router.get('/', (req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(new Response(statuses.get(200), [], ['Server is up'], [], null));
+        res.setHeader('Content-Type', 'application/json').status(200).send(new Response(statuses.get(200), [], ['Server is up'], [], null));
     });
 
     router.get('/tags', (req, res) => {
@@ -91,7 +92,7 @@ export default function api(dataHandler: DataHandler): Router {
     });
 
     router.use('/data', data(dataHandler));
-    router.use('/admin', admin(dataHandler));
+    router.use('/admin', admin(dataHandler, logHandler));
 
     router.all('*', (req, res) => {
         res.status(404).send(new Response(statuses.get(404), [], [], [], null));
@@ -100,7 +101,7 @@ export default function api(dataHandler: DataHandler): Router {
     return router;
 }
 
-function admin(dataHandler: DataHandler): Router {
+function admin(dataHandler: DataHandler, logHandler: Logger): Router {
     const router: Router = express.Router();
 
     router.put('/passChange',
@@ -134,6 +135,7 @@ function admin(dataHandler: DataHandler): Router {
                                 errors.push(error.message);
                                 reject();
                             }).then(() => {
+                                logHandler.info(`Password change for ${user.username} from host ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}`, new LogMetaData('api.admin'));
                                 resolve('Password chagned successfully!');
                             }, (error: Error) => {
                                 errors.push(error.message);
@@ -205,6 +207,7 @@ function admin(dataHandler: DataHandler): Router {
                                     errors.push(error.message);
                                     reject();
                                 }).then(() => {
+                                    logHandler.info(`Password set for ${user.username} from host ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}`, new LogMetaData('api.admin'));
                                     resolve('Password Set successfully!');
                                 }, (error: Error) => {
                                     errors.push(error.message);

@@ -9,13 +9,15 @@ import { SearchResults } from '@da/search';
 import { Tag, TagType } from '@da/tag';
 import { Role, User } from '@da/user';
 import DataHandler from '@dh/dataHandler';
+import { LogMetaData } from '@utl/logHandler';
+import { Logger } from 'winston';
 
 export default class PGDB extends DataHandler {
     private pool: Pool;
     public client: PoolClient;
 
-    constructor(config: DBConfig) {
-        super();
+    constructor(logHandler: Logger, config: DBConfig) {
+        super(logHandler);
         this.pool = new Pool({
             user: config.username,
             password: config.password,
@@ -32,7 +34,7 @@ export default class PGDB extends DataHandler {
                     this.client = client;
                     resolve1();
                 }, (error: Error) => {
-                    console.log(`[Server:DB]: Failed to connect: ${error.message}`);
+                    this.logHandler.error('Failed to connect to the postgres database', new LogMetaData('pgdb', error));
                     reject(error);
                 });
             }).then(() => this.client.query(`SELECT * FROM items LIMIT 1`)).then(null, (error: Error) => {
@@ -48,7 +50,7 @@ export default class PGDB extends DataHandler {
                         fp TEXT
                     )`);
                 } else {
-                    console.log(`[Server:DB] Failed to query: ${error.message}`);
+                    this.logHandler.error('Failed to query items', new LogMetaData('pgdb', error));
                     reject(error);
                 }
             }).then(() => this.client.query(`SELECT * FROM tags LIMIT 1`)).then(null, (error: Error) => {
@@ -61,7 +63,7 @@ export default class PGDB extends DataHandler {
                         refs TEXT
                     )`);
                 } else {
-                    console.log(`[Server:DB] Failed to query: ${error.message}`);
+                    this.logHandler.error('Failed to query tags', new LogMetaData('pgdb', error));
                     reject(error);
                 }
             }).then(() => this.client.query(`SELECT * FROM tag_types LIMIT 1`)).then(null, (error: Error) => {
@@ -72,7 +74,7 @@ export default class PGDB extends DataHandler {
                         ordr INT
                     )`);
                 } else {
-                    console.log(`[Server:DB] Failed to query: ${error.message}`);
+                    this.logHandler.error('Failed to query tag_types', new LogMetaData('pgdb', error));
                     reject(error);
                 }
             }).then(() => this.client.query(`SELECT * FROM users LIMIT 1`)).then(() => resolve(), (error: Error) => {
@@ -87,7 +89,7 @@ export default class PGDB extends DataHandler {
                     )`);
                     resolve();
                 } else {
-                    console.log(`[Server:DB] Failed to query: ${error.message}`);
+                    this.logHandler.error('Failed to query users', new LogMetaData('pgdb', error));
                     reject(error);
                 }
             });
@@ -593,7 +595,7 @@ export default class PGDB extends DataHandler {
                             if (old.filePath != item.filePath && old.filePath != '') {
                                 fs.rm(old.filePath, (error) => {
                                     if (error) {
-                                        console.log(`[Server:DB] Cleanup required (${old.filePath})`);
+                                        this.logHandler.warn(`Cleanup required for "${old.filePath}"`, new LogMetaData('pgdb', error));
                                         reject(error);
                                     } else {
                                         resolve1();
@@ -714,7 +716,7 @@ export default class PGDB extends DataHandler {
                 if (item.filePath != '') {
                     fs.rm(item.filePath, (error) => {
                         if (error) {
-                            console.log(`[Server:DB] Cleanup required (${item.filePath})`);
+                            this.logHandler.warn(`Cleanup required for "${item.filePath}"`, new LogMetaData('pgdb', error));
                             reject(error);
                         } else {
                             resolve1();
