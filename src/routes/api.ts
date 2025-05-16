@@ -398,7 +398,7 @@ function data(dataHandler: DataHandler): Router {
                             return dataHandler.addTag(new Tag(req.body.name, tagType.name, parent ? parent.name : ''));
                         } else {
                             word = 'updated';
-                            return dataHandler.updateTag(new Tag(req.body.name, tagType.name, parent ? parent.name : ''));
+                            return dataHandler.updateTag(new Tag(req.body.name, tagType.name, parent ? parent.name : ''), true);
                         }
                     }
                 }, (error: Error) => {

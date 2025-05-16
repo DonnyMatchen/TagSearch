@@ -450,7 +450,7 @@ export default class PGDB extends DataHandler {
                         if (prnt) {
                             parent = prnt;
                             prnt.addChild(tag.name);
-                            resolve1(this.updateTag(prnt));
+                            resolve1(this.updateTag(prnt, false));
                         }
                     });
                 } else {
@@ -528,7 +528,7 @@ export default class PGDB extends DataHandler {
             });
         });
     }
-    async updateTag(tag: Tag) {
+    async updateTag(tag: Tag, ignoreNewRefs: boolean) {
         return new Promise<void>((resolve, reject) => {
             this.getTag(tag.name).then(old => {
                 if (!old) {
@@ -538,7 +538,7 @@ export default class PGDB extends DataHandler {
                         if (old.parent != tag.parent && old.parent != '') {
                             this.getTag(old.parent).then(oldParent => {
                                 oldParent.removeChild(old.name);
-                                resolve1(this.updateTag(oldParent));
+                                resolve1(this.updateTag(oldParent, false));
                             });
                         } else {
                             resolve1();
@@ -548,7 +548,7 @@ export default class PGDB extends DataHandler {
                             if (old.parent != tag.parent && tag.parent != '') {
                                 this.getTag(tag.parent).then(newParent => {
                                     newParent.addChild(tag.name);
-                                    resolve1(this.updateTag(newParent));
+                                    resolve1(this.updateTag(newParent, false));
                                 });
                             } else {
                                 resolve1();
@@ -561,7 +561,7 @@ export default class PGDB extends DataHandler {
                                 for (let i = 0; i < tag.children.length; i++) {
                                     this.getTag(tag.children[i]).then(child => {
                                         child.type = tag.type;
-                                        children.push(this.updateTag(child));
+                                        children.push(this.updateTag(child, false));
                                     });
                                 }
                                 resolve1(Promise.all(children));
@@ -574,7 +574,7 @@ export default class PGDB extends DataHandler {
                             typ = '${this.sqlEscape(tag.type)}',
                             prnt = '${this.sqlEscape(tag.parent)}',
                             cldn = '${this.sqlEscape(tag.children.join(' '))}',
-                            refs = '${tag.refs.join(' ')}'
+                            refs = '${ignoreNewRefs ? old.refs.join(' ') : tag.refs.join(' ')}'
                             WHERE name = '${this.sqlEscape(tag.name)}'`;
                         this.client.query(query).then(result => {
                             resolve();
@@ -662,7 +662,7 @@ export default class PGDB extends DataHandler {
                         let tag = result.results[i];
                         if (tag.type == type.name) {
                             tag.type = 'default';
-                            altering.push(this.updateTag(tag));
+                            altering.push(this.updateTag(tag, false));
                         }
                     }
                     return Promise.all(altering);
@@ -692,7 +692,7 @@ export default class PGDB extends DataHandler {
                 return tag.getParent(this);
             }).then(parent => {
                 parent.removeChild(tag.name);
-                return this.updateTag(parent);
+                return this.updateTag(parent, false);
             }, error => reject(error)).then(() => {
                 return this.getItems(tag.refs);
             }).then(refs => {

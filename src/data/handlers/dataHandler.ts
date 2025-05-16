@@ -160,7 +160,7 @@ export default abstract class DataHandler {
      * If the tag doesn't exist, it is added instead.
      * @param tag the new tag to replace the old
      */
-    abstract updateTag(tag: Tag): Promise<void>;
+    abstract updateTag(tag: Tag, ignoreNewRefs: boolean): Promise<void>;
     /**
      * If the tag type doesn't exist, it is added instead.
      * @param type the new tag type to replace the old
@@ -432,12 +432,12 @@ export default abstract class DataHandler {
                 for (let i = 0; i < diff.removed.length; i++) {
                     let removed: Tag = fetched.get(diff.removed[i]);
                     removed.removeRef(ref);
-                    updating.push(this.updateTag(removed));
+                    updating.push(this.updateTag(removed, false));
                 }
                 for (let i = 0; i < diff.added.length; i++) {
                     let added: Tag = fetched.get(diff.added[i]);
                     added.addRef(ref);
-                    updating.push(this.updateTag(added));
+                    updating.push(this.updateTag(added, false));
                 }
 
                 return Promise.all(updating);

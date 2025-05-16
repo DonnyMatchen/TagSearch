@@ -96,29 +96,39 @@ export default function item(dataHandler: DataHandler): Router {
 async function getTagObject(dataHandler: DataHandler, tags: string[]): Promise<TagsCodex> {
     //let parents: Tag[] = [];
     let codex: TagsCodex = new TagsCodex(dataHandler);
-    let out: Tag[] = [];
 
     return new Promise<TagsCodex>((resolve, reject) => {
         let parents: string[] = [];
         let tagMap: Map<string, Tag> = new Map();
-        dataHandler.getTags(tags).then(async foundTags => {
+        let foundTags: Tag[] = [];
+        dataHandler.getTags(tags).then(found => {
+            foundTags = found;
+            let proxes: Promise<number>[] = [];
             for (let i = 0; i < foundTags.length; i++) {
-                let current = foundTags[i];
-                tagMap.set(current.name, current);
-                if (current.parent != '' && !parents.includes(current.parent)) {
-                    parents.push(current.parent);
+                proxes.push(foundTags[i].getProximity(dataHandler));
+            }
+            return Promise.all(proxes)
+        }).then(proxes => {
+            let map: Map<string, number> = new Map();
+            let max: number = 0;
+            for (let i = 0; i < foundTags.length; i++) {
+                map.set(foundTags[i].name, proxes[i]);
+                if (proxes[i] > max) {
+                    max = proxes[i];
                 }
             }
-            for (let i = 0; i < parents.length; i++) {
-                tagMap.delete(parents[i]);
+            let codexify: Promise<void>[] = [];
+            for (let i = 0; i <= max; i++) {
+                for (let j = 0; j < foundTags.length; j++) {
+                    if (map.get(foundTags[j].name) == i) {
+                        codexify.push(codex.add(foundTags[j].type, foundTags[j]));
+                    }
+                }
             }
-            let out = [...tagMap.values()];
-            out.sort((a, b) => a.name.localeCompare(b.name));
-            for (let i = 0; i < out.length; i++) {
-                await codex.add(out[i].type, out[i]);
-            }
+            return Promise.all(codexify);
+        }, err => reject(err)).then(() => {
             resolve(codex);
-        }, error => reject(error));
+        });
     });
 }
 
@@ -136,18 +146,27 @@ class TagsCodex {
             if (!this.codex.has(key)) {
                 this.codex.set(key, []);
             }
-            new Promise<void>((resolve1, reject1) => {
-                if (tag.parent != '') {
-                    tag.getParent(this.dataHandler).then(parent => resolve1(this.add(key, parent)));
-                } else {
-                    resolve1();
-                }
-            }).then(() => {
-                this.codex.get(key).push(tag);
-                return tag.getProximity(this.dataHandler)
-            }).then(prox => {
+            let current: Tag[] = this.codex.get(key);
+            tag.getProximity(this.dataHandler).then(prox => {
                 this.indents.set(tag.name, prox);
-                resolve();
+            }).then(() => {
+                let index: number = -1;
+                if (tag.parent != '') {
+                    for (let i = 0; i < current.length; i++) {
+                        if (current[i].name == tag.parent) {
+                            index = i + 1;
+                            break;
+                        }
+                    }
+                    if (index >= 0) {
+                        current.splice(index, 0, tag);
+                        resolve();
+                    }
+                }
+                if (index == -1) {
+                    current.push(tag);
+                    resolve();
+                }
             });
         });
     }
