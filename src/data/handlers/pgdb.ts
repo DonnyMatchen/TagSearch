@@ -11,6 +11,7 @@ import { Role, User } from '@da/user';
 import DataHandler from '@dh/dataHandler';
 import { LogMetaData } from '@utl/logHandler';
 import { Logger } from 'winston';
+import fileUpload from 'express-fileupload';
 
 export default class PGDB extends DataHandler {
     private pool: Pool;
@@ -755,11 +756,12 @@ export default class PGDB extends DataHandler {
     }
 
     //other
-    async reHost(tempFile: string, type: string, extension: string, id: number): Promise<string[]> {
+    async reHost(file: fileUpload.UploadedFile, id: number): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
-            let fileName = `${getRandomHexString(25)}_${id}${extension}`;
-            let newPath = path.join(__dirname, '..', 'public', 'items', fileName);
-            fs.rename(tempFile, newPath, (error) => {
+            let fileNameParts = (<string>file.name).split('.');
+            let fileName = `${getRandomHexString(25)}_${id}.${fileNameParts[fileNameParts.length - 1]}`;
+            let newPath = path.join(__dirname, '..', '..', 'public', 'items', fileName);
+            file.mv(newPath, (error) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -781,7 +783,7 @@ export default class PGDB extends DataHandler {
 
     private sqlEscape(unsafe: string): string {
         if (unsafe.includes("'")) {
-            return unsafe.replace("'", '\u0006');
+            return unsafe.replaceAll("'", '\u0006');
         } else {
             return unsafe;
         }
@@ -795,7 +797,7 @@ export default class PGDB extends DataHandler {
     }
     private sqlUnEscape(safe: string): string {
         if (safe.includes('\u0006')) {
-            return safe.replace('\u0006', "'");
+            return safe.replaceAll('\u0006', "'");
         } else {
             return safe;
         }

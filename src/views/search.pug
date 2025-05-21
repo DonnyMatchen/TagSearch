@@ -10,7 +10,7 @@ block layout-content
                         each item in rw
                             div.text-center.col-sm-2
                                 - if(item != undefined)
-                                    a.item(href=`/item?id=${item.id}&tags=${search.replace(' ', '+')}`)
+                                    a.item(href=`/item?id=${item.id}&tags=${search.split(' ').join('+')}`)
                                         -if(item.type == 0)
                                             img.width-snug(title=item.tags.join(" "), src=`${item.source}`)
                                         -else if(item.type == 1)

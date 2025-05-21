@@ -60,7 +60,8 @@ export function getItemType(src: string): ItemType {
         '.mp3',
         '.oga',
         '.wav',
-        '.weba'
+        '.weba',
+        '.m4a'
     ];
     let doc = [
         '.pdf',

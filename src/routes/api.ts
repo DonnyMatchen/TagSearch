@@ -302,8 +302,7 @@ function data(dataHandler: DataHandler): Router {
                                 }
                             });
                         } else {
-                            let fileNameParts = (<string>(<any>req.files['file']).name).split('.');
-                            return dataHandler.reHost((<any>req.files['file']).tempFilePath, (<any>req.files['file']).mimetype, `.${fileNameParts[fileNameParts.length - 1]}`, id);
+                            return dataHandler.reHost(req.files['file'], id);
                         }
                     }).then(src => {
                         let item = new Item(
@@ -316,7 +315,6 @@ function data(dataHandler: DataHandler): Router {
                             req.body.tags.trim().split(' '),
                             src[1]
                         );
-                        item.filePath = src[1];
                         if (req.body.state == 'new') {
                             return dataHandler.addItem(item);
                         } else {

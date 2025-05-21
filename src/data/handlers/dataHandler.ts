@@ -454,5 +454,5 @@ export default abstract class DataHandler {
      * @param type the mime type of the file
      * @returns the permanent file path after rehosting
      */
-    abstract reHost(tempFile: string, type: string, extension: string, id: number): Promise<string[]>;
+    abstract reHost(file: any, id: number): Promise<string[]>;
 }

@@ -42,7 +42,7 @@ html
                     div.col-sm-6.p-0
                         input#main-search.width-full.field.form-control(type='text' name='search' value=search oninput=`tagSuggest('main', true)`)
                     div.col-sm-3
-                        button#main-button.btn.gd-color(onclick=`window.location.href='/search?tags='+document.getElementById('main-search').value.replace(' ', '+');`) Go
+                        button#main-button.btn.gd-color(onclick=`window.location.href='/search?tags='+document.getElementById('main-search').value.split(' ').join('+');`) Go
                 div.col-sm-2
             nav.row
                 div.col-sm-8

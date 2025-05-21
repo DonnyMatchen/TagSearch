@@ -11,21 +11,21 @@ block layout-content
                         div (None)
                     - else
                         div
-                            a(style=`color: ${args.codex.type.getColorString(config.tagLum)}`, href=`/tag?name=${args.tag.parent}`)= args.tag.parent
+                            a(style=`color: ${args.codex.type.getColorString(config.tagLum)}`, href=`/tag?name=${args.tag.parent}`)= args.tag.parent.split('_').join(' ')
                     h3.mt-3 Children
                     -if(args.tag.children.length == 0)
                         div (None)
                     -else
                         each child in args.tag.children
                             div
-                                a(style=`color: ${args.codex.type.getColorString(config.tagLum)}`, href=`/tag?name=${child}`)= child
+                                a(style=`color: ${args.codex.type.getColorString(config.tagLum)}`, href=`/tag?name=${child}`)= child.split('_').join(' ')
                     h3.mt-3 Siblings
                     -if(args.codex.siblings.length == 0)
                         div (None)
                     -else
                         each sibling in args.codex.siblings
                             div
-                                a(style=`color: ${args.codex.type.getColorString(config.tagLum)}`, href=`/tag?name=${sibling}`)= sibling
+                                a(style=`color: ${args.codex.type.getColorString(config.tagLum)}`, href=`/tag?name=${sibling}`)= sibling.split('_').join(' ')
                 div.col-sm-5.box.ps-3.pe-3.pb-3
                     -if(user != undefined && user.role >= 2)
                         h3.mt-3 Options
@@ -37,7 +37,7 @@ block layout-content
                     h3.mt-3 Item Count
                     a(href=`/search?tags=${args.tag.name}`)= args.tag.refs.length
                     h3.mt-3 Link
-                    a(href=`/tag?name=${args.tag.name}`)= `/tag?name=${args.tag.name}`
+                    a(href=`/tag?name=${args.tag.name}`)= `/tag?name=${args.tag.name.split('_').join(' ')}`
                 div.col-sm-1
     - else
         h2 The specified tag could not be loaded or does not exist

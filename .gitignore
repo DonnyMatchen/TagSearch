@@ -7,5 +7,6 @@
 /tlsCert/*
 
 /src/test.html
+/src/test.js
 
 /src/public/items/*
