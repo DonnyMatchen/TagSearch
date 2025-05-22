@@ -28,7 +28,7 @@ block layout-content
                     div.row.mb-1.text-center
                         div.col-sm-3
                         div.col-sm-2
-                            a(href=`/tag?name=${tag.name}`)= tag.name.split('_').join(' ')
+                            a(href=`/tag?name=${tag.name}`)= tag.name.replaceAll('_', ' ')
                         div.col-sm-2
                             a(style=`color: ${args.types.get(tag.type).getColorString(config.tagLum)};`, href=`/search/tagTypes?tagTypeMatch=${tag.type}`)= tag.type
                         div.col-sm-2= tag.refs.length
